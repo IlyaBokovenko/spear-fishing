@@ -29,10 +29,11 @@ public class FishSeekingBehaviour : FishBehaviour {
         if(isFlee)
             direction = Vector3.zero - direction;     
 
-        velocityMatcher.velocity = direction * maxSpeed;
+        velocityMatcher.velocity = direction * maxSpeed;        
         
+        SteeringOutput ret = velocityMatcher.GetSteering();
         Profiler.EndProfile(PT.Seeking);
-        return velocityMatcher.GetSteering();
+        return ret;
     }
 
 }
