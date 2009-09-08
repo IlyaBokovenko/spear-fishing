@@ -1,0 +1,23 @@
+using UnityEngine;
+using System.Collections;
+
+public class VelocityMatching : FishBehaviour {
+    public Vector3 velocity;
+    public float timeToMatch = 0.1f;
+    public float maxAcceleration = 10;
+    
+    void Start(){}
+    
+    public override SteeringOutput GetSteering(){
+       Profiler.StartProfile(PT.Velocity);
+        
+       Vector3 fromVelocity = rigidbody.velocity;
+       Vector3 toVelocity = velocity;
+       Vector3 delta = toVelocity - fromVelocity;        
+       Vector3 acceleration = delta / timeToMatch;
+        
+        acceleration = Utils.ClampMagnitude(acceleration, 0, maxAcceleration);        
+        Profiler.EndProfile(PT.Velocity);
+        return SteeringOutput.WithForce(acceleration);
+    }
+}
