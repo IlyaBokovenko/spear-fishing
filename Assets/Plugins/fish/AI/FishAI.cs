@@ -61,7 +61,7 @@ public class FishAI : MonoBehaviour, IHittable
 	    isDead = true;
 	}
 	
-    static SteeringOutput steering = SteeringOutput.empty;
+    // static SteeringOutput steering = SteeringOutput.empty;
 
 	private void ExecuteRootBehaviours(){
 	    Profiler.StartProfile(PT.ExecBehs);
@@ -88,7 +88,7 @@ public class FishAI : MonoBehaviour, IHittable
                 if(!beh.enabled)
                     continue;
 		
-                // SteeringOutput steering  =  beh.GetSteering();        
+                SteeringOutput steering  =  beh.GetSteering();        
                 
                 if(!steering.Significant())
                     continue;
