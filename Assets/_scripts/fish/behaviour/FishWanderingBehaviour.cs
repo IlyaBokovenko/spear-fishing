@@ -3,10 +3,10 @@ using System.Collections;
 
 public class FishWanderingBehaviour : FishArbitratedBehaviour {
     public float wanderOffset = 60f;
-    public float wanderRadiusXZ = 10f;
+    public float wanderRadiusXZ = 20f;
     public float wanderRadiusY = 30f;
-    public float wanderRate = 5f;
-
+    public float wanderRate = 3f;
+ 
     private GameObject invisiblePole;
     private GameObject invisibleCarrot;
     private FishSeekingBehaviour seeking;

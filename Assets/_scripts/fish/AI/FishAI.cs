@@ -4,6 +4,8 @@ using System;
 
 public class FishAI : MonoBehaviour, IHittable
 {
+    // public float updatePeriod = 1f;
+    
 	private bool isDead = false;
 	private Vector3 originalScale;
 	private float size = 0.0f;
