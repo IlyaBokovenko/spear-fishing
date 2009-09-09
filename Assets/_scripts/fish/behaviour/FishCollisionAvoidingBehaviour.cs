@@ -16,6 +16,7 @@ public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
 	void Start () {
 	    seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
 	    seekingTarget = new GameObject("collision avoidance target");
+	    seekingTarget.transform.parent = transform;
 	    seeking.target = seekingTarget;
 	}
 	
@@ -25,11 +26,14 @@ public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
 	    
 	    RaycastHit hit;
 	    float distance = rigidbody.velocity.magnitude * timeToThinkAhead;
-	    bool collided = Physics.Raycast (transform.position, rigidbody.velocity, out hit, distance);
+	    int layerMask = 1 << gameObject.layer;
+	    layerMask = ~layerMask;
+	    bool collided = Physics.Raycast (transform.position, rigidbody.velocity, out hit, distance, layerMask);
 	    if(collided){
 	        seekingTarget.transform.position = hit.point + hit.normal * minDistance;
 	        return seeking.GetSteering();
 	    }else{
+	        seekingTarget.transform.position = transform.position;
 	        return SteeringOutput.empty;
 	    }
 	    
