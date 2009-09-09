@@ -6,7 +6,9 @@ public enum PT{
     Wandering,
     ExecBehs,
     Seeking,
-    Velocity
+    Velocity,
+    Yawing,
+    Idle
 }
 
 public class Profiler

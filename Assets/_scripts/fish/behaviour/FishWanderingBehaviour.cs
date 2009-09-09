@@ -2,14 +2,16 @@ using UnityEngine;
 using System.Collections;
 
 public class FishWanderingBehaviour : FishArbitratedBehaviour {
-    float wanderOffset = 60f;
-    float wanderRadiusXZ = 10f;
-    float wanderRadiusY = 30f;
-    float wanderRate = 5f;
+    public float wanderOffset = 60f;
+    public float wanderRadiusXZ = 10f;
+    public float wanderRadiusY = 30f;
+    public float wanderRate = 5f;
 
     private GameObject invisiblePole;
     private GameObject invisibleCarrot;
     private FishSeekingBehaviour seeking;
+    
+    // private GameObject helper;
 
     void Start(){
         CreatePoleWithCarrot();
@@ -17,17 +19,13 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
         seeking.target = invisibleCarrot;        
     }
 
-    // function FixedUpdate(){
-    //     GetSteering().ApplyTo(gameObject);
-    // }
-
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.Wandering);
 
         if(!invisiblePole)
             return SteeringOutput.empty;
 
-        // UpdatePole();
+        UpdatePolePosition();
         ShuffleCarrot();        
 
         SteeringOutput ret = seeking.GetSteering();
@@ -54,30 +52,42 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
     }
 
 ////////////////////////////////////////////////////////////////////////
-    void UpdatePole(){
+    void UpdatePolePosition(){
         if(!invisiblePole)
-            return;
+            return;            
 
         Vector3 fishDirection = transform.forward; 
         fishDirection.y = 0;
         fishDirection = fishDirection.normalized;
-        invisiblePole.transform.position = transform.position + fishDirection * wanderOffset;
-
+        invisiblePole.transform.position = transform.position + fishDirection * wanderOffset; 
+        invisiblePole.transform.rotation = Quaternion.identity;
+    }
+    
+    void UpdatePoleScale(){
+        if(!invisiblePole)
+            return;            
+        
         Vector3 selfScale = new Vector3(wanderRadiusXZ, wanderRadiusY, wanderRadiusXZ);
         Vector3 parentScale = transform.lossyScale;
         Vector3 invertedParentScale = Vector3.zero;
         invertedParentScale.x = 1/parentScale.x; invertedParentScale.y = 1/parentScale.y; invertedParentScale.z = 1/parentScale.z;
-        invisiblePole.transform.localScale = Vector3.Scale(invertedParentScale, selfScale);
+        invisiblePole.transform.localScale = Vector3.Scale(invertedParentScale, selfScale);        
     }
 
     private void CreatePoleWithCarrot(){
         invisiblePole = new GameObject("Pole with carrot");
         invisiblePole.transform.parent = transform;
-        UpdatePole();
-
+        
         invisibleCarrot = new GameObject("Invisible carrot");        
         invisibleCarrot.transform.parent = invisiblePole.transform;
         invisibleCarrot.transform.localPosition = Vector3.forward;        
+        
+        // helper = (GameObject)GameObject.CreatePrimitive(PrimitiveType.Cube);
+        // helper.transform.parent = invisiblePole.transform;
+        // helper.transform.localScale = new Vector3(2, 2, 2);
+
+        UpdatePoleScale();
+        UpdatePolePosition();                
     }
 
     private void ShuffleCarrot(){

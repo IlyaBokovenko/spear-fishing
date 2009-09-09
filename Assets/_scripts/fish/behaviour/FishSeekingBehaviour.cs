@@ -4,7 +4,7 @@ using System.Collections;
 public class FishSeekingBehaviour : FishBehaviour {
     public GameObject target;
     public float maxSpeed = 3;
-    public bool isFlee= false;
+    public bool isFlee = false;
     
     private VelocityMatching velocityMatcher;
 

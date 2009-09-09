@@ -6,7 +6,7 @@ public interface IHittable{
 }
 
 public class Spear : MonoBehaviour {
-	float lifetime = 10;
+	public float lifetime = 10;
 	
 	private bool isFlying = true;
 	private float flyStartTime;

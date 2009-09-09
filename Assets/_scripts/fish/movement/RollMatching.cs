@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 public class RollMatching : FishBehaviour {
-    float roll = 0f;
-    float speed = 100f;    
+    public float roll = 0f;
+    public float speed = 100f;    
 
     public override SteeringOutput GetSteering (){  
         Vector3 up  = Quaternion.Euler(0, 0, roll) * Vector3.up;
