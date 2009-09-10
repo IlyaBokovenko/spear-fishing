@@ -4,7 +4,6 @@ using System.Collections;
 public class SpawnFish : MonoBehaviour {
     public GameObject fishSample;
     public int population  = 20;
-    public Vector3 spawnVolumeCenter  = new Vector3(50, 50, 50);
     public Vector3 spawnVolumeBounds  = new Vector3(50, 50, 50);
 
     void Update () {    
@@ -16,6 +15,11 @@ public class SpawnFish : MonoBehaviour {
         while(IsNeedToSpawn())
             Spawn();
     }
+    
+    private void OnDrawGizmosSelected(){    
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(transform.position, spawnVolumeBounds);
+	}
 
     ////////////////////////////////////////////////////////////////////////
 
@@ -46,6 +50,6 @@ public class SpawnFish : MonoBehaviour {
     Vector3 SpawnPoint(){
         Vector3 randomPointInUnitCube = new Vector3(Random.value, Random.value, Random.value);
         Vector3 randomPointAround0 = randomPointInUnitCube - new Vector3(0.5f, 0.5f, 0.5f);
-        return spawnVolumeCenter + Vector3.Scale(randomPointAround0, spawnVolumeBounds);
+        return transform.position + Vector3.Scale(randomPointAround0, spawnVolumeBounds);
     }
 }
