@@ -34,26 +34,34 @@ public class FishEscapeBehaviour : FishArbitratedBehaviour
     }
 
     public override SteeringOutput GetSteering () {        
+        Profiler.StartProfile(PT.Escape);
+        
+        SteeringOutput ret;
 
         if(!seeking || !target)
-            return SteeringOutput.empty;
-
-        if(Vector3.Distance(transform.position, target.transform.position) < safetyDistance ){
-            if(!isEscaping){
-                startEscapingTime = Time.time;
+            ret = SteeringOutput.empty;
+        else{
+            if(Vector3.Distance(transform.position, target.transform.position) < safetyDistance ){
+                if(!isEscaping){
+                    startEscapingTime = Time.time;
+                }
+                isEscaping = true;
             }
-            isEscaping = true;
-        }
 
-        if(Time.time - startEscapingTime > panicTime){
-            isEscaping = false;
-        }    
+            if(Time.time - startEscapingTime > panicTime){
+                isEscaping = false;
+            }    
 
-        if(isEscaping)
-        {
-            return seeking.GetSteering();
-        }else{
-            return SteeringOutput.empty;
+            if(isEscaping)
+            {
+                ret = seeking.GetSteering();
+            }else{
+                ret = SteeringOutput.empty;
+            }            
         }
+        
+        Profiler.EndProfile(PT.Escape);
+        
+        return ret;
     }   
 }

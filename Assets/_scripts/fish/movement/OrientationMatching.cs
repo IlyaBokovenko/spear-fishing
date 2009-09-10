@@ -10,6 +10,8 @@ public class OrientationMatching : FishBehaviour {
     public float matchTime = 0.1f;
     
     public override SteeringOutput GetSteering (){
+        Profiler.StartProfile(PT.OrientationMatching);
+        
         Vector3 fromHeading = transform.forward;
         Vector3 toHeading = orientation;
         Vector3 delta = Quaternion.FromToRotation(fromHeading, toHeading).eulerAngles;        
@@ -24,6 +26,8 @@ public class OrientationMatching : FishBehaviour {
         Vector3 acceleration = deltaVelocity / matchTime;
         
         acceleration = Utils.ClampComponents(acceleration, -maxAcceleration, maxAcceleration);
+        
+        Profiler.EndProfile(PT.OrientationMatching);
         
         return SteeringOutput.WithTorque(acceleration * Mathf.Deg2Rad);   
     }

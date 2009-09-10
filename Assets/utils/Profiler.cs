@@ -8,7 +8,15 @@ public enum PT{
     Seeking,
     Velocity,
     Yawing,
-    Idle
+    Idle,
+    CollisionAvoiding,
+    LookAhead,
+    RollMatching,
+    OrientationMatching,
+    Escape,
+    CA_Cast,
+    CA_Change,
+    CA_Process
 }
 
 public class Profiler

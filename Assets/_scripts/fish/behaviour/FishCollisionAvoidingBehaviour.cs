@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections;
 
-public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
+public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {   
+    
+    
     public float timeToThinkAhead = 3f;
     public float minDistance = 2f;
 
@@ -9,6 +11,9 @@ public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
     public float whiskersAngle = 30f;    
     public float whiskersLength = 1.0f;
     public float timeToKeepAvoiding = 0.5f;
+    
+    public float  raycastPeriod = 0.3f;
+    private float lastCastTime = 0.0f;
     
     enum State{
         Idle,
@@ -20,6 +25,8 @@ public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
         
     private FishSeekingBehaviour seeking;
     private GameObject seekingTarget;
+    
+    private bool isCollided = false;
     private RaycastHit hit;
     
     private Line[] whiskers;
@@ -37,19 +44,21 @@ public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
 	    seekingTarget.transform.parent = transform;
 	    seeking.target = seekingTarget;	    
 	    
-	    whiskers = CreateWhiskers();
+	    whiskers = CreateWhiskers();	    
 	}
 	
 	public override SteeringOutput GetSteering(){
-	    if(!seeking)
-	        return SteeringOutput.empty;	        
+	    Profiler.StartProfile(PT.CollisionAvoiding);
 	    
-
-        if(Utils.Approximately(rigidbody.velocity.magnitude, 0.0f))
-            return SteeringOutput.empty;
-
-        ChangeState();
-        ProcessState();
+	    if(!seeking || Utils.Approximately(rigidbody.velocity.magnitude, 0.0f))
+	        steering = SteeringOutput.empty;
+	    else{
+	        TryCheckCollisions();
+            ChangeState();
+            ProcessState();
+	    }        
+        
+        Profiler.EndProfile(PT.CollisionAvoiding);
         
         return steering;
 	}
@@ -80,9 +89,8 @@ public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
 	    return ret;    
 	}
 	
-	private void ChangeState(){
-	    bool collided = CheckCollisions(out hit);
-        if(collided){
+	private void ChangeState(){	    
+        if(isCollided){
             state = State.Avoiding;
             lastCollisionTime = Time.time;
         }else{
@@ -117,17 +125,22 @@ public class FishCollisionAvoidingBehaviour : FishArbitratedBehaviour {
 	    return collided;
 	}
 	
-	private bool CheckCollisions(out RaycastHit hit){
-	    bool collided = Cast(MainRay(), out hit);        
-        if(!collided){
+	private void CheckCollisions(){
+	    isCollided = Cast(MainRay(), out hit);        
+        if(!isCollided){
             foreach(Line line in whiskers){
-                collided = Cast(line, out hit);
-                if(collided)
+                isCollided = Cast(line, out hit);
+                if(isCollided)
                     break;
             }
-        }
-        
-        return collided;        
+        }        
+	}
+	
+	private void TryCheckCollisions(){
+	    if(Time.time - lastCastTime > raycastPeriod){
+	        CheckCollisions();
+	        lastCastTime = Time.time;
+	    }
 	}
 	
 	private void OnDrawGizmosSelected(){    

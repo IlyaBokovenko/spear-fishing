@@ -4,7 +4,8 @@ using System;
 
 public class FishAI : MonoBehaviour, IHittable
 {
-    // public float updatePeriod = 1f;
+    public float updatePeriod = 0.1f;
+    private float lastUpdateTime = 0.0f;
     
 	private bool isDead = false;
 	private Vector3 originalScale;
@@ -27,7 +28,7 @@ public class FishAI : MonoBehaviour, IHittable
 	   
 	void FixedUpdate () {
        if(!isDead)
-           ExecuteRootBehaviours();
+           TryExecuteBehaviours();
 	}
 	
 	///// IHittable
@@ -101,6 +102,13 @@ public class FishAI : MonoBehaviour, IHittable
 	    }
 	    
 	    Profiler.EndProfile(PT.ExecBehs);    
+	}
+	
+	private void TryExecuteBehaviours(){
+	    if(Time.time - lastUpdateTime > updatePeriod){
+	        ExecuteRootBehaviours();
+	        lastUpdateTime = Time.time;
+	    }
 	}
 
 	private void GatherRootBehaviours(){

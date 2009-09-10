@@ -22,16 +22,19 @@ public class FishSeekingBehaviour : FishBehaviour {
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.Seeking);
         
-        if(!velocityMatcher || !target)
-            return new SteeringOutput();        
-            
-        Vector3 direction = (target.transform.position - transform.position).normalized;
-        if(isFlee)
-            direction = Vector3.zero - direction;     
-
-        velocityMatcher.velocity = direction * maxSpeed;        
+        SteeringOutput ret;
         
-        SteeringOutput ret = velocityMatcher.GetSteering();
+        if(!velocityMatcher || !target)
+            ret = SteeringOutput.empty;        
+        else{
+            Vector3 direction = (target.transform.position - transform.position).normalized;
+            if(isFlee)
+                direction = Vector3.zero - direction;     
+
+            velocityMatcher.velocity = direction * maxSpeed;
+            ret = velocityMatcher.GetSteering();            
+        }
+            
         Profiler.EndProfile(PT.Seeking);
         return ret;
     }

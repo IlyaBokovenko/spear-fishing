@@ -6,6 +6,8 @@ public class RollMatching : FishBehaviour {
     public float speed = 100f;    
 
     public override SteeringOutput GetSteering (){  
+        Profiler.StartProfile(PT.RollMatching);
+        
         Vector3 up  = Quaternion.Euler(0, 0, roll) * Vector3.up;
         up = transform.InverseTransformDirection(up);
         up.z = 0;
@@ -15,7 +17,9 @@ public class RollMatching : FishBehaviour {
         
         float torque = delta * speed;
         
-        return SteeringOutput.WithRelativeTorque(new Vector3(0, 0, torque) * Mathf.Deg2Rad);
+        Profiler.EndProfile(PT.RollMatching);
+        
+        return SteeringOutput.WithRelativeTorque(new Vector3(0, 0, torque) * Mathf.Deg2Rad);        
     }
     
     public void Start() {}

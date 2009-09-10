@@ -14,7 +14,9 @@ public class FishLookAheadBehaviour : FishBehaviour
         base.SelfDestroy();
     }
 
-    public override SteeringOutput GetSteering(){
+    public override SteeringOutput GetSteering(){        
+        Profiler.StartProfile(PT.LookAhead);
+        
         if(!orientationMatcher)
             return SteeringOutput.empty;
 
@@ -23,6 +25,10 @@ public class FishLookAheadBehaviour : FishBehaviour
         else
             orientationMatcher.orientation = transform.forward;
 
-        return orientationMatcher.GetSteering();
+        SteeringOutput ret = orientationMatcher.GetSteering();
+        
+        Profiler.EndProfile(PT.LookAhead);
+        
+        return ret;
     }
 }

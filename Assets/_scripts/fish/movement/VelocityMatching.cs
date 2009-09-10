@@ -19,7 +19,9 @@ public class VelocityMatching : FishBehaviour {
         acceleration = Utils.ClampMagnitude(acceleration, 0, maxAcceleration);        
         
         SteeringOutput ret = SteeringOutput.WithForce(acceleration);
+        
         Profiler.EndProfile(PT.Velocity);
+        
         return ret;
     }
 }

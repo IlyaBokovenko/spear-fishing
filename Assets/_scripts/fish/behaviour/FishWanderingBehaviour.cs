@@ -11,8 +11,6 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
     private GameObject invisibleCarrot;
     private FishSeekingBehaviour seeking;
     
-    // private GameObject helper;
-
     void Start(){
         CreatePoleWithCarrot();
         seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
@@ -21,15 +19,20 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
 
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.Wandering);
+        
+        SteeringOutput ret;
 
         if(!invisiblePole)
-            return SteeringOutput.empty;
+            ret = SteeringOutput.empty;
+        else{
+            UpdatePolePosition();
+            ShuffleCarrot();        
 
-        UpdatePolePosition();
-        ShuffleCarrot();        
+            ret = seeking.GetSteering();            
+        }
+        
+        Profiler.EndProfile(PT.Wandering);             
 
-        SteeringOutput ret = seeking.GetSteering();
-        Profiler.EndProfile(PT.Wandering); 
         return ret;
     }
 
@@ -80,12 +83,8 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
         
         invisibleCarrot = new GameObject("Invisible carrot");        
         invisibleCarrot.transform.parent = invisiblePole.transform;
-        invisibleCarrot.transform.localPosition = Vector3.forward;        
+        invisibleCarrot.transform.localPosition = Random.insideUnitSphere;        
         
-        // helper = (GameObject)GameObject.CreatePrimitive(PrimitiveType.Cube);
-        // helper.transform.parent = invisiblePole.transform;
-        // helper.transform.localScale = new Vector3(2, 2, 2);
-
         UpdatePoleScale();
         UpdatePolePosition();                
     }

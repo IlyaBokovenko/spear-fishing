@@ -36,20 +36,10 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 	
 	public override SteeringOutput GetSteering(){
 		if(!seeking || !target)
-		    return new SteeringOutput();
+		    return SteeringOutput.empty;
 		    
 		ChangeState();
-		    
-		
-		switch(state){
-			case State.Calm:
-				return new SteeringOutput();
-			case State.Pursue:
-			case State.Biting:
-				return seeking.GetSteering();
-			default:
-				return SteeringOutput.empty;
-		}
+		return ProcessState();		
 	}
 	
 	private void ChangeState(){
@@ -68,5 +58,17 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 		     		state = State.Calm;      			
       			break;
 		}
+	}
+	
+	private SteeringOutput ProcessState(){
+	    switch(state){
+			case State.Calm:
+				return SteeringOutput.empty;
+			case State.Pursue:
+			case State.Biting:
+				return seeking.GetSteering();
+			default:
+				return SteeringOutput.empty;
+		}		
 	}
 }
