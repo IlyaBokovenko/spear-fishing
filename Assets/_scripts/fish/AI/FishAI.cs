@@ -13,7 +13,7 @@ public class FishAI : MonoBehaviour, IHittable
 
 	private FishBehaviour[] rootNonArbitratedBehaviours;
 	private FishArbitratedBehaviour[][] rootArbitratedBehaviours;
-
+	
 	void Awake(){
 	    GatherRootBehaviours(); 
 		// PrintBehaviours();
@@ -60,6 +60,13 @@ public class FishAI : MonoBehaviour, IHittable
     
 	    foreach(GenericScript elem in GetComponentsInChildren(typeof(FishAnimation)))
 	        elem.SelfDestroy();
+	        
+
+	    foreach(Animation elem in GetComponentsInChildren(typeof(Animation)))
+	        Destroy(elem);
+
+	    rigidbody.useGravity = true;
+	    rigidbody.drag = 10;
         
 	    isDead = true;
 	}
@@ -68,7 +75,7 @@ public class FishAI : MonoBehaviour, IHittable
 
 	private void ExecuteRootBehaviours(){
 	    Profiler.StartProfile(PT.ExecBehs);
-	
+	    
         // execute non-arbitrated behaviours
         foreach(FishBehaviour beh in rootNonArbitratedBehaviours){
                  if(!beh.enabled)

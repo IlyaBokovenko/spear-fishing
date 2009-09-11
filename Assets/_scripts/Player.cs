@@ -9,11 +9,6 @@ public class Player : MonoBehaviour
 
     public float speed  = 4; 
 
-    // void Start(){
-    //     Fire();
-    // }
-
-
     void Awake() {
         Screen.SetResolution(480, 320, true);
     }

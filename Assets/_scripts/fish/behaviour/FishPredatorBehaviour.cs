@@ -1,74 +1,150 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
+[RequireComponent(typeof(Nose))]
 public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
-	
-	private enum State{
-		Calm,
-		Pursue,
-		Biting
-	}
-	
-	public GameObject target;
-	public float pursueSpeed = 12;
-	public float pursueTime = 10;
-	public float biteDistance = 0.2f;
-	public float biteTime = 3;
-	
-	private State state = State.Calm;
-	private float biteStartTime;
-	private float pursueStartTime;
-	
-	private FishSeekingBehaviour seeking;
-	
-	void Start(){
-		target = GameObject.FindWithTag("Player");
-		
-        seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
-        seeking.target = target;
-        seeking.maxSpeed = pursueSpeed;
-	}
+    
+    public float huntPeriod = 1f;
+    
+    public float maxHuntDistance = 10;
+    public float restTime = 20f;
 
-	 public void OnHit(Spear spear){  
-		pursueStartTime = Time.time;
-		state = State.Pursue;			
-	}	
+    private SteeringOutput steering;
+    
+    private Transform _transform;
+    private static readonly int preysLayerMask;    
+    
+    private enum State
+    {
+        Tracking,
+        Hunting,
+        Rest
+    }
+    private State state;
+    
+    private FishHuntingTargetBehaviour hunting;
+    
+    private Vector3 nose;
+    
+    static FishPredatorBehaviour(){
+        preysLayerMask = 1 << LayerMask.NameToLayer("Preys");
+    }
+    
+    FishPredatorBehaviour(){
+        priority = 1;
+    }
+    
+    public override string ToString(){
+        return base.ToString() + ": " + Enum.GetName(typeof(State), state);
+    }
+    
+    void Awake(){
+        nose = ((Nose)GetComponent(typeof(Nose))).position;
+    }
+    
+    void Start(){
+        _transform = transform;
+        EnterTracking();
+    }    
+    
+    void OnDrawGizmosSelected(){    
+        if(!enabled)
+            return;
+        
+        if(state == State.Tracking){
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, maxHuntDistance);        
+        }else if(state == State.Hunting){
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.TransformPoint(nose), 
+                hunting.target.transform.position);
+        }
+    }
+
+     public void OnHit(Spear spear){  
+        ExitCurrentState();
+        GameObject player = GameObject.FindWithTag("Player");
+        EnterHunting(player);	     
+	}
 	
 	public override SteeringOutput GetSteering(){
-		if(!seeking || !target)
-		    return SteeringOutput.empty;
-		    
-		ChangeState();
-		return ProcessState();		
-	}
+	    ChangeState();
+	    ProcessState();
+	    
+	    return steering;
+	}	
 	
 	private void ChangeState(){
-       	switch(state){
-			case State.Pursue:
-				if(Time.time - pursueStartTime > pursueTime)
-					state = State.Calm;       			
-			      		
-		      	if(Vector3.Distance(transform.position, target.transform.position) < biteDistance){
-		       	 	biteStartTime = Time.time;
-		       	 	state = State.Biting;
-		       	}
-		       	break;
-	     	case State.Biting:
-		     	if(Time.time - biteStartTime > biteTime)
-		     		state = State.Calm;      			
-      			break;
-		}
+	    if(state == State.Hunting){
+    	    if(hunting.state == FishHuntingTargetBehaviour.State.Calm){
+    	        ExitCurrentState();
+    	        if(hunting.succeed){        	            
+    	            EnterRest();
+    	        }else{
+    	            EnterTracking();
+    	        }    	        
+    	    }
+	    }
 	}
 	
-	private SteeringOutput ProcessState(){
-	    switch(state){
-			case State.Calm:
-				return SteeringOutput.empty;
-			case State.Pursue:
-			case State.Biting:
-				return seeking.GetSteering();
-			default:
-				return SteeringOutput.empty;
-		}		
+	private void ProcessState(){
+	    if(state == State.Hunting){
+	        steering = hunting.GetSteering();	        
+	    }else{
+	        steering = SteeringOutput.empty;
+	    }
 	}
+	
+	private void EnterTracking(){
+	   state = State.Tracking;
+	   InvokeRepeating("HuntAttempt", 0, huntPeriod);
+	}
+	
+	private void ExitTracking(){
+	    CancelInvoke();
+	}
+	
+	private void EnterHunting(GameObject prey){	    
+	    hunting = (FishHuntingTargetBehaviour)gameObject.AddComponent(typeof(FishHuntingTargetBehaviour));
+	    hunting.target = prey; 
+	    state = State.Hunting;	    
+	}
+		
+	private void ExitHunting(){
+        hunting.SelfDestroy();        
+	}
+	
+	private void EnterRest(){
+	    state = State.Rest;
+	    Invoke("EnterTracking", restTime);
+	}
+	
+	private void ExitRest(){
+	    CancelInvoke();
+	}
+	
+	private void ExitCurrentState(){
+	    switch(state){
+	        case State.Rest:
+	            ExitRest();
+	            break;
+	        case State.Hunting:
+	            ExitHunting();
+	            break;
+	        case State.Tracking:
+	            ExitTracking();
+	            break;
+	    }
+	}
+	
+	private void HuntAttempt(){
+	    Collider[] potentialPreys = Physics.OverlapSphere(_transform.position, maxHuntDistance, preysLayerMask);	    
+	    if(potentialPreys.Length > 0){
+	        ExitCurrentState();
+	        EnterHunting(potentialPreys[0].gameObject);
+	    }	        
+	}
+	
+
 }
