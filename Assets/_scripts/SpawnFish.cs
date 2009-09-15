@@ -7,6 +7,8 @@ public class SpawnFish : MonoBehaviour {
     public Vector3 spawnVolumeBounds  = new Vector3(50, 50, 50);
     public float minSizeDeviation = 0.5f;
     public float maxSizeDeviation = 2.0f;
+    
+    private string cloneName;
 
     void Update () {    
         // while(IsNeedToSpawn())
@@ -32,6 +34,9 @@ public class SpawnFish : MonoBehaviour {
     void Spawn(){
         Quaternion rotation = Random.rotation;
         GameObject fish  = (GameObject)Instantiate(fishSample, SpawnPoint(), rotation);
+        cloneName = fish.name;
+        DeathNotifier notifier = (DeathNotifier)fish.AddComponent(typeof(DeathNotifier));
+        notifier.notefee = this;
         FishAI fishComponent  = (FishAI)fish.GetComponent(typeof(FishAI));
         float minPower = Mathf.Log(minSizeDeviation,2);
         float maxPower = Mathf.Log(maxSizeDeviation,2);
@@ -56,5 +61,12 @@ public class SpawnFish : MonoBehaviour {
         Vector3 randomPointInUnitCube = new Vector3(Random.value, Random.value, Random.value);
         Vector3 randomPointAround0 = randomPointInUnitCube - new Vector3(0.5f, 0.5f, 0.5f);
         return transform.position + Vector3.Scale(randomPointAround0, spawnVolumeBounds);
+    }
+    
+    void OnObjectDied(string objectName){
+      if(objectName.Equals(cloneName)) {          
+          Spawn();
+          print("population restored");
+      }
     }
 }
