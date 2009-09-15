@@ -10,9 +10,9 @@ public class SpawnFish : MonoBehaviour {
     
     private string cloneName;
 
-    IEnumerator Start(){
+    void Start(){
         for(int i = 0; i < population; i++){
-            yield return StartCoroutine("Spawn");
+            StartCoroutine("Spawn");
         }         
     }
     
@@ -38,7 +38,9 @@ public class SpawnFish : MonoBehaviour {
         fishComponent.setSize(Mathf.Pow(2, power));               
         
         while(true){
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(3f);
+            if(fish == null)
+                yield return 0;
             Bounds b = new Bounds(transform.position, spawnVolumeBounds);
             if(b.Contains(fish.transform.position))
                 break;
@@ -55,9 +57,9 @@ public class SpawnFish : MonoBehaviour {
         return transform.position + Vector3.Scale(randomPointAround0, spawnVolumeBounds);
     }
     
-    IEnumerator OnObjectDied(string objectName){
+    void OnObjectDied(string objectName){
         if(objectName.Equals(cloneName)) {            
-            yield return StartCoroutine("Spawn");
+            StartCoroutine("Spawn");
         }
     }
 }
