@@ -4,10 +4,10 @@ using System.Collections;
 public class OrientationMatching : FishBehaviour {
 	
     public Vector3 orientation;
-    public float maxRotation  = 360f;
+    public float maxRotationSpeed  = 360f;
     public float slowAngle = 30f;
-    public float maxAcceleration = 500f;       
-    public float matchTime = 0.1f;
+    public float maxRotationAcceleration = 500f;       
+    public float timeToMatchOrientation = 0.1f;
     
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.OrientationMatching);
@@ -23,9 +23,9 @@ public class OrientationMatching : FishBehaviour {
             rotation *= angle / slowAngle;
 
         Vector3 deltaVelocity = rotation - rigidbody.angularVelocity * Mathf.Rad2Deg;        
-        Vector3 acceleration = deltaVelocity / matchTime;
+        Vector3 acceleration = deltaVelocity / timeToMatchOrientation;
         
-        acceleration = Utils.ClampComponents(acceleration, -maxAcceleration, maxAcceleration);
+        acceleration = Utils.ClampComponents(acceleration, -maxRotationAcceleration, maxRotationAcceleration);
         
         Profiler.EndProfile(PT.OrientationMatching);
         
@@ -38,11 +38,11 @@ public class OrientationMatching : FishBehaviour {
 
     private Vector3 calcRotation(Vector3  delta){
         float max = maxComponent(delta); 
-        if(Utils.Approximately(max, 0))
+        if(Utils.Approximately(max, 0.0f))
             return delta;
             
         Vector3 rotation = delta / max;
-        rotation *= maxRotation;
+        rotation *= maxRotationSpeed;
         return rotation;
     }
     

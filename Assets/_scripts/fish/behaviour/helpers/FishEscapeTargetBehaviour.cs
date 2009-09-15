@@ -1,27 +1,44 @@
 using UnityEngine;
 using System.Collections;
 
-public class FishEscapeBehaviour : FishArbitratedBehaviour
+public class FishEscapeTargetBehaviour : FishArbitratedBehaviour
 {    	
-    GameObject target;
+    private GameObject _target;
+    public GameObject target
+    {
+        get{return seeking ? seeking.target : _target;}
+        set{if(seeking) seeking.target = value; else _target = value;}
+    }
+    
     public float fleeSpeed  = 10;    
-    public float safetyDistance  = 3;
     public float panicTime  = 4;    
 
-    private bool isEscaping  = false;
+    public bool isEscaping  = true;
     private float startEscapingTime;    
 
     private FishSeekingBehaviour seeking;
+    
+    protected override ArrayList children
+    {
+        get {ArrayList ret = base.children; ret.Add(seeking); return ret; }
+    }	
+    
+    public override string ToString(){
+	    string ret = base.ToString();
+	    if(!isEscaping)
+	        ret += " (calm)";
+        return ret;
+	}	
+	
 
-    FishEscapeBehaviour(){
+    FishEscapeTargetBehaviour(){
         priority = 1;
     }
 
     void Start(){
-        target = GameObject.FindWithTag("Player");
-
+        startEscapingTime = Time.time;
         seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
-        seeking.target = target;
+        seeking.target = _target;
         seeking.isFlee = true;
         seeking.maxSpeed = fleeSpeed;
     }
@@ -41,13 +58,6 @@ public class FishEscapeBehaviour : FishArbitratedBehaviour
         if(!seeking || !target)
             ret = SteeringOutput.empty;
         else{
-            if(Vector3.Distance(transform.position, target.transform.position) < safetyDistance ){
-                if(!isEscaping){
-                    startEscapingTime = Time.time;
-                }
-                isEscaping = true;
-            }
-
             if(Time.time - startEscapingTime > panicTime){
                 isEscaping = false;
             }    

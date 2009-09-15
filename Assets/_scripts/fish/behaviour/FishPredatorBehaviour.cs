@@ -9,6 +9,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     
     public float maxHuntDistance = 10;
     public float restTime = 20f;
+    public float huntingSpeed = 12f;
 
     private SteeringOutput steering;
     
@@ -23,7 +24,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }
     private State state;
     
-    private FishHuntingTargetBehaviour hunting;
+    private FishHuntTargetBehaviour hunting;
     
     private Vector3 nose;
     
@@ -33,6 +34,11 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     
     FishPredatorBehaviour(){
         priority = 1;
+    }
+    
+    protected override ArrayList children
+    {
+        get {ArrayList ret = base.children; if(state == State.Hunting)ret.Add(hunting); return ret; }
     }
     
     public override string ToString(){
@@ -56,9 +62,10 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, maxHuntDistance);        
         }else if(state == State.Hunting){
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.TransformPoint(nose), 
-                hunting.target.transform.position);
+            if(hunting.target){
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(transform.TransformPoint(nose), hunting.target.transform.position);                
+            }
         }
     }
 
@@ -77,7 +84,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 	
 	private void ChangeState(){
 	    if(state == State.Hunting){
-    	    if(hunting.state == FishHuntingTargetBehaviour.State.Calm){
+    	    if(hunting.state == FishHuntTargetBehaviour.State.Calm){
     	        ExitCurrentState();
     	        if(hunting.succeed){        	            
     	            EnterRest();
@@ -106,8 +113,9 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 	}
 	
 	private void EnterHunting(GameObject prey){	    
-	    hunting = (FishHuntingTargetBehaviour)gameObject.AddComponent(typeof(FishHuntingTargetBehaviour));
+	    hunting = (FishHuntTargetBehaviour)gameObject.AddComponent(typeof(FishHuntTargetBehaviour));
 	    hunting.target = prey; 
+	    hunting.pursueSpeed = huntingSpeed;
 	    state = State.Hunting;	    
 	}
 		

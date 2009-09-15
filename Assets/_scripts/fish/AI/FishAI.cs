@@ -11,8 +11,13 @@ public class FishAI : MonoBehaviour, IHittable
 	private Vector3 originalScale;
 	private float size = 0.0f;
 
+    private ArrayList activeBehaviours;
 	private FishBehaviour[] rootNonArbitratedBehaviours;
-	private FishArbitratedBehaviour[][] rootArbitratedBehaviours;
+	private FishArbitratedBehaviour[][] rootArbitratedBehaviours;	
+	
+	private float deltaTime{
+	    get{return Time.time - lastUpdateTime;}
+	}
 	
 	void Awake(){
 	    GatherRootBehaviours(); 
@@ -38,6 +43,22 @@ public class FishAI : MonoBehaviour, IHittable
 	}
 	
 	///////////////
+	
+	public string BehavioursDescription(){
+	    if(activeBehaviours == null)
+	        return "";
+	        
+        string msg = "";        
+        foreach(FishBehaviour beh in activeBehaviours){
+            if(!beh)
+                continue;
+            if(beh.enabled)
+                msg += beh.ToStringWithChildren() + "\n";            
+        }
+        
+        return msg;	    
+	}
+    
 
 	public void setSize(float sz){    
 	    size = sz;
@@ -76,6 +97,8 @@ public class FishAI : MonoBehaviour, IHittable
 	private void ExecuteRootBehaviours(){
 	    Profiler.StartProfile(PT.ExecBehs);
 	    
+	    activeBehaviours = new ArrayList();
+	    
         // execute non-arbitrated behaviours
         foreach(FishBehaviour beh in rootNonArbitratedBehaviours){
                  if(!beh.enabled)
@@ -83,7 +106,8 @@ public class FishAI : MonoBehaviour, IHittable
          
          SteeringOutput steering = beh.GetSteering();
          if(steering.Significant())
-             steering.ApplyTo(gameObject);
+             steering.ApplyTo(gameObject, deltaTime);             
+             activeBehaviours.Add(beh);
         }
 	
 		// execute arbitrated behaviours
@@ -103,7 +127,8 @@ public class FishAI : MonoBehaviour, IHittable
                 if(!steering.Significant())
                     continue;
 		
-                steering.ApplyTo(gameObject);
+                steering.ApplyTo(gameObject, deltaTime);
+                activeBehaviours.Add(beh);
 				isAlreadyApplied = true;		
 			}
 	    }
@@ -121,11 +146,11 @@ public class FishAI : MonoBehaviour, IHittable
 	private void GatherRootBehaviours(){
 	
 		// separate arbitrated and non arbitrated behaviours
-		ArrayList allBehaviours =  new ArrayList(GetComponents(typeof(FishBehaviour)));
+		ArrayList allRootBehaviours =  new ArrayList(GetComponents(typeof(FishBehaviour)));
 		
 		ArrayList tmpRootArbitratedBehaviours =  new ArrayList();
 		ArrayList tmpRootNonArbitratedBehaviours =  new ArrayList();
-		foreach(System.Object beh in allBehaviours){
+		foreach(System.Object beh in allRootBehaviours){
 			if(typeof(FishArbitratedBehaviour).IsInstanceOfType(beh))
 				tmpRootArbitratedBehaviours.Add(beh);
 			else

@@ -3,11 +3,11 @@ using System.Collections;
 using System;
 
 public interface IBitable{
-    void OnBite(FishHuntingTargetBehaviour hunter);
+    bool OnBite(FishHuntTargetBehaviour hunter); // return true if target dead
 }
 
 [RequireComponent(typeof(Nose))]
-public class FishHuntingTargetBehaviour : FishBehaviour {
+public class FishHuntTargetBehaviour : FishBehaviour {
 	
 	public enum State{		
 		Pursue,
@@ -26,9 +26,9 @@ public class FishHuntingTargetBehaviour : FishBehaviour {
 	            _target = value;
 	        SetBitable(value);
 	    }
-	}	
+	}
 	
-	public float pursueSpeed = 12;
+	public float pursueSpeed = 12f;
 	public float pursueTime = 10f;
 	public float biteDistance = 0.3f;
 	public float biteTime = 3f;
@@ -46,6 +46,11 @@ public class FishHuntingTargetBehaviour : FishBehaviour {
 	private FishSeekingBehaviour seeking;
 	
 	private Vector3 nose;
+	
+	protected override ArrayList children
+    {
+        get {ArrayList ret = base.children; ret.Add(seeking); return ret; }
+    }	
 	
 	public override string ToString(){
 	    return base.ToString() + ": " + Enum.GetName(typeof(State), state);
@@ -65,7 +70,7 @@ public class FishHuntingTargetBehaviour : FishBehaviour {
 
 	public override SteeringOutput GetSteering(){
 		if(!seeking || !target)
-		    return SteeringOutput.empty;
+		    return SteeringOutput.empty;				    
 		    
 		ChangeState();
 		return ProcessState();		
@@ -81,9 +86,12 @@ public class FishHuntingTargetBehaviour : FishBehaviour {
 	    bitables = (IBitable[])_bitables.ToArray(typeof(IBitable));
 	}
 	
-	private void NotifyBitables(){	    
+	private bool NotifyBitables(){	    
 	    foreach(IBitable b in bitables)
-	        b.OnBite(this);
+	        if(b.OnBite(this))
+	            return true;
+	            
+	    return false;
 	}
 	
 	private void ChangeState(){
@@ -99,12 +107,10 @@ public class FishHuntingTargetBehaviour : FishBehaviour {
 		       	}
 		       	break;
 	     	case State.Biting:	     	        		     	    
-		     	if(Time.time - biteStartTime > biteTime){
-                    NotifyBitables();
+	     	    if(NotifyBitables() || Time.time - biteStartTime > biteTime){                    
 		     	    _succeed = true;    			
 		     		state = State.Calm;	     	    
-		     	}
-		     	    
+		     	}		     	    
       			break;
 		}
 	}

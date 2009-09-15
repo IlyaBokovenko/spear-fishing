@@ -4,6 +4,10 @@ using System.Collections;
 public class RollMatching : FishBehaviour {
     public float roll = 0f;
     public float speed = 100f;    
+    
+    public override string ToString(){
+        return base.ToString() + " (" + roll + ")";
+    }
 
     public override SteeringOutput GetSteering (){  
         Profiler.StartProfile(PT.RollMatching);

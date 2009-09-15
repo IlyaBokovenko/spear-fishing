@@ -10,6 +10,11 @@ public class FishSeekingBehaviour : FishBehaviour {
     private VelocityMatching velocityMatcher;
     private Vector3 nose;
     
+    protected override ArrayList children
+    {
+        get {ArrayList ret = base.children; ret.Add(velocityMatcher); return ret; }
+    }
+    
     void Awake(){
         nose = ((Nose)GetComponent(typeof(Nose))).position;
     }
@@ -22,8 +27,7 @@ public class FishSeekingBehaviour : FishBehaviour {
     public override void SelfDestroy(){
         Destroy(velocityMatcher);
         base.SelfDestroy();
-    }
-
+    }    
 
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.Seeking);

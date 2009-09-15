@@ -15,6 +15,8 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     public float  raycastPeriod = 0.3f;
     private float lastCastTime = 0.0f;
     
+    public float maxSpeed = 3.0f;
+    
     enum State{
         Idle,
         Avoiding,
@@ -41,6 +43,11 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     FishObstacleAvoidingBehaviour(){
         priority = 2;
         
+    }    
+    
+    protected override ArrayList children
+    {
+        get {ArrayList ret = base.children; ret.Add(seeking); return ret; }
     }
     
     void Awake(){
@@ -52,10 +59,10 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	    SetObstaclesLayerMask();
 	    
 	    seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
+	    seeking.maxSpeed = maxSpeed;
 	    seekingTarget = new GameObject("collision avoidance target");
 	    seekingTarget.transform.parent = transform;
 	    seeking.target = seekingTarget;	    
-	    
 
 	    whiskers = CreateWhiskers();	    
 	}

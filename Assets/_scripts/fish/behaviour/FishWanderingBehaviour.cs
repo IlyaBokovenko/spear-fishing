@@ -6,15 +6,24 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
     public float wanderRadiusXZ = 20f;
     public float wanderRadiusY = 30f;
     public float wanderRate = 3f;
+    public float carrotUpdatePeriod = 2f;
+    private float lastCarrotUpdate = 0.0f;
+    public float maxSpeed = 3f;
  
     private GameObject invisiblePole;
     private GameObject invisibleCarrot;
     private FishSeekingBehaviour seeking;
     
+	protected override ArrayList children
+    {
+        get {ArrayList ret = base.children; ret.Add(seeking); return ret; }
+    }    	
+    
     void Start(){
         CreatePoleWithCarrot();
         seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
         seeking.target = invisibleCarrot;        
+        seeking.maxSpeed = maxSpeed;
     }
 
     public override SteeringOutput GetSteering (){
@@ -26,7 +35,7 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
             ret = SteeringOutput.empty;
         else{
             UpdatePolePosition();
-            ShuffleCarrot();        
+            TryShuffleCarrot();
 
             ret = seeking.GetSteering();            
         }
@@ -49,9 +58,26 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
             return;
 
         Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(invisiblePole.transform.position, invisiblePole.transform.lossyScale * 2);
+        DrawUnitCubeIn(invisiblePole.transform);
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(invisibleCarrot.transform.position, Mathf.Min(wanderRadiusXZ / 5, 0.2f));        
+    }
+    
+    void DrawUnitCubeIn(Transform t){
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(-1,-1,-1)), t.TransformPoint(new Vector3(-1,-1,1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(-1,-1,1)), t.TransformPoint(new Vector3(1,-1,1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(1,-1,1)), t.TransformPoint(new Vector3(1,-1,-1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(1,-1,-1)), t.TransformPoint(new Vector3(-1,-1,-1)));
+        
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(-1,1,-1)), t.TransformPoint(new Vector3(-1,1,1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(-1,1,1)), t.TransformPoint(new Vector3(1,1,1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(1,1,1)), t.TransformPoint(new Vector3(1,1,-1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(1,1,-1)), t.TransformPoint(new Vector3(-1,1,-1)));
+        
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(-1,-1,-1)), t.TransformPoint(new Vector3(-1,1,-1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(-1,-1,1)), t.TransformPoint(new Vector3(-1,1,1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(1,-1,1)), t.TransformPoint(new Vector3(1,1,1)));
+        Gizmos.DrawLine(t.TransformPoint(new Vector3(1,-1,-1)), t.TransformPoint(new Vector3(1,1,-1)));        
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -63,7 +89,8 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
         fishDirection.y = 0;
         fishDirection = fishDirection.normalized;
         invisiblePole.transform.position = transform.position + fishDirection * wanderOffset; 
-        invisiblePole.transform.rotation = Quaternion.identity;
+        Quaternion rotation = transform.rotation;        
+        invisiblePole.transform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
     }
     
     void UpdatePoleScale(){
@@ -88,9 +115,17 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
         UpdatePoleScale();
         UpdatePolePosition();                
     }
+    
+    private void TryShuffleCarrot(){
+        if(Time.time - lastCarrotUpdate > carrotUpdatePeriod){
+            ShuffleCarrot();
+            lastCarrotUpdate = Time.time;
+        }
+    }
 
     private void ShuffleCarrot(){
         Vector3 oldPos = invisibleCarrot.transform.localPosition.normalized;
+        // Vector3 oldPos = Vector3.forward;
         Quaternion randomRotation = Quaternion.Euler(RandomAngle(), RandomAngle(), RandomAngle());
         Vector3 newPos = randomRotation * oldPos;
         invisibleCarrot.transform.localPosition = newPos;

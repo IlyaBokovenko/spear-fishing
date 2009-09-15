@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 
 public struct SteeringOutput
-{
+{    
 	public static SteeringOutput empty
 	{
 		get {return new SteeringOutput(Vector3.zero, Vector3.zero, Vector3.zero);}
@@ -52,13 +52,17 @@ public struct SteeringOutput
 	    relativeTorque += rt;
 	}
 	
-	public void ApplyTo(GameObject gameObject){
+	public void ApplyTo(GameObject gameObject, float deltaTime){
 	    if(SignificantForce())
-	        gameObject.rigidbody.AddForce(force * Time.deltaTime, ForceMode.VelocityChange);
+	        gameObject.rigidbody.AddForce(force * deltaTime, ForceMode.VelocityChange);
 	    if(SignificantTorque())
-	        gameObject.rigidbody.AddTorque(torque * Time.deltaTime, ForceMode.VelocityChange);
+	        gameObject.rigidbody.AddTorque(torque * deltaTime, ForceMode.VelocityChange);
 	    if(SignificantRelativeTorque())
-	        gameObject.rigidbody.AddRelativeTorque(relativeTorque * Time.deltaTime, ForceMode.VelocityChange);       
+	        gameObject.rigidbody.AddRelativeTorque(relativeTorque * deltaTime, ForceMode.VelocityChange);       
+	}
+	
+	public void ApplyTo(GameObject gameObject){
+	    ApplyTo(gameObject, Time.deltaTime);
 	}
 	
 	public bool SignificantForce(){
