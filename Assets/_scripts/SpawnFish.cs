@@ -10,14 +10,10 @@ public class SpawnFish : MonoBehaviour {
     
     private string cloneName;
 
-    void Update () {    
-        // while(IsNeedToSpawn())
-        //     spawnFish();    
-    }
-
-    void Start(){
-        while(IsNeedToSpawn())
-            Spawn();
+    IEnumerator Start(){
+        for(int i = 0; i < population; i++){
+            yield return StartCoroutine("Spawn");
+        }         
     }
     
     private void OnDrawGizmosSelected(){    
@@ -27,35 +23,31 @@ public class SpawnFish : MonoBehaviour {
 
     ////////////////////////////////////////////////////////////////////////
 
-    bool IsNeedToSpawn(){
-        return Fishes().Length < population;
-    }
-
-    void Spawn(){
+    IEnumerator Spawn(){
         Quaternion rotation = Random.rotation;
-        GameObject fish  = (GameObject)Instantiate(fishSample, SpawnPoint(), rotation);
-        cloneName = fish.name;
+        Vector3 position = SpawnPoint();
+        GameObject fish  = (GameObject)Instantiate(fishSample, position, rotation);
+        cloneName = fish.name;          
         DeathNotifier notifier = (DeathNotifier)fish.AddComponent(typeof(DeathNotifier));
         notifier.notefee = this;
+        
         FishAI fishComponent  = (FishAI)fish.GetComponent(typeof(FishAI));
         float minPower = Mathf.Log(minSizeDeviation,2);
         float maxPower = Mathf.Log(maxSizeDeviation,2);
         float power = minPower + Random.value * (maxPower - minPower);
-        fishComponent.setSize(Mathf.Pow(2, power));
+        fishComponent.setSize(Mathf.Pow(2, power));               
+        
+        while(true){
+            yield return new WaitForSeconds(0.2f);
+            Bounds b = new Bounds(transform.position, spawnVolumeBounds);
+            if(b.Contains(fish.transform.position))
+                break;
+                
+            print("correcting spawned fish position");
+            fish.transform.position = SpawnPoint();
+        }
     }
 
-    GameObject[] Fishes(){
-        GameObject[] allFishes = GameObject.FindGameObjectsWithTag("Fish");
-        ArrayList liveFishes = new ArrayList();
-        foreach(GameObject fish in allFishes){
-            FishAI fishComponent  = (FishAI)fish.GetComponent(typeof(FishAI));
-            if(!fishComponent.IsDead()){
-                liveFishes.Add(fish);
-            }
-        }   
-
-        return (GameObject[])liveFishes.ToArray(typeof(GameObject));
-    }
 
     Vector3 SpawnPoint(){
         Vector3 randomPointInUnitCube = new Vector3(Random.value, Random.value, Random.value);
@@ -63,10 +55,9 @@ public class SpawnFish : MonoBehaviour {
         return transform.position + Vector3.Scale(randomPointAround0, spawnVolumeBounds);
     }
     
-    void OnObjectDied(string objectName){
-      if(objectName.Equals(cloneName)) {          
-          Spawn();
-          print("population restored");
-      }
+    IEnumerator OnObjectDied(string objectName){
+        if(objectName.Equals(cloneName)) {            
+            yield return StartCoroutine("Spawn");
+        }
     }
 }

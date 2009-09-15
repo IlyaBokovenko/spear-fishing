@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class FishAI : MonoBehaviour, IHittable
+public class FishAI : GenericScript, IHittable
 {
     public float updatePeriod = 0.1f;
     private float lastUpdateTime = 0.0f;

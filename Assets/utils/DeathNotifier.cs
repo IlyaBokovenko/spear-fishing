@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class DeathNotifier : MonoBehaviour {
+public class DeathNotifier : GenericScript {
     private static Hashtable objectsByName = new Hashtable();
 
     public Component notefee;
@@ -12,9 +12,11 @@ public class DeathNotifier : MonoBehaviour {
         objName = gameObject.name;
     }
     
-	
-	 ~DeathNotifier(){
-        if(Application.isPlaying)
-	        notefee.SendMessage("OnObjectDied", objName, SendMessageOptions.DontRequireReceiver);
-	 }
+
+	void OnDestroyGameObject() // see GenericScript
+     {         
+            if(Application.isPlaying){
+                notefee.SendMessage("OnObjectDied", objName);
+            }
+     }
 }

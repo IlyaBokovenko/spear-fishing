@@ -7,4 +7,9 @@ public class GenericScript : MonoBehaviour {
 	{
 	    Destroy(this);
 	}
+	
+	public void DestroyGameObject(){
+	    SendMessage("OnDestroyGameObject", null, SendMessageOptions.DontRequireReceiver);
+	    Destroy(gameObject);	    
+	}
 }

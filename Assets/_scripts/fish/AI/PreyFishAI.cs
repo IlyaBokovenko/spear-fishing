@@ -8,8 +8,7 @@ public class PreyFishAI : FishAI, IBitable {
      }
      
      public bool OnBite(FishHuntTargetBehaviour hunter){
-         Die();
-         Destroy(gameObject);
+         DestroyGameObject();
          return true;
      }
 }
