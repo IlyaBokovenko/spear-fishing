@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Collections;
 
-public class FishFleeBehaviour : FishSeekingBehaviour {
+public class FishFleeBehaviour : FishVelocityDrivenSeekingBehaviour {
 
-    protected override Vector3 direction(){
-        return -base.direction();
+    public override Vector3 Direction(){
+        return -base.Direction();
     }
 }

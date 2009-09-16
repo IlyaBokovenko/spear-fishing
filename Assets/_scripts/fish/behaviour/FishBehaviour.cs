@@ -3,7 +3,7 @@ using System.Collections;
 
 public class FishBehaviour : GenericScript
 {    
-    public virtual SteeringOutput GetSteering(){
+    public virtual SteeringOutput GetSteering(){        
         return SteeringOutput.empty;
     }
     

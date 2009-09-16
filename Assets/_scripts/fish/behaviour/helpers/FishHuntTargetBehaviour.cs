@@ -4,7 +4,7 @@ using System;
 
 public class FishHuntTargetBehaviour : FishBehaviour {
     
-    public FishSeekingBehaviour seeking;
+    public GenericSeekingBehaviour seeking;
     
 	public GameObject target
 	{
@@ -16,10 +16,10 @@ public class FishHuntTargetBehaviour : FishBehaviour {
 	private float pursueStartTime;	
 
 	protected override ArrayList ActiveChildren(){
-	    ArrayList ret = base.ActiveChildren();
 	    if(enabled)
-	        ret.Add(seeking);
-	    return ret;
+	        return base.ActiveChildren();
+	    else
+	        return new ArrayList();
 	}
 	
 	void Awake(){

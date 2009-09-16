@@ -6,21 +6,34 @@ public class OrientationMatching : FishBehaviour {
     public Vector3 orientation;
     public float maxRotationSpeed  = 360f;
     public float slowAngle = 30f;
-    public float maxRotationAcceleration = 500f;       
-    public float timeToMatchOrientation = 0.1f;
+    public float maxRotationAcceleration = 50f;       
+    public float timeToMatchOrientation = 0.3f;
+    
+    private Transform _transform;
+    private Vector3 delta;
+    
+    void Awake(){
+        _transform = transform;
+    }
+    
+    // public override string ToString(){
+    //     return base.ToString() + " (" + delta + ")";
+    // }    
     
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.OrientationMatching);
         
-        Vector3 fromHeading = transform.forward;
+        Vector3 fromHeading = _transform.forward;
         Vector3 toHeading = orientation;
-        Vector3 delta = Quaternion.FromToRotation(fromHeading, toHeading).eulerAngles;        
+        delta = Quaternion.FromToRotation(fromHeading, toHeading).eulerAngles;        
         delta = Utils.DegToShifted(delta);
         
         Vector3 rotation = calcRotation(delta);
         float angle = Mathf.Abs(Vector3.Angle(fromHeading, toHeading));
-        if(angle < slowAngle)
+        
+        if(angle < slowAngle){
             rotation *= angle / slowAngle;
+        }            
 
         Vector3 deltaVelocity = rotation - rigidbody.angularVelocity * Mathf.Rad2Deg;        
         Vector3 acceleration = deltaVelocity / timeToMatchOrientation;
@@ -30,9 +43,7 @@ public class OrientationMatching : FishBehaviour {
         Profiler.EndProfile(PT.OrientationMatching);
         
         return SteeringOutput.WithTorque(acceleration * Mathf.Deg2Rad);   
-    }
-    
-    
+    }    
 ////////////////////////////////////////////////////////////////////////////////////////
 
 

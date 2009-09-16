@@ -4,6 +4,8 @@ using System;
 
 [RequireComponent(typeof(Nose))]
 public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
+    public FishHuntTargetBehaviour hunting;
+    public FishBiteBehaviour biting;
     
     public float huntPeriod = 1f;    
     public float maxHuntDistance = 10;
@@ -18,11 +20,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
         Hunting,
         Rest
     }
-    private State state;
-    
-    private FishHuntTargetBehaviour hunting;
-    private FishBiteBehaviour biting;
-    
+    private State state;    
     private Vector3 nose;
     
     static FishPredatorBehaviour(){
@@ -34,13 +32,10 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }
     
     protected override ArrayList ActiveChildren(){
-        ArrayList ret = base.ActiveChildren();
-        if(state == State.Hunting){
-            ret.Add(hunting); 
-            ret.Add(biting);
-        }
-            
-        return ret;
+        if(state == State.Hunting)
+            return base.ActiveChildren();
+        else
+            return new ArrayList();
     }
     
     public override string ToString(){
@@ -49,10 +44,10 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     
     void Awake(){
         nose = ((Nose)GetComponent(typeof(Nose))).position;
+        children = new FishBehaviour[2] {hunting, biting};
     }
     
-    void Start(){
-        children = new FishBehaviour[2] {hunting, biting};
+    void Start(){        
         _transform = transform;
         EnterTracking();
     }    

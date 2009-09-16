@@ -4,7 +4,7 @@ using System.Collections;
 public class VelocityMatching : FishBehaviour {
     public Vector3 velocity;
     public float timeToMatch = 0.1f;
-    public float maxAcceleration = 10;
+    public float maxAcceleration = 100;
     
     public override string ToString(){
         return base.ToString() + " " + velocity.magnitude + "(" + rigidbody.velocity.magnitude + ")";

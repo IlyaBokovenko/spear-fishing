@@ -15,10 +15,10 @@ public class FishEscapeTargetBehaviour : FishArbitratedBehaviour
     private float startEscapingTime;    
 
     protected override ArrayList ActiveChildren(){
-        ArrayList ret = base.ActiveChildren();
         if(enabled)
-            ret.Add(flee);
-        return ret;
+            return base.ActiveChildren();
+        else
+            return new ArrayList();
     }	
     
     public override string ToString(){

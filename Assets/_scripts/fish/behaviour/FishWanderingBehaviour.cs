@@ -3,13 +3,13 @@ using System.Collections;
 
 public class FishWanderingBehaviour : FishArbitratedBehaviour {
     
-    public FishSeekingBehaviour seeking;
+    public GenericSeekingBehaviour seeking;
     
-    public float wanderOffset = 60f;
-    public float wanderRadiusXZ = 20f;
-    public float wanderRadiusY = 30f;
-    public float wanderRate = 3f;
-    public float carrotUpdatePeriod = 2f;
+    public float wanderOffset = 10f;
+    public float wanderRadiusXZ = 1f;
+    public float wanderRadiusY = 3f;
+    public float wanderRate = 30f;
+    public float carrotUpdatePeriod = 0.1f;
     private float lastCarrotUpdate = 0.0f;
  
     private GameObject invisiblePole;

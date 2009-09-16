@@ -5,7 +5,7 @@ using System;
 [RequireComponent (typeof (Nose))]
 public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {   
 
-    public FishSeekingBehaviour seeking;     
+    public GenericSeekingBehaviour seeking;     
     
     public float timeToThinkAhead = 3f;
     public float minDistance = 2f;
@@ -46,11 +46,10 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     } 
     
     protected override ArrayList ActiveChildren(){
-        ArrayList ret = base.ActiveChildren();
-        if(state != State.Idle){
-            ret.Add(seeking);
-        }
-        return ret;
+        if(state != State.Idle)
+            return base.ActiveChildren();
+        else
+            return new ArrayList();
     }
     
     public override string ToString(){
