@@ -5,14 +5,10 @@ using System;
 [RequireComponent(typeof(Nose))]
 public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     
-    public float huntPeriod = 1f;
-    
+    public float huntPeriod = 1f;    
     public float maxHuntDistance = 10;
     public float restTime = 20f;
-    public float huntingSpeed = 12f;
 
-    private SteeringOutput steering;
-    
     private Transform _transform;
     private static readonly int preysLayerMask;    
     
@@ -25,6 +21,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     private State state;
     
     private FishHuntTargetBehaviour hunting;
+    private FishBiteBehaviour biting;
     
     private Vector3 nose;
     
@@ -36,9 +33,14 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
         priority = 1;
     }
     
-    protected override ArrayList children
-    {
-        get {ArrayList ret = base.children; if(state == State.Hunting)ret.Add(hunting); return ret; }
+    protected override ArrayList ActiveChildren(){
+        ArrayList ret = base.ActiveChildren();
+        if(state == State.Hunting){
+            ret.Add(hunting); 
+            ret.Add(biting);
+        }
+            
+        return ret;
     }
     
     public override string ToString(){
@@ -50,6 +52,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }
     
     void Start(){
+        children = new FishBehaviour[2] {hunting, biting};
         _transform = transform;
         EnterTracking();
     }    
@@ -77,31 +80,25 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 	
 	public override SteeringOutput GetSteering(){
 	    ChangeState();
-	    ProcessState();
 	    
-	    return steering;
+	    if(state == State.Hunting)
+	        return hunting.GetSteering();	        
+	    else
+	        return SteeringOutput.empty;	    
 	}	
 	
 	private void ChangeState(){
 	    if(state == State.Hunting){
-    	    if(hunting.state == FishHuntTargetBehaviour.State.Calm){
+    	    if(!hunting.enabled){
     	        ExitCurrentState();
-    	        if(hunting.succeed){        	            
+    	        if(biting.bited){        	            
     	            EnterRest();
     	        }else{
     	            EnterTracking();
     	        }    	        
     	    }
 	    }
-	}
-	
-	private void ProcessState(){
-	    if(state == State.Hunting){
-	        steering = hunting.GetSteering();	        
-	    }else{
-	        steering = SteeringOutput.empty;
-	    }
-	}
+	}	
 	
 	private void EnterTracking(){
 	   state = State.Tracking;
@@ -113,14 +110,14 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 	}
 	
 	private void EnterHunting(GameObject prey){	    
-	    hunting = (FishHuntTargetBehaviour)gameObject.AddComponent(typeof(FishHuntTargetBehaviour));
-	    hunting.target = prey; 
-	    hunting.pursueSpeed = huntingSpeed;
+	    hunting.StartHunting(prey);
+	    biting.StartBiting(prey);
 	    state = State.Hunting;	    
 	}
 		
 	private void ExitHunting(){
-        hunting.SelfDestroy();        
+	    hunting.enabled = false;
+        biting.enabled = false;
 	}
 	
 	private void EnterRest(){

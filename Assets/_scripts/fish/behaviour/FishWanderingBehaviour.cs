@@ -2,28 +2,26 @@ using UnityEngine;
 using System.Collections;
 
 public class FishWanderingBehaviour : FishArbitratedBehaviour {
+    
+    public FishSeekingBehaviour seeking;
+    
     public float wanderOffset = 60f;
     public float wanderRadiusXZ = 20f;
     public float wanderRadiusY = 30f;
     public float wanderRate = 3f;
     public float carrotUpdatePeriod = 2f;
     private float lastCarrotUpdate = 0.0f;
-    public float maxSpeed = 3f;
  
     private GameObject invisiblePole;
     private GameObject invisibleCarrot;
-    private FishSeekingBehaviour seeking;
     
-	protected override ArrayList children
-    {
-        get {ArrayList ret = base.children; ret.Add(seeking); return ret; }
-    }    	
+    void Awake(){
+        children = new FishBehaviour[1]{seeking};        
+    }
     
-    void Start(){
-        CreatePoleWithCarrot();
-        seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
-        seeking.target = invisibleCarrot;        
-        seeking.maxSpeed = maxSpeed;
+    void Start(){        
+        CreatePoleWithCarrot();        
+        seeking.target = invisibleCarrot;
     }
 
     public override SteeringOutput GetSteering (){
@@ -46,9 +44,6 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
     }
 
     public override void SelfDestroy(){
-        if(seeking)
-            seeking.SelfDestroy();
-
         Destroy(invisiblePole);
         base.SelfDestroy();        
     }
@@ -125,7 +120,6 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
 
     private void ShuffleCarrot(){
         Vector3 oldPos = invisibleCarrot.transform.localPosition.normalized;
-        // Vector3 oldPos = Vector3.forward;
         Quaternion randomRotation = Quaternion.Euler(RandomAngle(), RandomAngle(), RandomAngle());
         Vector3 newPos = randomRotation * oldPos;
         invisibleCarrot.transform.localPosition = newPos;

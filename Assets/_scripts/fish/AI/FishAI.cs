@@ -7,7 +7,12 @@ public class FishAI : GenericScript, IHittable
     public float updatePeriod = 0.1f;
     private float lastUpdateTime = 0.0f;
     
-	private bool isDead = false;
+	private bool _isDead = false;
+	public bool isDead
+	{
+	    get{return _isDead;}
+	}
+	
 	private Vector3 originalScale;
 	private float size = 0.0f;
 
@@ -19,14 +24,13 @@ public class FishAI : GenericScript, IHittable
 	    get{return Time.time - lastUpdateTime;}
 	}
 	
-	void Awake(){
-	    GatherRootBehaviours(); 
-		// PrintBehaviours();
-	}
 
 	void Start(){
-       originalScale = transform.localScale;
-       if(!Utils.Approximately(size, 0.0f)) {
+        GatherRootBehaviours(); 
+        // PrintBehaviours();
+
+        originalScale = transform.localScale;
+        if(!Utils.Approximately(size, 0.0f)) {
             updateScale();    
         }
 	}
@@ -70,10 +74,6 @@ public class FishAI : GenericScript, IHittable
 	    transform.localScale = originalScale * size;
 	}
 
-	public bool IsDead(){
-	    return isDead;    
-	}
-
 	public void Die(){
 		ArrayList behs = new ArrayList(GetComponents(typeof(FishBehaviour)));		
 	    foreach(GenericScript elem in behs)
@@ -89,7 +89,7 @@ public class FishAI : GenericScript, IHittable
 	    rigidbody.useGravity = true;
 	    rigidbody.drag = 10;
         
-	    isDead = true;
+	    _isDead = true;
 	}
 	
     // static SteeringOutput steering = SteeringOutput.empty;
@@ -144,10 +144,15 @@ public class FishAI : GenericScript, IHittable
 	}
 
 	private void GatherRootBehaviours(){
-	
-		// separate arbitrated and non arbitrated behaviours
-		ArrayList allRootBehaviours =  new ArrayList(GetComponents(typeof(FishBehaviour)));
+
+	    // find roots
+	    ArrayList allBehaviours = new ArrayList(GetComponents(typeof(FishBehaviour)));
+		ArrayList allRootBehaviours = (ArrayList)allBehaviours.Clone();
+		foreach(FishBehaviour beh in allBehaviours){
+		    beh.RemoveChildrenFrom(allRootBehaviours);
+		}
 		
+		// separate arbitrated and non arbitrated behaviours
 		ArrayList tmpRootArbitratedBehaviours =  new ArrayList();
 		ArrayList tmpRootNonArbitratedBehaviours =  new ArrayList();
 		foreach(System.Object beh in allRootBehaviours){
@@ -156,12 +161,10 @@ public class FishAI : GenericScript, IHittable
 			else
 				tmpRootNonArbitratedBehaviours.Add(beh);
 		}
-		
-		rootNonArbitratedBehaviours = (FishBehaviour[])tmpRootNonArbitratedBehaviours.ToArray(typeof(FishBehaviour));
-		
+				
+		rootNonArbitratedBehaviours = (FishBehaviour[])tmpRootNonArbitratedBehaviours.ToArray(typeof(FishBehaviour));		
 		// group arbitrated behaviours by priorities
-		rootArbitratedBehaviours = FishArbitratedBehaviour.GroupByPriorities(tmpRootArbitratedBehaviours);
-		
+		rootArbitratedBehaviours = FishArbitratedBehaviour.GroupByPriorities(tmpRootArbitratedBehaviours);		
         // PrintBehaviours();
 	}
 	

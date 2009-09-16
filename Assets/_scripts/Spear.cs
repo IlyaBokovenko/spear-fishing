@@ -15,11 +15,16 @@ public class Spear : MonoBehaviour {
 	private Vector3 prevPosition;
 	private Quaternion prevRotation;
 	
+	private bool isDead
+	{
+	    get{return !gameObject.active;} 
+	}
+	
 	void Update () {
 	    prevPosition = transform.position;
 	    prevRotation = transform.rotation;
 	    
-	    if(!IsDead() && IsTimeToDie())
+	    if(!isDead && IsTimeToDie())
 	        Die();
 	    
 	    if(isFlying)
@@ -61,10 +66,6 @@ public class Spear : MonoBehaviour {
 	
 	bool IsTimeToDie(){
 	    return !neverDie && Time.time - flyStartTime > lifetime;
-	}
-	
-	bool IsDead(){
-	    return !gameObject.active;
 	}
 	
 	void Die(){

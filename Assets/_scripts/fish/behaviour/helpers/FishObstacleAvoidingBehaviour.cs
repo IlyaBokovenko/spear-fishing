@@ -1,9 +1,11 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 [RequireComponent (typeof (Nose))]
 public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {   
-    
+
+    public FishSeekingBehaviour seeking;     
     
     public float timeToThinkAhead = 3f;
     public float minDistance = 2f;
@@ -15,17 +17,15 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     public float  raycastPeriod = 0.3f;
     private float lastCastTime = 0.0f;
     
-    public float maxSpeed = 3.0f;
-    
     enum State{
         Idle,
         Avoiding,
         PostAvoiding    
     }
+    
     private State state = State.Idle;
-    private float lastCollisionTime = 0.0f;    
-        
-    private FishSeekingBehaviour seeking;
+    private float lastCollisionTime = 0.0f;            
+    
     private GameObject seekingTarget;
     
     private bool isCollided = false;
@@ -43,23 +43,29 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     FishObstacleAvoidingBehaviour(){
         priority = 2;
         
-    }    
+    } 
     
-    protected override ArrayList children
-    {
-        get {ArrayList ret = base.children; ret.Add(seeking); return ret; }
+    protected override ArrayList ActiveChildren(){
+        ArrayList ret = base.ActiveChildren();
+        if(state != State.Idle){
+            ret.Add(seeking);
+        }
+        return ret;
     }
     
+    public override string ToString(){
+        return base.ToString() + " : " + Enum.GetName(typeof(State), state);
+    }
+            
     void Awake(){
         Nose _nose  = (Nose)GetComponent(typeof(Nose)); 
         nose = _nose.position;	    
+        children = new FishBehaviour[1]{seeking};
     }
 	
-	void Start () {
+	void Start () {	    
 	    SetObstaclesLayerMask();
 	    
-	    seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
-	    seeking.maxSpeed = maxSpeed;
 	    seekingTarget = new GameObject("collision avoidance target");
 	    seekingTarget.transform.parent = transform;
 	    seeking.target = seekingTarget;	    
@@ -84,7 +90,6 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	}
 	
 	public override void SelfDestroy(){
-	    seeking.SelfDestroy();
 	    Destroy(seekingTarget);
 	    base.SelfDestroy();
 	}
@@ -179,7 +184,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         Gizmos.DrawLine(mainRay.from, mainRay.to);
         
         if(whiskers != null){
-            Gizmos.color = Color.red;
+            Gizmos.color = Color.magenta;
             foreach(Line line in whiskers){
                 Line worldLine = line.ToWorldFrom(transform);
                 Gizmos.DrawLine(worldLine.from, worldLine.to); 

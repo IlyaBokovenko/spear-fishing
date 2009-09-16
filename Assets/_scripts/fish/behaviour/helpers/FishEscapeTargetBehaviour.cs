@@ -3,29 +3,27 @@ using System.Collections;
 
 public class FishEscapeTargetBehaviour : FishArbitratedBehaviour
 {    	
-    private GameObject _target;
+    public FishFleeBehaviour flee;
+    
     public GameObject target
     {
-        get{return seeking ? seeking.target : _target;}
-        set{if(seeking) seeking.target = value; else _target = value;}
-    }
-    
-    public float fleeSpeed  = 10;    
-    public float panicTime  = 4;    
+        get{return flee.target;}
+        set{flee.target = value;}
+    }    
 
-    public bool isEscaping  = true;
+    public float panicTime  = 4;    
     private float startEscapingTime;    
 
-    private FishSeekingBehaviour seeking;
-    
-    protected override ArrayList children
-    {
-        get {ArrayList ret = base.children; ret.Add(seeking); return ret; }
+    protected override ArrayList ActiveChildren(){
+        ArrayList ret = base.ActiveChildren();
+        if(enabled)
+            ret.Add(flee);
+        return ret;
     }	
     
     public override string ToString(){
 	    string ret = base.ToString();
-	    if(!isEscaping)
+	    if(!enabled)
 	        ret += " (calm)";
         return ret;
 	}	
@@ -33,45 +31,40 @@ public class FishEscapeTargetBehaviour : FishArbitratedBehaviour
 
     FishEscapeTargetBehaviour(){
         priority = 1;
-    }
+    }    
 
-    void Start(){
-        startEscapingTime = Time.time;
-        seeking = (FishSeekingBehaviour)gameObject.AddComponent(typeof(FishSeekingBehaviour));
-        seeking.target = _target;
-        seeking.isFlee = true;
-        seeking.maxSpeed = fleeSpeed;
+    void Awake(){
+        children = new FishBehaviour[1]{flee};        
     }
-
-    public override void SelfDestroy(){
-    	if(seeking)
-        	seeking.SelfDestroy();
-
-        base.SelfDestroy();
+    
+    public void StartEscapingFrom(GameObject obj){
+        target = obj;
+        enabled = true;
     }
+    
+    void OnEnable(){
+         startEscapingTime = Time.time;       
+    }    
 
     public override SteeringOutput GetSteering () {        
-        Profiler.StartProfile(PT.Escape);
-        
-        SteeringOutput ret;
-
-        if(!seeking || !target)
-            ret = SteeringOutput.empty;
-        else{
-            if(Time.time - startEscapingTime > panicTime){
-                isEscaping = false;
-            }    
-
-            if(isEscaping)
-            {
-                ret = seeking.GetSteering();
-            }else{
-                ret = SteeringOutput.empty;
-            }            
-        }
-        
-        Profiler.EndProfile(PT.Escape);
-        
+        Profiler.StartProfile(PT.Escape);        
+        SteeringOutput ret = _GetSteering();        
+        Profiler.EndProfile(PT.Escape);        
         return ret;
-    }   
+    }
+    
+    private SteeringOutput _GetSteering(){
+        if(!flee)
+            return SteeringOutput.empty;
+        if(!target)
+            return SteeringOutput.empty;
+
+        if(Time.time - startEscapingTime > panicTime)
+            enabled = false;
+            
+        if(enabled)
+            return flee.GetSteering();
+        else
+            return SteeringOutput.empty;
+    }
 }

@@ -3,31 +3,25 @@ using System.Collections;
 
 [RequireComponent(typeof(Nose))]
 public class FishSeekingBehaviour : FishBehaviour {
+    public VelocityMatching velocityMatcher;
+    
     public GameObject target;
     public float maxSpeed = 3;
-    public bool isFlee = false;
+    public bool isFlee = false;    
     
-    private VelocityMatching velocityMatcher;
     private Vector3 nose;
-    
-    protected override ArrayList children
-    {
-        get {ArrayList ret = base.children; ret.Add(velocityMatcher); return ret; }
-    }
-    
+
     void Awake(){
         nose = ((Nose)GetComponent(typeof(Nose))).position;
-    }
-
-    
-    void Start(){
-        velocityMatcher = (VelocityMatching)gameObject.AddComponent(typeof(VelocityMatching));        
+        children = new FishBehaviour[1]{velocityMatcher};    
     }
     
-    public override void SelfDestroy(){
-        Destroy(velocityMatcher);
-        base.SelfDestroy();
-    }    
+    protected virtual Vector3 direction(){
+        Vector3 from = transform.TransformPoint(nose);
+        Vector3 to = target.transform.position;
+        Vector3 direction = (to - from).normalized;
+        return direction;        
+    }   
 
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.Seeking);
@@ -37,14 +31,8 @@ public class FishSeekingBehaviour : FishBehaviour {
         if(!velocityMatcher || !target)
             ret = SteeringOutput.empty;        
         else{
-            Vector3 from = transform.TransformPoint(nose);
-            Vector3 to = target.transform.position;
-            Vector3 direction = (to - from).normalized;
-            if(isFlee)
-                direction = Vector3.zero - direction;     
-
-            velocityMatcher.velocity = direction * maxSpeed;
-            ret = velocityMatcher.GetSteering();            
+            velocityMatcher.velocity = direction() * maxSpeed;
+            ret = velocityMatcher.GetSteering();          
         }
             
         Profiler.EndProfile(PT.Seeking);

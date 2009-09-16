@@ -2,30 +2,22 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-[RequireComponent(typeof(Nose))]
 public class FishPreyBehaviour : FishArbitratedBehaviour {
+    public FishEscapeTargetBehaviour escape;
     
     public float escapeAttemptPeriod = 1f;
     public float safetyDistance  = 3;
-    public float fleeSpeed  = 10;    
-    public float panicTime  = 4;    
+    public float panicTime = 4;    
     
     private Transform _transform;
-    private static readonly int predatorsLayerMask;    
-    
-    private FishEscapeTargetBehaviour escape;
-    
-    private Vector3 nose;
+    private static readonly int predatorsLayerMask;        
     
     enum State{
         Escaping,
         Calm
     } 
     
-    private State state
-    {
-        get{return escape ? State.Escaping : State.Calm;}
-    }
+    private State state = State.Calm;
     
     public override string ToString(){
         return base.ToString() + ": " + Enum.GetName(typeof(State), state);
@@ -39,18 +31,20 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
         priority = 1;
     }
     
-    protected override ArrayList children
-    {
-        get {ArrayList ret = base.children; if(state == State.Escaping)ret.Add(escape); return ret; }
+    protected override ArrayList ActiveChildren(){
+        ArrayList ret = base.ActiveChildren(); 
+        if(state == State.Escaping)
+            ret.Add(escape); 
+        return ret; 
     }
     
     void Awake(){
-        nose = ((Nose)GetComponent(typeof(Nose))).position;
+        children = new FishBehaviour[1] {escape};
     }
     
-    void Start(){
+    void Start(){        
         _transform = transform;
-        InvokeRepeating("EscapeAttempt", 0, escapeAttemptPeriod);
+        EnterCalm();
     }    
     
     void OnDrawGizmosSelected(){    
@@ -69,27 +63,40 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
     }
 	
 	public override SteeringOutput GetSteering(){
+	    ChangeState();
+
 	    if(state == State.Calm)
-	        return SteeringOutput.empty;	        
-	    
-        if(!escape.isEscaping){
-            escape.SelfDestroy();	            
-            InvokeRepeating("EscapeAttempt", 0, escapeAttemptPeriod);
-        }
-        
-        return escape.GetSteering();
+	        return SteeringOutput.empty;
+	    else
+            return escape.GetSteering();
 	}		
 	
 	private void EscapeAttempt(){
 	    Collider[] potentialPredators = Physics.OverlapSphere(_transform.position, safetyDistance, predatorsLayerMask);	    
 	    if(potentialPredators.Length > 0){
-	        CancelInvoke();
-	        escape = (FishEscapeTargetBehaviour)gameObject.AddComponent(typeof(FishEscapeTargetBehaviour));
-	        escape.target = potentialPredators[0].gameObject;
-	        escape.fleeSpeed = fleeSpeed;
-	        escape.panicTime = panicTime;
+	        ExitCalm();
+	        EnterEscape(potentialPredators[0].gameObject);
 	    }	        
 	}
 	
-
+/////////////// state machine ///////////////	
+	void ChangeState(){
+	    if(state == State.Escaping){
+	        if(!escape.enabled)
+	            EnterCalm();
+	    }
+	}
+	
+	private void EnterEscape(GameObject obj){
+	    escape.StartEscapingFrom(obj);
+	}
+	
+	private void EnterCalm(){
+	    state = State.Calm;
+        InvokeRepeating("EscapeAttempt", 0, escapeAttemptPeriod);        
+	}
+	
+	private void ExitCalm(){
+	    CancelInvoke();
+	}
 }
