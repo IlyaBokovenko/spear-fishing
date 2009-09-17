@@ -54,10 +54,6 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }    
     
 	void OnDrawGizmosSelected(){	    
-        // if(state == State.Hunting && hunting.target != null){
-        //     Gizmos.color = Color.cyan;
-        //     Gizmos.DrawSphere(hunting.target.transform.position, 0.5f);
-        // }
         if(state == State.Tracking){
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, maxHuntDistance);        
