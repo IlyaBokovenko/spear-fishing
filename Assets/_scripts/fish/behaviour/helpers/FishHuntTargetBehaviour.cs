@@ -36,13 +36,14 @@ public class FishHuntTargetBehaviour : FishBehaviour {
 	}
 
 	public override SteeringOutput GetSteering(){
-		if(!seeking || !target || !enabled)
-		    return SteeringOutput.empty;
-		    
-	    if(Time.time - pursueStartTime > pursueTime){	        
-	        enabled = false;
-	        return SteeringOutput.empty;   
+	    if(!enabled){
+	        return SteeringOutput.empty;
 	    }
+	    
+		if(!target || Time.time - pursueStartTime > pursueTime){
+	        enabled = false;
+	        return SteeringOutput.empty;		    
+		}
 	    
 	    return seeking.GetSteering();		    
 	}	

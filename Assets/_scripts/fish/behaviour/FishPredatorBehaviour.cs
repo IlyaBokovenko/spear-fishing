@@ -39,7 +39,8 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }
     
     public override string ToString(){
-        return base.ToString() + ": " + Enum.GetName(typeof(State), state);
+        string ret = base.ToString() + ": " + Enum.GetName(typeof(State), state);
+        return ret;
     }
     
     void Awake(){
@@ -53,6 +54,10 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }    
     
 	void OnDrawGizmosSelected(){	    
+        // if(state == State.Hunting && hunting.target != null){
+        //     Gizmos.color = Color.cyan;
+        //     Gizmos.DrawSphere(hunting.target.transform.position, 0.5f);
+        // }
         if(state == State.Tracking){
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, maxHuntDistance);        
@@ -78,7 +83,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 	    if(state == State.Hunting){
     	    if(!hunting.enabled){
     	        ExitCurrentState();
-    	        if(biting.bited){        	            
+    	        if(biting.bited){    
     	            EnterRest();
     	        }else{
     	            EnterTracking();
@@ -87,7 +92,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
 	    }
 	}	
 	
-	private void EnterTracking(){
+	private void EnterTracking(){       
 	   state = State.Tracking;
 	   InvokeRepeating("HuntAttempt", 0, huntPeriod);
 	}

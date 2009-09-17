@@ -24,7 +24,10 @@ public class FishBiteBehaviour : FishBehaviour {
 	
 	
 	private bool _bited = false;
-	public bool bited{get{return _bited;}}
+	public bool bited
+	{
+	    get{return _bited;}	    
+	}
 	
 	public void StartBiting(GameObject obj){
 	    target = obj;

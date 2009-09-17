@@ -38,9 +38,9 @@ public class SpawnFish : MonoBehaviour {
         fishComponent.setSize(Mathf.Pow(2, power));               
         
         while(true){
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(5f);
             if(fish == null)
-                yield return 0;
+                break;
             Bounds b = new Bounds(transform.position, spawnVolumeBounds);
             if(b.Contains(fish.transform.position))
                 break;
