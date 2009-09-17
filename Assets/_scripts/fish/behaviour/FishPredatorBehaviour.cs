@@ -52,7 +52,7 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
         EnterTracking();
     }    
     
-	protected override void PrivateDrawGizmosSelected(){	    
+	void OnDrawGizmosSelected(){	    
         if(state == State.Tracking){
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, maxHuntDistance);        

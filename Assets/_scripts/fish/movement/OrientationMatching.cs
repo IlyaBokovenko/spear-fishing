@@ -9,6 +9,11 @@ public class OrientationMatching : FishBehaviour {
     public float maxRotationAcceleration = 50f;       
     public float timeToMatchOrientation = 0.3f;
     
+    private bool _isSlowing;
+    public bool isSlowing{
+        get{return _isSlowing;}
+    }
+    
     private Transform _transform;
     private Vector3 delta;
     
@@ -36,8 +41,11 @@ public class OrientationMatching : FishBehaviour {
         float angle = Mathf.Abs(Vector3.Angle(fromHeading, toHeading));
         
         if(angle < slowAngle){
+            _isSlowing = true;
             rotation *= angle / slowAngle;
-        }            
+        }else{
+            _isSlowing = false;
+        }
 
         Vector3 deltaVelocity = rotation - rigidbody.angularVelocity * Mathf.Rad2Deg;        
         Vector3 acceleration = deltaVelocity / timeToMatchOrientation;

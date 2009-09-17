@@ -60,12 +60,12 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         Nose _nose  = (Nose)GetComponent(typeof(Nose)); 
         nose = _nose.position;	    
         children = new FishBehaviour[1]{seeking};
+        seekingTarget = new GameObject("collision avoidance target");
     }
 	
 	void Start () {	    
-	    SetObstaclesLayerMask();
+	    SetObstaclesLayerMask();    
 	    
-	    seekingTarget = new GameObject("collision avoidance target");
 	    seekingTarget.transform.parent = transform;
 	    seeking.target = seekingTarget;	    
 
@@ -180,7 +180,9 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	        Gizmos.DrawSphere(hit.point, 0.1f);
 	        Gizmos.DrawLine(hit.point, seekingTarget.transform.position);
 	    }
-	    
+    }    
+    
+    void OnDrawGizmosSelected(){
         Gizmos.color = Color.blue;
         Line mainRay = MainRay().ToWorldFrom(transform);
         Gizmos.DrawLine(mainRay.from, mainRay.to);
@@ -191,9 +193,8 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
                 Line worldLine = line.ToWorldFrom(transform);
                 Gizmos.DrawLine(worldLine.from, worldLine.to); 
             }                    
-        }
-
-    }    
+        }        
+    }
     
 }
 

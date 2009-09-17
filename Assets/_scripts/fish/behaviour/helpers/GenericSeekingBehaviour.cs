@@ -47,6 +47,9 @@ public class GenericSeekingBehaviour : FishBehaviour {
     }    
 
     protected override void PrivateDrawGizmosSelected(){
+        if(targetTransform == null)
+            return;
+            
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(targetTransform.position, 0.1f);
         Gizmos.DrawLine(From(), To());        
