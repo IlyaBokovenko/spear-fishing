@@ -48,14 +48,12 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
         base.SelfDestroy();        
     }
 
-    void OnDrawGizmosSelected(){    
+	protected override void PrivateDrawGizmosSelected(){	      
         if(!invisiblePole)
             return;
 
         Gizmos.color = Color.white;
         DrawUnitCubeIn(invisiblePole.transform);
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(invisibleCarrot.transform.position, Mathf.Min(wanderRadiusXZ / 5, 0.2f));        
     }
     
     void DrawUnitCubeIn(Transform t){

@@ -168,6 +168,15 @@ public class FishAI : GenericScript, IHittable
         // PrintBehaviours();
 	}
 	
+	void OnDrawGizmosSelected(){
+	    if(activeBehaviours == null)
+	        return;
+	        
+	    foreach(FishBehaviour beh in activeBehaviours){
+	        beh.DrawGizmosSelectedWithChildren();
+	    }
+	}
+	
 	private void PrintBehaviours(){
 		print("========= non arbitrated behaviours =========");
 		foreach(FishBehaviour beh in rootNonArbitratedBehaviours){

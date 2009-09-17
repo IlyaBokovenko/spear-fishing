@@ -46,4 +46,16 @@ public class FishBehaviour : GenericScript
         }
         base.SelfDestroy();
     }
+    
+    protected virtual void PrivateDrawGizmosSelected(){        
+    }
+    
+    public void DrawGizmosSelectedWithChildren(){
+        if(!enabled)
+            return;
+        PrivateDrawGizmosSelected();
+        foreach(FishBehaviour beh in ActiveChildren()){
+            beh.DrawGizmosSelectedWithChildren();
+        }        
+    }
 }

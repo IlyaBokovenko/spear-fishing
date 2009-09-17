@@ -52,18 +52,10 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
         EnterTracking();
     }    
     
-    void OnDrawGizmosSelected(){    
-        if(!enabled)
-            return;
-        
+	protected override void PrivateDrawGizmosSelected(){	    
         if(state == State.Tracking){
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, maxHuntDistance);        
-        }else if(state == State.Hunting){
-            if(hunting.target){
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(transform.TransformPoint(nose), hunting.target.transform.position);                
-            }
         }
     }
 

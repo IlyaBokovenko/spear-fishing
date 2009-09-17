@@ -16,10 +16,14 @@ public class OrientationMatching : FishBehaviour {
         _transform = transform;
     }
     
-    // public override string ToString(){
-    //     return base.ToString() + " (" + delta + ")";
-    // }    
-    
+	protected override void PrivateDrawGizmosSelected(){	    	    
+	    if(_transform == null)
+	        return;
+	        
+	    Gizmos.color = Color.yellow;
+	    Gizmos.DrawRay(_transform.position, orientation);
+    }   
+     
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.OrientationMatching);
         

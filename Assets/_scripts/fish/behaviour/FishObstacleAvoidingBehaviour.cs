@@ -174,9 +174,12 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	    }
 	}
 	
-	private void OnDrawGizmosSelected(){	    
-	    if(!enabled)
-	        return;
+	protected override void PrivateDrawGizmosSelected(){	    
+	    if(state != State.Idle){
+	        Gizmos.color = Color.green;
+	        Gizmos.DrawSphere(hit.point, 0.1f);
+	        Gizmos.DrawLine(hit.point, seekingTarget.transform.position);
+	    }
 	    
         Gizmos.color = Color.blue;
         Line mainRay = MainRay().ToWorldFrom(transform);

@@ -3,21 +3,16 @@ using System.Collections;
 
 public class FishVelocityDrivenSeekingBehaviour : GenericSeekingBehaviour {
 
-    public override Vector3 Direction(){
-        return DirectionFromNose();
+    public override Vector3 From(){
+        return nose;
     }
     
     public override SteeringOutput GetSteering (){
-        Profiler.StartProfile(PT.Seeking);
-        
-        SteeringOutput ret;
-        
-        if(!velocityMatcher || !target)
-            ret = SteeringOutput.empty;      
-        else{
-            velocityMatcher.velocity = Direction() * maxSpeed;
-            ret = velocityMatcher.GetSteering();          
-        }
+        Profiler.StartProfile(PT.Seeking);        
+                
+        velocityMatcher.velocity = Direction() * maxSpeed;
+        orientationMatcher.orientation = rigidbody.velocity;
+        SteeringOutput ret = velocityMatcher.GetSteering() + orientationMatcher.GetSteering();                      
             
         Profiler.EndProfile(PT.Seeking);
         return ret;

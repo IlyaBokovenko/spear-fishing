@@ -48,18 +48,10 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
         EnterCalm();
     }    
     
-    void OnDrawGizmosSelected(){    
-        if(!enabled)
-            return;
-        
+	protected override void PrivateDrawGizmosSelected(){	           
         if(state == State.Calm){
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, safetyDistance);        
-        }else if(state == State.Escaping){
-            if(escape.target){
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(transform.position, escape.target.transform.position);                
-            }
         }
     }
 	

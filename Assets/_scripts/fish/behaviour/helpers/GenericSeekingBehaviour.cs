@@ -6,33 +6,49 @@ public class GenericSeekingBehaviour : FishBehaviour {
     public VelocityMatching velocityMatcher;
     public OrientationMatching orientationMatcher;    
     
-    public GameObject target;
-    public float maxSpeed = 2;
+    private GameObject _target;
+    public GameObject target
+    {
+        get{return _target;}
+        set{_target = value; targetTransform = value.transform;}
+    }
     
-    protected Vector3 nose;
+    public Vector3 center
+    {
+        get{return _transform.position;}
+    }
+    
+    private Vector3 noseRelative;
+    public Vector3 nose
+    {
+        get{return _transform.TransformPoint(noseRelative);}
+    }
+    
+    public float maxSpeed = 2;    
+
     protected Transform _transform;
+    protected Transform targetTransform;
     
     protected virtual void Awake(){
         children = new FishBehaviour[2]{velocityMatcher, orientationMatcher};
-        nose = ((Nose)GetComponent(typeof(Nose))).position;        
+        noseRelative = ((Nose)GetComponent(typeof(Nose))).position;        
         _transform = transform;
     }
     
-    public Vector3 DirectionFromNose(){
-        Vector3 from = _transform.TransformPoint(nose);
-        Vector3 to = target.transform.position;
-        Vector3 direction = (to - from).normalized;
-        return direction;                
+    public virtual Vector3 From(){        
+        return center;
+    }
+    public virtual Vector3 To(){
+        return targetTransform.position;
     }
     
-    public Vector3 DirectionFromCenter(){
-        Vector3 from = _transform.position;
-        Vector3 to = target.transform.position;
-        Vector3 direction = (to - from).normalized;
-        return direction;                
-    }
-
     public virtual Vector3 Direction(){
-        return DirectionFromCenter();
-    }   
+        return (To() - From()).normalized;
+    }    
+
+    protected override void PrivateDrawGizmosSelected(){
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(targetTransform.position, 0.1f);
+        Gizmos.DrawLine(From(), To());        
+    }
 }
