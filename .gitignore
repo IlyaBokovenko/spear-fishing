@@ -6,11 +6,10 @@
 
 Temp/*
 Library/*
-Scenes/*
-_Materials/*
-_Models/*
-_prefabs/*
-_Scenes/*
-_Shaders/*
-_Textures/*
+Assets/_Fonts/*
+Assets/_Materials/*
+Assets/_Models/*
+Assets/_Shaders/*
+Assets/_Textures/*
+
 Unity Player/*
