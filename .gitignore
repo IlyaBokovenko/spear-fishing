@@ -7,4 +7,10 @@
 Temp/*
 Library/*
 Scenes/*
+_Materials/*
+_Models/*
+_prefabs/*
+_Scenes/*
+_Shaders/*
+_Textures/*
 Unity Player/*
