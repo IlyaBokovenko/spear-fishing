@@ -16,12 +16,13 @@ public class Spear : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider other) {
     	GameObject obj = other.gameObject;
+    	
 		if(obj.tag == "Fish" && isActive) {
-			CallHittable(other.gameObject);
+			CallHittable(obj);
 		}
 		if(obj.tag == "Player" && fish != null) {
 			obj.SendMessage("addFish", fish.name + ":" + fish.transform.localScale.x);
-			Destroy(fish);
+			((GenericScript)fish.GetComponent(typeof(FishAI))).DestroyGameObject();
 		}
 	}
 	

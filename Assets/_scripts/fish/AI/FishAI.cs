@@ -90,7 +90,6 @@ public class FishAI : GenericScript, IHittable
 			}
 			elem.Play("Agony");
 		}
-	    //Destroy(elem);
 		
 		rigidbody.useGravity = true;
 	    rigidbody.drag = 10;
