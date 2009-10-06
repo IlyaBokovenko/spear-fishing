@@ -43,7 +43,7 @@ public class FishBiteBehaviour : FishBehaviour {
 	}	
 	
 	void Update(){
-	    if( target == null || targetAI.isDead){	            
+	    if( target == null || (targetAI != null && targetAI.isDead)){	            
                 enabled = false;
                 return;
         }
@@ -65,10 +65,36 @@ public class FishBiteBehaviour : FishBehaviour {
 	}
 	
 	private void DoBite(){	
-	    _bited = true;    
+	    //AnimateAgony();
+		_bited = true;    
 	    foreach(IBitable b in bitables){
 	        if(b != null)
 	            b.OnBite();
 	    }	        
 	}	
+
+	private void AnimateAgony() {
+		foreach(Animation elem in GetComponentsInChildren(typeof(Animation))) {
+			if(!elem.IsPlaying("Agony")) {
+				if(elem.isPlaying) {
+					elem.Stop();
+				}
+				elem.wrapMode = WrapMode.Once;
+				elem.Play("Attack");
+				//elem.PlayQueued("Swim");
+				//elem.wrapMode = WrapMode.Loop;
+			}
+		}
+	}
+	private void AminateSwim() {
+		foreach(Animation elem in GetComponentsInChildren(typeof(Animation))) {
+			if(!elem.IsPlaying("Swim")) {
+				if(elem.isPlaying) {
+					elem.Stop();
+				}
+				elem.wrapMode = WrapMode.Loop;
+				elem.Play("Swim");
+			}
+		}
+	}
 }

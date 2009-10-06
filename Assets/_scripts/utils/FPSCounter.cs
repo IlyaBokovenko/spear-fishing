@@ -10,6 +10,10 @@ public class FPSCounter : MonoBehaviour {
 	private int fps = 0;
 	private int count = 0;
 	
+	void Awake() {
+		useGUILayout = false;
+	}
+	
 	void OnGUI () {
         if(currentTime < updateTime) {
                  currentTime += Time.deltaTime;
@@ -23,11 +27,9 @@ public class FPSCounter : MonoBehaviour {
         }
                 
         if(isShow) {
-           GUI.Box(fpsCounterRect, "FPS : " + fps.ToString());
+           	GUI.Box(fpsCounterRect, "FPS : " + fps.ToString());
         }
-        
-        //GUI.Box(fpsCounterRect, "FPS : " + 1/Time.deltaTime);
-	}
+ 	}
 	
 	int getFPS() {
 		return fps;

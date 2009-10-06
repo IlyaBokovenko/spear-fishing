@@ -69,7 +69,9 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	    seekingTarget.transform.parent = transform;
 	    seeking.target = seekingTarget;	    
 
-	    whiskers = CreateWhiskers();	    
+	    whiskers = CreateWhiskers();
+	
+		lastCastTime = Time.time;
 	}
 	
 	public override SteeringOutput GetSteering(){
@@ -150,7 +152,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         }        
 	}
 	
-	private bool Cast(Line line, out RaycastHit hit){
+	private bool Cast(Line line, out RaycastHit hit) {
         Line worldLine = line.ToWorldFrom(transform);
 	    bool collided = Physics.Raycast (worldLine.from, worldLine.direction, out hit, worldLine.length, obstaclesLayerMask);	    
 	    return collided;

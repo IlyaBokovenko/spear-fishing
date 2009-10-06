@@ -63,7 +63,8 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
      public void OnHit(Spear spear){  
         ExitCurrentState();
         GameObject player = GameObject.FindWithTag("Player");
-        EnterHunting(player);	     
+        if(player != null)
+			EnterHunting(player);	     
 	}
 	
 	public override SteeringOutput GetSteering(){

@@ -7,7 +7,6 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
     
     public float escapeAttemptPeriod = 1f;
     public float safetyDistance  = 3;
-    public float panicTime = 4;    
     
     private Transform _transform;
     private static readonly int predatorsLayerMask;        

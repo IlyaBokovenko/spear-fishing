@@ -26,15 +26,16 @@ public class FishAI : GenericScript, IHittable
 	
 
 	void Start(){
-        GatherRootBehaviours(); 
-        // PrintBehaviours();
-
-        originalScale = transform.localScale;
+        lastUpdateTime = Time.time;
+		GatherRootBehaviours(); 
+        //PrintBehaviours();
+		
+		originalScale = transform.localScale;
         if(!Utils.Approximately(size, 0.0f)) {
             updateScale();    
         }
 	}
-	   
+	
 	void FixedUpdate () {
        if(!isDead)
            TryExecuteBehaviours();
@@ -76,17 +77,22 @@ public class FishAI : GenericScript, IHittable
 
 	public void Die(){
 		ArrayList behs = new ArrayList(GetComponents(typeof(FishBehaviour)));		
+
 	    foreach(GenericScript elem in behs)
 	        elem.SelfDestroy();
-    
-	    foreach(GenericScript elem in GetComponentsInChildren(typeof(FishAnimation)))
+		
+		foreach(GenericScript elem in GetComponentsInChildren(typeof(FishAnimation)))
 	        elem.SelfDestroy();
-	        
-
-	    foreach(Animation elem in GetComponentsInChildren(typeof(Animation)))
-	        Destroy(elem);
-
-	    rigidbody.useGravity = true;
+	    
+		foreach(Animation elem in GetComponentsInChildren(typeof(Animation))) {
+			if(elem.isPlaying) {
+				elem.Stop();
+			}
+			elem.Play("Agony");
+		}
+	    //Destroy(elem);
+		
+		rigidbody.useGravity = true;
 	    rigidbody.drag = 10;
         
 	    _isDead = true;

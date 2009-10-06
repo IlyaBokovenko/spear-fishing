@@ -20,13 +20,14 @@ public class FishWanderingBehaviour : FishArbitratedBehaviour {
     }
     
     void Start(){        
-        CreatePoleWithCarrot();        
+        lastCarrotUpdate = Time.time;
+		CreatePoleWithCarrot();        
         seeking.target = invisibleCarrot;
     }
 
     public override SteeringOutput GetSteering (){
         Profiler.StartProfile(PT.Wandering);
-        
+
         SteeringOutput ret;
 
         if(!invisiblePole)

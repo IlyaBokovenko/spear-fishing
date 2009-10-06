@@ -23,18 +23,39 @@ public class SpawnFish : MonoBehaviour {
 	}
 
     ////////////////////////////////////////////////////////////////////////
-
-    void Spawn(){
+	void Spawn(){
         Quaternion rotation = Random.rotation;        
         GameObject fish  = (GameObject)Instantiate(fishSample, new Vector3(10000, 10000, 10000), rotation);
-        cloneName = fish.name;          
+        cloneName = fish.name = fishSample.name;          
         DeathNotifier notifier = (DeathNotifier)fish.AddComponent(typeof(DeathNotifier));
         notifier.notefee = this;        
         FishAI fishComponent  = (FishAI)fish.GetComponent(typeof(FishAI));
         fishComponent.setSize(RandomSize());        
         MoveToClearWater(fish);        
     }
-    
+    /*
+	void Spawn() {
+		Quaternion rotation = Quaternion.identity;//Random.rotation;        
+        Vector3 position = transform.position;
+		//position.x = Random.Range( -spawnVolumeBounds.x/2 * 10.0f, spawnVolumeBounds.x/2 * 10.0f) * 0.1f;
+		//position.y = Random.Range( -spawnVolumeBounds.y/2 * 10.0f, spawnVolumeBounds.y/2 * 10.0f) * 0.1f;
+		//position.z = Random.Range( -spawnVolumeBounds.z/2* 10.0f, spawnVolumeBounds.z/2 * 10.0f) * 0.1f;
+		
+		//position.y = 1.0f;
+		
+		GameObject fish  = (GameObject)Instantiate(fishSample, position, rotation);
+        cloneName = fish.name;          
+        DeathNotifier notifier = (DeathNotifier)fish.AddComponent(typeof(DeathNotifier));
+        notifier.notefee = this;        
+        FishAI fishComponent  = (FishAI)fish.GetComponent(typeof(FishAI));
+        fishComponent.setSize(RandomSize());        
+        
+		//Debug.Log(fishSample.name + " respawn at : " + position);
+		Debug.Break();
+		//MoveToClearWater(fish);
+	}//*/
+
+
     float RandomSize(){
         float minPower = Mathf.Log(minSizeDeviation,2);
         float maxPower = Mathf.Log(maxSizeDeviation,2);
@@ -58,7 +79,6 @@ public class SpawnFish : MonoBehaviour {
         
         obj.transform.position = point;
     }
-
 
     Vector3 SpawnPoint(){
         Vector3 randomPointInUnitCube = new Vector3(Random.value, Random.value, Random.value);
