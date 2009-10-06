@@ -53,7 +53,7 @@ public class GameMaster : MonoBehaviour {
 			bmFPSCount = 0;
 		} else {
 			lives = 3;
-			Load();
+            // Load();
 		}
 		Pause(false);
 	}

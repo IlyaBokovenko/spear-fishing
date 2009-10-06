@@ -31,11 +31,10 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
     }
     
     protected override ArrayList ActiveChildren(){
-
-        if(state == State.Escaping)
-            return base.ActiveChildren();
-        else
+        if(state != State.Escaping)
             return new ArrayList();
+            
+        return base.ActiveChildren();
     }
     
     void Awake(){
@@ -80,6 +79,7 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
 	}
 	
 	private void EnterEscape(GameObject obj){
+	    state = State.Escaping;
 	    escape.StartEscapingFrom(obj);
 	}
 	
