@@ -12,7 +12,6 @@ public class SpawnFish : MonoBehaviour {
     
     void Start(){
         for(int i = 0; i < population; i++){
-            // StartCoroutine("Spawn");
             Spawn();
         }         
     }
@@ -33,28 +32,6 @@ public class SpawnFish : MonoBehaviour {
         fishComponent.setSize(RandomSize());        
         MoveToClearWater(fish);        
     }
-    /*
-	void Spawn() {
-		Quaternion rotation = Quaternion.identity;//Random.rotation;        
-        Vector3 position = transform.position;
-		//position.x = Random.Range( -spawnVolumeBounds.x/2 * 10.0f, spawnVolumeBounds.x/2 * 10.0f) * 0.1f;
-		//position.y = Random.Range( -spawnVolumeBounds.y/2 * 10.0f, spawnVolumeBounds.y/2 * 10.0f) * 0.1f;
-		//position.z = Random.Range( -spawnVolumeBounds.z/2* 10.0f, spawnVolumeBounds.z/2 * 10.0f) * 0.1f;
-		
-		//position.y = 1.0f;
-		
-		GameObject fish  = (GameObject)Instantiate(fishSample, position, rotation);
-        cloneName = fish.name;          
-        DeathNotifier notifier = (DeathNotifier)fish.AddComponent(typeof(DeathNotifier));
-        notifier.notefee = this;        
-        FishAI fishComponent  = (FishAI)fish.GetComponent(typeof(FishAI));
-        fishComponent.setSize(RandomSize());        
-        
-		//Debug.Log(fishSample.name + " respawn at : " + position);
-		Debug.Break();
-		//MoveToClearWater(fish);
-	}//*/
-
 
     float RandomSize(){
         float minPower = Mathf.Log(minSizeDeviation,2);
@@ -67,17 +44,19 @@ public class SpawnFish : MonoBehaviour {
     void MoveToClearWater(GameObject obj){        
         Collider fc = (Collider)obj.GetComponentInChildren(typeof(Collider));        
         
-        float objSize = fc.bounds.extents.magnitude;      
+        float objSize = fc.bounds.extents.magnitude;    
         
         Vector3 point = Vector3.zero;
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 300; i++){
             point = SpawnPoint();
-            Collider[] cs = Physics.OverlapSphere(point, objSize);
-            if(cs.Length == 0)
-                break;
+            Collider[] cs = Physics.OverlapSphere(point, objSize * 2);
+            if(cs.Length == 0){
+                obj.transform.position = point;
+                return;
+            }                
         }
         
-        obj.transform.position = point;
+        print("can't find place for fish");
     }
 
     Vector3 SpawnPoint(){
