@@ -16,12 +16,34 @@ public class FishAI : GenericScript, IHittable
 	private Vector3 originalScale;
 	private float size = 0.0f;
 
-    private ArrayList activeBehaviours;
+    private FishBehaviour[] rawActiveBehaviours;
+    private int activeBehaviourCount;
 	private FishBehaviour[] rootNonArbitratedBehaviours;
 	private FishArbitratedBehaviour[][] rootArbitratedBehaviours;	
 	
 	private float deltaTime{
 	    get{return Time.time - lastUpdateTime;}
+	}
+	
+	private void AllocateActiveBehaviours(int num){
+        // print("resetting behaviours to " + num);
+	    rawActiveBehaviours = new FishBehaviour[num];
+	    ResetActiveBehaviors();
+	}
+	
+	private void ResetActiveBehaviors(){
+	    activeBehaviourCount = 0;
+	}
+	
+	private void AddActiveBehaviour(FishBehaviour beh){
+        // print("behaviours: " + rawActiveBehaviours.Length + "; trying to push: " + activeBehaviourCount + 1);
+	    rawActiveBehaviours[activeBehaviourCount++] = beh;
+	}
+	
+	private IEnumerable ActiveBehaviours(){
+	    for(int i = 0; i < activeBehaviourCount; i++){
+	        yield return rawActiveBehaviours[i];
+	    }
 	}
 	
 
@@ -50,18 +72,18 @@ public class FishAI : GenericScript, IHittable
 	///////////////
 	
 	public string BehavioursDescription(){
-	    if(activeBehaviours == null)
-	        return "";
-	        
-        string msg = "";        
-        foreach(FishBehaviour beh in activeBehaviours){
+        if(activeBehaviourCount == 0)
+            return "";
+            
+        string msg = "";
+        foreach(FishBehaviour beh in ActiveBehaviours()){
             if(!beh)
                 continue;
-            if(beh.enabled)
-                msg += beh.ToStringWithChildren() + "\n";            
+            if(!beh.enabled)
+                continue;
+            msg += beh.ToStringWithChildren() + "\n";
         }
-        
-        return msg;	    
+        return msg;
 	}
     
 
@@ -102,7 +124,7 @@ public class FishAI : GenericScript, IHittable
 	private void ExecuteRootBehaviours(){
 	    Profiler.StartProfile(PT.ExecBehs);
 	    
-	    activeBehaviours = new ArrayList();
+	    ResetActiveBehaviors();
 	    
         // execute non-arbitrated behaviours
         foreach(FishBehaviour beh in rootNonArbitratedBehaviours){
@@ -112,7 +134,7 @@ public class FishAI : GenericScript, IHittable
          SteeringOutput steering = beh.GetSteering();
          if(steering.Significant())
              steering.ApplyTo(gameObject, deltaTime);             
-             activeBehaviours.Add(beh);
+             AddActiveBehaviour(beh);
         }
 	
 		// execute arbitrated behaviours
@@ -133,7 +155,7 @@ public class FishAI : GenericScript, IHittable
                     continue;
 		
                 steering.ApplyTo(gameObject, deltaTime);
-                activeBehaviours.Add(beh);
+                AddActiveBehaviour(beh);
 				isAlreadyApplied = true;		
 			}
 	    }
@@ -153,6 +175,8 @@ public class FishAI : GenericScript, IHittable
 	    // find roots
 	    ArrayList allBehaviours = new ArrayList(GetComponents(typeof(FishBehaviour)));
 		ArrayList allRootBehaviours = (ArrayList)allBehaviours.Clone();
+		AllocateActiveBehaviours(allBehaviours.Count);
+		
 		foreach(FishBehaviour beh in allBehaviours){
 		    beh.RemoveChildrenFrom(allRootBehaviours);
 		}
@@ -170,14 +194,14 @@ public class FishAI : GenericScript, IHittable
 		rootNonArbitratedBehaviours = (FishBehaviour[])tmpRootNonArbitratedBehaviours.ToArray(typeof(FishBehaviour));		
 		// group arbitrated behaviours by priorities
 		rootArbitratedBehaviours = FishArbitratedBehaviour.GroupByPriorities(tmpRootArbitratedBehaviours);		
-        // PrintBehaviours();
+        // PrintBehaviours();        
 	}
 	
 	void OnDrawGizmosSelected(){
-	    if(activeBehaviours == null)
+	    if(activeBehaviourCount == 0)
 	        return;
 	        
-	    foreach(FishBehaviour beh in activeBehaviours){
+	    foreach(FishBehaviour beh in ActiveBehaviours()){
 	        beh.DrawGizmosSelectedWithChildren();
 	    }
 	}
