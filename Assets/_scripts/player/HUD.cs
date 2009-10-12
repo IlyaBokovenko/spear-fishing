@@ -3,6 +3,7 @@ using System.Collections;
 
 public class HUD : MonoBehaviour {
 	public bool hideHud = false;
+	public bool isFreeVersion = false;
 	//Textures
 	//GUI
 	public Texture2D crosshair;
@@ -101,7 +102,9 @@ public class HUD : MonoBehaviour {
 		rcCrosshair = new Rect(Screen.width / 2 - 8, Screen.height / 2 - 8, 16, 16);
 		rcAirTank = new Rect(Screen.width / 2 - 120, Screen.height - 150, 100,150);
 		rcWatch = new Rect(Screen.width / 2 - 64, Screen.height - 130, 128 , 128);
-		rcStatus = new Rect(Screen.width / 2 - 115, 0, 229, 26);
+		
+		float statusHeight = isFreeVersion ? 50 : 0;
+		rcStatus = new Rect(Screen.width / 2 - 115, statusHeight, 229, 26);
 		
 		int yLayout = 134;
 		btPesume = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
