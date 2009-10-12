@@ -11,6 +11,7 @@
 #import "ARRollerProtocol.h"
 #import "ARRollerView.h"
 
+#import "FBPlayerPrefs.h"
 
 @interface AdwhirlController : UIViewController<ARRollerDelegate> {
 	
@@ -741,15 +742,33 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 {
 	printf_console("-> applicationDidFinishLaunching()\n");
 	[self startUnity:application];	
+	
+	
 }
 	
 - (void) applicationDidBecomeActive:(UIApplication*)application
 {
 	printf_console("-> applicationDidBecomeActive()\n");
 	UnitySetAudioSessionActive(true);
-	UnityPause(false);
+	UnityPause(false);	
 	
+	[FBPlayerPrefs setInt:0 withKey:@"someFlag"];
+	[NSTimer scheduledTimerWithTimeInterval:1.0 target:self
+								   selector:@selector(checkForFlag:)
+								   userInfo:nil repeats:YES];
+	
+	//_adController.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
 	[NSTimer scheduledTimerWithTimeInterval: 2.0 target: self selector: @selector(showAdView) userInfo: nil repeats: NO]; 
+}
+
+-(void)checkForFlag: (NSTimer*) timer{
+	if([FBPlayerPrefs getInt:@"someFlag" orDefault:0] == 1){
+		UILabel* label  = [[UILabel alloc] initWithFrame: CGRectMake(10, 10, 100, 100)];
+		label.text = @"QQQ";
+		[[[UIApplication sharedApplication] keyWindow] addSubview: label];
+		
+		[FBPlayerPrefs setInt:0 withKey:@"someFlag"];
+	}
 }
 
 - (void) applicationWillResignActive:(UIApplication*)application
@@ -788,7 +807,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 
 -(void)showAdView{
 	//_adController = [AdwhirlController createAdwhirlControllerIn: [[UIApplication sharedApplication] keyWindow]];
-	_adController.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
+	//_adController.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
 }
 
 @end

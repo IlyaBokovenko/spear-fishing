@@ -248,6 +248,8 @@ public class HUD : MonoBehaviour {
 		fishInfo = new FishInfo(fishes);
 		isComplete = true;
 		state = GALLERY;
+		
+		PlayerPrefs.SetInt("someFlag", 1);
 	}
 	
 	public void showBenchResult(string arg) { benchString = arg; state = BENCHMARK; }
