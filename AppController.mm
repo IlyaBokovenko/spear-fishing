@@ -49,7 +49,7 @@
 #pragma mark ARRollerDelegate
 
 - (NSString*)adWhirlApplicationKey{
-	return @"d3a1d37a928b102caf90c29cca1d33aa";
+	return @"9bbe397d0864102d96dc5b26aef5c1e9";
 }
 
 #pragma mark ARRollerDelegate optional delegate method implementations 
