@@ -17,7 +17,7 @@ public class GameMaster : MonoBehaviour {
 	private float underwaterLevel = 3.0f;
 	private float airMax = 240.0f;
 	private float healthMax = 100.0f;
-	private float gameTimer = 60.0f;
+	private float gameTimer = 6.0f;
 	private float currentTimer = 0.0f;
 	private int lives = 0;
 

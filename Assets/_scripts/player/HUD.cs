@@ -94,7 +94,7 @@ public class HUD : MonoBehaviour {
 		InitControlButton();
 		state = hideHud ? HIDEHUD : GAME;
 		gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
-	}
+	}	
 
 	void GUIInit() {
 		btMenu = new Rect(0, 0, 48, 48);
@@ -197,17 +197,24 @@ public class HUD : MonoBehaviour {
 				if(bgGallery)
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgGallery);
 				
-				GUI.Label(new Rect(292,135,64,24), "" + fishInfo.getCount(FishInfo.YELLOWFINTUNA), galleryText);
-				GUI.Label(new Rect(348,135,64,24), "" + fishInfo.getWeight(FishInfo.YELLOWFINTUNA), galleryText);
+				GUI.Label(new Rect(292,125,64,4), "" + fishInfo.getCount(FishInfo.YELLOWFINTUNA), galleryText);
+				GUI.Label(new Rect(348,125,64,24), "" + fishInfo.getWeight(FishInfo.YELLOWFINTUNA), galleryText);
 				
-				GUI.Label(new Rect(292,182,64,24), "" + fishInfo.getCount(FishInfo.REDSNAPPER), galleryText);
-				GUI.Label(new Rect(348,182,64,24), "" + fishInfo.getWeight(FishInfo.REDSNAPPER), galleryText);
+				GUI.Label(new Rect(292,172,64,24), "" + fishInfo.getCount(FishInfo.REDSNAPPER), galleryText);
+				GUI.Label(new Rect(348,172,64,24), "" + fishInfo.getWeight(FishInfo.REDSNAPPER), galleryText);
 				
-				GUI.Label(new Rect(292,229,64,24), "" + fishInfo.getCount(FishInfo.GROUPER), galleryText);
-				GUI.Label(new Rect(348,229,64,24), "" + fishInfo.getWeight(FishInfo.GROUPER), galleryText);
+				GUI.Label(new Rect(292,219,64,24), "" + fishInfo.getCount(FishInfo.GROUPER), galleryText);
+				GUI.Label(new Rect(348,219,64,24), "" + fishInfo.getWeight(FishInfo.GROUPER), galleryText);
 				
-				GUI.Label(new Rect(136,272,64,24), "" + fishes.Count, galleryText);
-				GUI.Label(new Rect(386,272,64,24), "" + (int)weight, galleryText);
+				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);
+				GUI.Label(new Rect(386,262,64,24), "" + (int)weight, galleryText);
+				
+				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
+				    PlayerPrefs.SetInt("totalCount", fishes.Count);
+				    PlayerPrefs.SetInt("totalWeight", weight);				    
+				    PlayerPrefs.SetInt("upload", 1);
+				    print("upload button pressed");
+				}
 				
 				if(GUI.Button(new Rect(0,0,Screen.width, Screen.height), "", buttonNull)) {
 					if(isComplete) {
@@ -247,9 +254,7 @@ public class HUD : MonoBehaviour {
 	public void showComplete() {
 		fishInfo = new FishInfo(fishes);
 		isComplete = true;
-		state = GALLERY;
-		
-		PlayerPrefs.SetInt("someFlag", 1);
+		state = GALLERY;		
 	}
 	
 	public void showBenchResult(string arg) { benchString = arg; state = BENCHMARK; }

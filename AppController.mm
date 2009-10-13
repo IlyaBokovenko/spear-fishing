@@ -12,21 +12,25 @@
 #import "ARRollerView.h"
 
 #import "FBPlayerPrefs.h"
+#import "FacebookController.h"
 
 @interface AdwhirlController : UIViewController<ARRollerDelegate> {
 	
 }
 
-+(AdwhirlController*) createAdwhirlControllerIn: (UIView*)parent;
++(AdwhirlController*) createAdwhirlControllerWith: (UIView*)parent;
 @end
 
 @implementation AdwhirlController
 
-+(AdwhirlController*) createAdwhirlControllerIn: (UIView*)parent{
++(AdwhirlController*) createAdwhirlControllerWith: (UIView*)parent{
 	AdwhirlController* instance = [self new];
 	
-	//[instance retain]; // ARRollerView for some reason releases it's delegate
+	[instance retain]; // ARRollerView for some reason releases it's delegate
 	ARRollerView* roller = [ARRollerView requestRollerViewWithDelegate:instance];	
+//	UILabel* roller = [UILabel new];
+//	roller.text = @"TEST";
+//	roller.backgroundColor = [UIColor redColor];
 	
 	instance.view = roller;
 	[parent addSubview:roller];	
@@ -34,9 +38,6 @@
 	return instance;
 }
 
-- (void) viewDidLoad{
-	[super viewDidLoad];		
-}
 
 - (void) dealloc{	
 	[super dealloc];
@@ -50,7 +51,7 @@
 #pragma mark ARRollerDelegate
 
 - (NSString*)adWhirlApplicationKey{
-	return @"9bbe397d0864102d96dc5b26aef5c1e9";
+	return @"d3a1d37a928b102caf90c29cca1d33aa";
 }
 
 #pragma mark ARRollerDelegate optional delegate method implementations 
@@ -65,6 +66,13 @@
 	NSLog(@"Failed to receive ad from \n%@.  \nUsing Backup: %@", [adWhirlView mostRecentNetworkName], YesOrNo ? @"YES" : @"NO"); 
 }
 
+- (void)rollerReceivedNotificationAdsAreOff:(ARRollerView*)adWhirlView{
+	NSLog(@"Ads are off");
+}
+
+- (void)rollerReceivedRequestForDeveloperToFulfill:(ARRollerView*)adWhirlView{
+	NSLog(@"Custom ads");
+}
 
 @end
 
@@ -372,6 +380,7 @@ UIWindow *				_window;
 NSTimer*				_timer;
 BOOL					_accelerometerIsActive = NO;
 AdwhirlController*		_adController;
+FacebookController*		_facebookController;
 
 bool CreateWindowSurface(CAEAGLLayer* eaglLayer, GLuint format, GLuint depthFormat, bool retained, MyEAGLSurface* surface)
 {
@@ -513,8 +522,8 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	EAGLView* view = [[EAGLView alloc] initWithFrame:rect];
 	[_window addSubview:view];
 	
-	_adController = [AdwhirlController createAdwhirlControllerIn: _window];
-	
+	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
+
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
 	
@@ -741,9 +750,8 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 - (void) applicationDidFinishLaunching:(UIApplication*)application
 {
 	printf_console("-> applicationDidFinishLaunching()\n");
+	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight animated:NO];
 	[self startUnity:application];	
-	
-	
 }
 	
 - (void) applicationDidBecomeActive:(UIApplication*)application
@@ -752,22 +760,28 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	UnitySetAudioSessionActive(true);
 	UnityPause(false);	
 	
-	[FBPlayerPrefs setInt:0 withKey:@"someFlag"];
-	[NSTimer scheduledTimerWithTimeInterval:1.0 target:self
-								   selector:@selector(checkForFlag:)
+	[FBPlayerPrefs setInt:0 withKey:@"upload"];
+	[NSTimer scheduledTimerWithTimeInterval:0.25 target:self
+								   selector:@selector(checkUploadButton:)
 								   userInfo:nil repeats:YES];
 	
-	//_adController.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
-	[NSTimer scheduledTimerWithTimeInterval: 2.0 target: self selector: @selector(showAdView) userInfo: nil repeats: NO]; 
+	//_adController.view.frame = CGRectMake(3print("!!!!");20-48-2, (480-320)/2, 48, 320);
+	[NSTimer scheduledTimerWithTimeInterval: 2.0 target: self selector: @selector(adjustViewSize) userInfo: nil repeats: NO]; 
 }
 
--(void)checkForFlag: (NSTimer*) timer{
-	if([FBPlayerPrefs getInt:@"someFlag" orDefault:0] == 1){
-		UILabel* label  = [[UILabel alloc] initWithFrame: CGRectMake(10, 10, 100, 100)];
-		label.text = @"QQQ";
-		[[[UIApplication sharedApplication] keyWindow] addSubview: label];
+-(void)checkUploadButton: (NSTimer*) timer{	
+	if(_facebookController && _facebookController.isExternalGuiShown)
+		return;
+	
+	int value = [FBPlayerPrefs getInt:@"upload" orDefault:0];
+	if(value == 1){		
+		[FBPlayerPrefs setInt:0 withKey:@"upload"];
 		
-		[FBPlayerPrefs setInt:0 withKey:@"someFlag"];
+		if(!_facebookController) _facebookController = [FacebookController createFacebookController];				
+		
+		int fishes = [FBPlayerPrefs getInt:@"totalFishes" orDefault:0];
+		int weight = [FBPlayerPrefs getInt:@"totalWeight" orDefault:0];
+		[_facebookController uploadScoreFishes: fishes weight:weight];		
 	}
 }
 
@@ -805,9 +819,8 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	_accelerometerIsActive = YES;
 }
 
--(void)showAdView{
-	//_adController = [AdwhirlController createAdwhirlControllerIn: [[UIApplication sharedApplication] keyWindow]];
-	//_adController.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
+-(void)adjustViewSize{	
+	_adController.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
 }
 
 @end
