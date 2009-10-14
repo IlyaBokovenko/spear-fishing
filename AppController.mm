@@ -8,74 +8,9 @@
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
 
-#import "ARRollerProtocol.h"
-#import "ARRollerView.h"
-
 #import "FBPlayerPrefs.h"
 #import "FacebookController.h"
-
-@interface AdwhirlController : UIViewController<ARRollerDelegate> {
-	
-}
-
-+(AdwhirlController*) createAdwhirlControllerWith: (UIView*)parent;
-@end
-
-@implementation AdwhirlController
-
-+(AdwhirlController*) createAdwhirlControllerWith: (UIView*)parent{
-	AdwhirlController* instance = [self new];
-	
-	[instance retain]; // ARRollerView for some reason releases it's delegate
-	ARRollerView* roller = [ARRollerView requestRollerViewWithDelegate:instance];	
-//	UILabel* roller = [UILabel new];
-//	roller.text = @"TEST";
-//	roller.backgroundColor = [UIColor redColor];
-	
-	instance.view = roller;
-	[parent addSubview:roller];	
-
-	return instance;
-}
-
-
-- (void) dealloc{	
-	[super dealloc];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
-}
-
-#pragma mark ARRollerDelegate
-
-- (NSString*)adWhirlApplicationKey{
-	return @"d3a1d37a928b102caf90c29cca1d33aa";
-}
-
-#pragma mark ARRollerDelegate optional delegate method implementations 
-
-- (void)didReceiveAd:(ARRollerView*)adWhirlView 
-{ 
-	NSLog(@"Received ad from \n%@!", [adWhirlView mostRecentNetworkName]); 
-    
-} 
-- (void)didFailToReceiveAd:(ARRollerView*)adWhirlView usingBackup:(BOOL)YesOrNo 
-{ 
-	NSLog(@"Failed to receive ad from \n%@.  \nUsing Backup: %@", [adWhirlView mostRecentNetworkName], YesOrNo ? @"YES" : @"NO"); 
-}
-
-- (void)rollerReceivedNotificationAdsAreOff:(ARRollerView*)adWhirlView{
-	NSLog(@"Ads are off");
-}
-
-- (void)rollerReceivedRequestForDeveloperToFulfill:(ARRollerView*)adWhirlView{
-	NSLog(@"Custom ads");
-}
-
-@end
-
+#import "AdwhirlController.h"
 
 // NSTIMER_BASED_LOOP
 //
@@ -523,6 +458,8 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	[_window addSubview:view];
 	
 	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
+	[_adController showDummyBanner];
+	[_adController adjustViewSize];
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
@@ -762,26 +699,28 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	
 	[FBPlayerPrefs setInt:0 withKey:@"upload"];
 	[NSTimer scheduledTimerWithTimeInterval:0.25 target:self
-								   selector:@selector(checkUploadButton:)
-								   userInfo:nil repeats:YES];
+								   selector:@selector(updateUI:)
+								   userInfo:nil repeats:YES];	
 	
-	//_adController.view.frame = CGRectMake(3print("!!!!");20-48-2, (480-320)/2, 48, 320);
-	[NSTimer scheduledTimerWithTimeInterval: 2.0 target: self selector: @selector(adjustViewSize) userInfo: nil repeats: NO]; 
+	//[NSTimer scheduledTimerWithTimeInterval: 2.0 target: _adController selector: @selector(adjustViewSize) userInfo: nil repeats: NO]; 
 }
-
--(void)checkUploadButton: (NSTimer*) timer{	
-	if(_facebookController && _facebookController.isExternalGuiShown)
-		return;
+ 
+-(void)updateUI: (NSTimer*) timer{	
+	BOOL isGameRunning = [FBPlayerPrefs getInt:@"game" orDefault:0];
+	_adController.view.hidden = !isGameRunning;
 	
-	int value = [FBPlayerPrefs getInt:@"upload" orDefault:0];
-	if(value == 1){		
-		[FBPlayerPrefs setInt:0 withKey:@"upload"];
-		
-		if(!_facebookController) _facebookController = [FacebookController createFacebookController];				
-		
-		int fishes = [FBPlayerPrefs getInt:@"totalFishes" orDefault:0];
-		int weight = [FBPlayerPrefs getInt:@"totalWeight" orDefault:0];
-		[_facebookController uploadScoreFishes: fishes weight:weight];		
+	BOOL externalGuiShown = _facebookController && _facebookController.isExternalGuiShown;
+	if(!externalGuiShown){
+		int value = [FBPlayerPrefs getInt:@"upload" orDefault:0];
+		if(value == 1){		
+			[FBPlayerPrefs setInt:0 withKey:@"upload"];
+			
+			if(!_facebookController) _facebookController = [FacebookController createFacebookController];				
+			
+			int fishes = [FBPlayerPrefs getInt:@"totalFishes" orDefault:0];
+			int weight = [FBPlayerPrefs getInt:@"totalWeight" orDefault:0];
+			[_facebookController uploadScoreFishes: fishes weight:weight];		
+		}		
 	}
 }
 
@@ -817,10 +756,6 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 {
 	UnityDidAccelerate(acceleration.x, acceleration.y, acceleration.z, acceleration.timestamp);
 	_accelerometerIsActive = YES;
-}
-
--(void)adjustViewSize{	
-	_adController.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
 }
 
 @end

@@ -117,8 +117,12 @@ public class HUD : MonoBehaviour {
 	}
 
 	void OnGUI() {
+	    PlayerPrefs.SetInt("game", 0);
+	    
 		switch(state) {
 			case 0 : //GAME
+			    PlayerPrefs.SetInt("game", 1);
+			    
 				if(crosshair)
 					GUI.DrawTexture(rcCrosshair, crosshair);
 				if(mask)

@@ -138,9 +138,12 @@ static NSString* SHARE_PERMISSION = @"share_item";
 
 #pragma mark FBDialogDelegate 
 
-- (void)dialogDidSucceed:(FBDialog*)dialog { // permission granted
+- (void)dialogDidSucceed:(FBDialog*)dialog { // permission or login dialog
    isExternalGuiShown = NO;
-   [self performSelectorOnMainThread:@selector(postLink) withObject:nil waitUntilDone:NO];
+	
+	if([dialog isKindOfClass: [FBPermissionDialog class]]){
+		[self performSelectorOnMainThread:@selector(postLink) withObject:nil waitUntilDone:NO];		
+	} 
 }
 
 - (void)dialogDidCancel:(FBDialog*)dialog { 

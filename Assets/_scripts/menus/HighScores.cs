@@ -43,6 +43,8 @@ public class HighScores : MonoBehaviour {
 				keyboard = iPhoneKeyboard.Open(players[newPlayerPosition].name, iPhoneKeyboardType.Default);
 			MainMenu.CleanPlayerPrefs();
 		}
+		
+		PlayerPrefs.SetInt("game", 0);
 	}
 	
 	void OnGUI () {

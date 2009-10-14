@@ -23,6 +23,9 @@
 		0975D5131084EB64004BC774 /* FacebookController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0975D50E1084EB64004BC774 /* FacebookController.m */; };
 		0975D5141084EB64004BC774 /* FacebookPermissionChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 0975D5101084EB64004BC774 /* FacebookPermissionChecker.m */; };
 		0975D5151084EB64004BC774 /* UIAlertView+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 0975D5121084EB64004BC774 /* UIAlertView+Utils.m */; };
+		0975DB461085E3540007CF0B /* dummy-ad.png in Resources */ = {isa = PBXBuildFile; fileRef = 0975DB451085E3540007CF0B /* dummy-ad.png */; };
+		097B02081085E5C20032F6F5 /* AdwhirlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 097B02071085E5C20032F6F5 /* AdwhirlController.m */; };
+		09F09D60108600C9008E29AE /* FBSession+Fix.m in Sources */ = {isa = PBXBuildFile; fileRef = 09F09D5F108600C9008E29AE /* FBSession+Fix.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		5682F4B20F3B34FF007A219C /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5682F4B10F3B34FF007A219C /* MediaPlayer.framework */; };
 		5692F3DD0FA9D8E500EBA2F1 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5692F3DC0FA9D8E500EBA2F1 /* CoreLocation.framework */; };
@@ -97,6 +100,11 @@
 		0975D5101084EB64004BC774 /* FacebookPermissionChecker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FacebookPermissionChecker.m; path = Classes/FacebookPermissionChecker.m; sourceTree = "<group>"; };
 		0975D5111084EB64004BC774 /* UIAlertView+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertView+Utils.h"; path = "Classes/UIAlertView+Utils.h"; sourceTree = "<group>"; };
 		0975D5121084EB64004BC774 /* UIAlertView+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertView+Utils.m"; path = "Classes/UIAlertView+Utils.m"; sourceTree = "<group>"; };
+		0975DB451085E3540007CF0B /* dummy-ad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dummy-ad.png"; sourceTree = "<group>"; };
+		097B02061085E5C20032F6F5 /* AdwhirlController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdwhirlController.h; sourceTree = "<group>"; };
+		097B02071085E5C20032F6F5 /* AdwhirlController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdwhirlController.m; sourceTree = "<group>"; };
+		09F09D5E108600C9008E29AE /* FBSession+Fix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "FBSession+Fix.h"; path = "Classes/FBSession+Fix.h"; sourceTree = "<group>"; };
+		09F09D5F108600C9008E29AE /* FBSession+Fix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "FBSession+Fix.m"; path = "Classes/FBSession+Fix.m"; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* SpearFishing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpearFishing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5682F4B10F3B34FF007A219C /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
@@ -177,6 +185,8 @@
 		0975CA1F1084A27E004BC774 /* OtherSources */ = {
 			isa = PBXGroup;
 			children = (
+				09F09D5E108600C9008E29AE /* FBSession+Fix.h */,
+				09F09D5F108600C9008E29AE /* FBSession+Fix.m */,
 				0975D50D1084EB64004BC774 /* FacebookController.h */,
 				0975D50E1084EB64004BC774 /* FacebookController.m */,
 				0975D50F1084EB64004BC774 /* FacebookPermissionChecker.h */,
@@ -220,6 +230,14 @@
 			path = FBConnect;
 			sourceTree = "<group>";
 		};
+		097B01FB1085E5530032F6F5 /* img */ = {
+			isa = PBXGroup;
+			children = (
+				0975DB451085E3540007CF0B /* dummy-ad.png */,
+			);
+			name = img;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -231,6 +249,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				097B01FB1085E5530032F6F5 /* img */,
 				0975CA1F1084A27E004BC774 /* OtherSources */,
 				56BCBA380FCF049A0030C3B2 /* SystemConfiguration.framework */,
 				5692F3DC0FA9D8E500EBA2F1 /* CoreLocation.framework */,
@@ -280,6 +299,8 @@
 				D82DCFBC0E8000A5005D6AD8 /* MainWindow.xib */,
 				D82DCFBD0E8000A5005D6AD8 /* RegisterClasses.cpp */,
 				D82DCFBE0E8000A5005D6AD8 /* RegisterClasses.h */,
+				097B02061085E5C20032F6F5 /* AdwhirlController.h */,
+				097B02071085E5C20032F6F5 /* AdwhirlController.m */,
 			);
 			path = Classes;
 			sourceTree = SOURCE_ROOT;
@@ -348,6 +369,7 @@
 				83DEA7430EACED0700D8A291 /* Default.png in Resources */,
 				83DEA7440EACED0700D8A291 /* Icon.png in Resources */,
 				0975CA381084A29E004BC774 /* FBConnect.bundle in Resources */,
+				0975DB461085E3540007CF0B /* dummy-ad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,6 +415,8 @@
 				0975D5131084EB64004BC774 /* FacebookController.m in Sources */,
 				0975D5141084EB64004BC774 /* FacebookPermissionChecker.m in Sources */,
 				0975D5151084EB64004BC774 /* UIAlertView+Utils.m in Sources */,
+				097B02081085E5C20032F6F5 /* AdwhirlController.m in Sources */,
+				09F09D60108600C9008E29AE /* FBSession+Fix.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,10 +504,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = fbconnect;
-				OTHER_LDFLAGS = (
-					"-Wl,-S,-x,",
-					"-ObjC",
-				);
+				OTHER_LDFLAGS = "-Wl,-S,-x";
 				PREBINDING = NO;
 				SDKROOT = iphoneos2.0;
 			};

@@ -53,6 +53,8 @@ public class MainMenu : MonoBehaviour {
 		rectHelp = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		//rectBenchMark = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		rectMoreGames = new Rect((Screen.width - btSize.x) / 2, Screen.height - 6 - btSize.y, btSize.x, btSize.y);
+		
+		 PlayerPrefs.SetInt("game", 0);
 	}
 	// Update is called once per frame
 	void OnGUI () {
