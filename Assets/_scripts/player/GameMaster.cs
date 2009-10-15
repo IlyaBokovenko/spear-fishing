@@ -29,6 +29,11 @@ public class GameMaster : MonoBehaviour {
 	private FadeEffect fade;
 	private int state;
 	
+	public bool isSurface
+	{
+	    get{return depthMeter <= 0;}
+	}
+	
 	void Start () {
 		playerTransform = gameObject.transform;
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));

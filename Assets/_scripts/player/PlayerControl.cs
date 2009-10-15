@@ -25,7 +25,6 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	private bool isEnabled = true;
 	//Keys
 	private bool isBoost = false;
-	private bool isSurface = false;
 	
 	void Awake () {
 		goTransform = transform;
@@ -39,10 +38,11 @@ public class PlayerControl : MonoBehaviour, IBitable {
 			defaultGunPosition = gun.transform.localRotation;
 		defaultPosition = new Vector3(-0.7f, 0.0f, -0.7f);
 		gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
-		hud = (HUD)gameObject.GetComponent(typeof(HUD));
+		hud = (HUD)gameObject.GetComponent(typeof(HUD));	
 	}
-
+	
 	void Update () {
+	    
 		isBoost = false;
 		if(!gun.animation.isPlaying && isEnabled) {
 			if(Application.platform == RuntimePlatform.OSXEditor) {
@@ -132,8 +132,8 @@ public class PlayerControl : MonoBehaviour, IBitable {
 			gameMaster.DoBite();
 	} 
 
-	void Fire(){
-        if(gun) {
+	void Fire(){	    
+        if(gun && !gameMaster.isSurface) {
 			gun.animation.Play();
 		}
 	}

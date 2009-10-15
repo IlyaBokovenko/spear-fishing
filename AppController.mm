@@ -459,7 +459,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	
 	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
 	[_adController showDummyBanner];
-	[_adController adjustViewSize];
+	//[_adController adjustViewSize];
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
@@ -689,6 +689,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	printf_console("-> applicationDidFinishLaunching()\n");
 	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight animated:NO];
 	[self startUnity:application];	
+	[NSTimer scheduledTimerWithTimeInterval: 2.0 target: _adController selector: @selector(adjustViewSize) userInfo: nil repeats: NO];
 }
 	
 - (void) applicationDidBecomeActive:(UIApplication*)application
