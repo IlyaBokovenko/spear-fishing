@@ -1,19 +1,25 @@
 using UnityEngine;
 using System.Collections;
 
-public class SpawnFish : MonoBehaviour {
-    public GameObject fishSample;
+public class Spawner : MonoBehaviour {
+    public GameObject sample;
     public int population  = 20;
     public Vector3 spawnVolumeBounds  = new Vector3(50, 50, 50);
     public float minSizeDeviation = 0.5f;
     public float maxSizeDeviation = 2.0f;
     
+    private GameObject[] children;
+    
     private string cloneName;
     
     void Start(){
+        children = new GameObject[0];
+        
         for(int i = 0; i < population; i++){
             Spawn();
-        }         
+        }
+        
+        InvokeRepeating("MaintainPopulation", 0.0f, 1.0f);
     }
     
     private void OnDrawGizmosSelected(){    
@@ -22,15 +28,15 @@ public class SpawnFish : MonoBehaviour {
 	}
 
     ////////////////////////////////////////////////////////////////////////
-	void Spawn(){
+	GameObject Spawn(){
         Quaternion rotation = Random.rotation;        
-        GameObject fish  = (GameObject)Instantiate(fishSample, new Vector3(10000, 10000, 10000), rotation);
-        cloneName = fish.name = fishSample.name;          
-        DeathNotifier notifier = (DeathNotifier)fish.AddComponent(typeof(DeathNotifier));
-        notifier.notefee = this;        
-        FishAI fishComponent  = (FishAI)fish.GetComponent(typeof(FishAI));
-        fishComponent.setSize(RandomSize());        
-        MoveToClearWater(fish);        
+        GameObject instance  = (GameObject)Instantiate(sample, new Vector3(10000, 10000, 10000), rotation);
+        cloneName = instance.name = sample.name;          
+        instance.SendMessage("SetSize", RandomSize(), SendMessageOptions.DontRequireReceiver);
+        if(!MoveToClearWater(instance))
+            Destroy(instance);        
+        AddChild(instance);
+        return instance;
     }
 
     float RandomSize(){
@@ -41,22 +47,25 @@ public class SpawnFish : MonoBehaviour {
         return size;        
     }
     
-    void MoveToClearWater(GameObject obj){        
+    bool MoveToClearWater(GameObject obj){        
         Collider fc = (Collider)obj.GetComponentInChildren(typeof(Collider));        
         
         float objSize = fc.bounds.extents.magnitude;    
         
         Vector3 point = Vector3.zero;
-        for(int i = 0; i < 300; i++){
+        for(int i = 0; i < 100; i++){
             point = SpawnPoint();
             Collider[] cs = Physics.OverlapSphere(point, objSize * 2);
             if(cs.Length == 0){
                 obj.transform.position = point;
-                return;
+                return true;
+            }else{
+                // print(string.Format("{0} collided with {1} at point {2}", obj.name, cs[0].gameObject.name, point));
             }                
         }
         
-        print("can't find place for fish");
+        print(string.Format("can't find place for object \"{0}\"", obj.name));
+        return false;        
     }
 
     Vector3 SpawnPoint(){
@@ -65,9 +74,24 @@ public class SpawnFish : MonoBehaviour {
         return transform.position + Vector3.Scale(randomPointAround0, spawnVolumeBounds);
     }
     
-    void OnObjectDied(string objectName){
-        if(objectName.Equals(cloneName)) { 
-            Spawn();
+    ArrayList LiveChildren(){
+        ArrayList live = new ArrayList();
+        foreach(GameObject child in children) if(child) live.Add(child);
+        return live;
+    }
+    
+    void AddChild(GameObject instance){
+        ArrayList live = LiveChildren();
+        live.Add(instance);
+        children = (GameObject[])live.ToArray(typeof(GameObject));
+    }
+    
+    void MaintainPopulation(){
+        ArrayList live = LiveChildren();        
+        int objectsToSpawn = population - live.Count;
+        for(int i = 0; i < objectsToSpawn; i++) {            
+            GameObject instance = Spawn();
+            print(string.Format("spawned additional {0}", instance.name));
         }
     }
 }

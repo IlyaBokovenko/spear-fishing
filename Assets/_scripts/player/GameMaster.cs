@@ -34,6 +34,10 @@ public class GameMaster : MonoBehaviour {
 	    get{return depthMeter <= 0;}
 	}
 	
+	public void AddHealth(){
+	    health = Mathf.Min(health + 10, healthMax);
+	}
+	
 	void Start () {
 		playerTransform = gameObject.transform;
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));

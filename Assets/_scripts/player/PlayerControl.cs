@@ -118,6 +118,13 @@ public class PlayerControl : MonoBehaviour, IBitable {
 		}
 	}
 	
+	void OnTriggerEnter(Collider other){
+	    if(other.name.Equals("health") ){
+	        Destroy(other.gameObject);
+	        gameMaster.AddHealth();
+	    }
+	}
+	
 	
 	public void setAimButtonControl(ControlButton arg) { buttonAim = arg; }
 	public void setFireButtonControl(ControlButton arg) { buttonFire = arg; }

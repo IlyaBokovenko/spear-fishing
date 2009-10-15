@@ -87,7 +87,7 @@ public class FishAI : GenericScript, IHittable
 	}
     
 
-	public void setSize(float sz){    
+	public void SetSize(float sz){    
 	    size = sz;
 	    if(originalScale != Vector3.zero)
 	        updateScale();    
