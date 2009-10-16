@@ -200,12 +200,20 @@ public class GameMaster : MonoBehaviour {
 		return (int)health;
 	}
 	
+	public void setHealth(float _health) {
+		health = _health;
+	}
+
 	public int getDepth() {
 		return (int)depthMeter;
 	}
 	
 	public float getAir() {
 		return (airTimer/airMax);
+	}
+	
+	public void setAir(float air){
+	    airTimer = air*airMax;
 	}
 	
 	public int getLives() {

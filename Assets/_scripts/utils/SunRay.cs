@@ -10,7 +10,7 @@ public class SunRay : MonoBehaviour {
 	    renderer = (LineRenderer)(GetComponent(typeof(LineRenderer)));
 	    Transform _transform = transform;
 	    Vector3 pos = _transform.position;
-	    pos.y = 4;
+	    pos.y = 3;
 	    renderer.SetPosition(0, pos);	    
 	    pos.y = -6;
 	    pos.x += 6;	    

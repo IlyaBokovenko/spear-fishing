@@ -58,7 +58,7 @@
 #define MAIN_LOOP_TYPE THREAD_BASED_LOOP
 //#define MAIN_LOOP_TYPE EVENT_PUMP_BASED_LOOP
 
-#define ENABLE_INTERNAL_PROFILER 0
+#define ENABLE_INTERNAL_PROFILER 1
 #define ENABLE_BLOCK_ON_GPU_PROFILER 0
 #define BLOCK_ON_GPU_EACH_NTH_FRAME 4
 #define INCLUDE_OPENGLES_IN_RENDER_TIME 0
@@ -457,8 +457,8 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	EAGLView* view = [[EAGLView alloc] initWithFrame:rect];
 	[_window addSubview:view];
 	
-	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
-	[_adController showDummyBanner];
+	//_adController = [AdwhirlController createAdwhirlControllerWith: _window];
+	//[_adController showDummyBanner];
 	//[_adController adjustViewSize];
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];

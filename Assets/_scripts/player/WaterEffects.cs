@@ -9,6 +9,7 @@ public class WaterEffects : MonoBehaviour {
 	public Material skybox;
 	public bool lowLight = false;
 	public Color ambientLight;
+	public GameObject sunRays;
 	
 	//Default
 	private bool defaultFog = RenderSettings.fog;
@@ -46,6 +47,8 @@ public class WaterEffects : MonoBehaviour {
 	
 	void Underwater() {
 		if(state != UNDERWATER) {
+            sunRays.SetActiveRecursively(true);
+		    
 			if(camera)
 				camera.clearFlags = CameraClearFlags.SolidColor;
 			RenderSettings.fog = true;
@@ -59,6 +62,8 @@ public class WaterEffects : MonoBehaviour {
 	
 	void Surface() {
 		if(state != SURFACE) {	
+            sunRays.SetActiveRecursively(false);
+		    
 			if(camera)
 				camera.clearFlags = CameraClearFlags.Skybox;
 			RenderSettings.fog = defaultFog;

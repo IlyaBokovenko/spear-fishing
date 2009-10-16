@@ -11,10 +11,13 @@ public class HUD : MonoBehaviour {
 	public Texture2D[] airTank;
 	public Texture2D fireButtonOn;
 	public Texture2D fireButtonOff;
+	public Texture2D fireButtonHighlight;
 	public Texture2D boostButtonOn;
 	public Texture2D boostButtonOff;
+	public Texture2D boostButtonHighlight;
 	public Texture2D aimButtonOn;
 	public Texture2D aimButtonOff;
+	public Texture2D aimButtonHighlight;
 	public Texture2D menuButton;
 	public Texture2D watch;
 	public Texture2D status;
@@ -48,9 +51,9 @@ public class HUD : MonoBehaviour {
 	private Rect btFail;
 	
 	//GUI
-	private ControlButton buttonFire;
-	private ControlButton buttonAim;
-	private ControlButton buttonBoost;
+	private HighlightableControlButton buttonFire;
+	private HighlightableControlButton buttonAim;
+	private HighlightableControlButton buttonBoost;
 	
 	private Rect btAim;	
 	private Rect btMenu;
@@ -83,11 +86,11 @@ public class HUD : MonoBehaviour {
 	
 	void Awake() {
 		useGUILayout = false;
-		buttonFire = new ControlButton(new Rect(Screen.width - 76, Screen.height - 90, 68, 68), fireButtonOn, fireButtonOff);
-		buttonBoost = new ControlButton(new Rect(Screen.width - 150, Screen.height - 72, 68, 68), boostButtonOn, boostButtonOff);
-		buttonAim =  new ControlButton(new Rect(0, Screen.height - 128, 128, 128), aimButtonOn, aimButtonOff);
+		buttonFire = new HighlightableControlButton(this, new Rect(Screen.width - 76, Screen.height - 90, 68, 68), fireButtonOn, fireButtonOff, fireButtonHighlight);
+		buttonBoost = new HighlightableControlButton(this, new Rect(Screen.width - 150, Screen.height - 72, 68, 68), boostButtonOn, boostButtonOff, boostButtonHighlight);
+		buttonAim =  new HighlightableControlButton(this, new Rect(0, Screen.height - 128, 128, 128), aimButtonOn, aimButtonOff, aimButtonHighlight);		
 		fishes = new ArrayList();
-	}
+	}	
 	
 	void Start () {
 		GUIInit();
@@ -117,11 +120,11 @@ public class HUD : MonoBehaviour {
 	}
 
 	void OnGUI() {
-	    PlayerPrefs.SetInt("game", 0);
+        PlayerPrefs.SetInt("game", 0);
 	    
 		switch(state) {
 			case 0 : //GAME
-			    PlayerPrefs.SetInt("game", 1);
+                PlayerPrefs.SetInt("game", 1);
 			    
 				if(crosshair)
 					GUI.DrawTexture(rcCrosshair, crosshair);
@@ -248,6 +251,8 @@ public class HUD : MonoBehaviour {
 		gameObject.SendMessage("setAimButtonControl", buttonAim);
 		gameObject.SendMessage("setBoostButtonControl", buttonBoost);
 		gameObject.SendMessage("setFireButtonControl", buttonFire);
+		gameObject.SendMessage("setDepthTextStyle", depthText);
+		gameObject.SendMessage("setHealthTextStyle", healthText);
 	}
 	
 	

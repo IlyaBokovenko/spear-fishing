@@ -44,7 +44,7 @@ public class HighScores : MonoBehaviour {
 			MainMenu.CleanPlayerPrefs();
 		}
 		
-		PlayerPrefs.SetInt("game", 0);
+        PlayerPrefs.SetInt("game", 0);
 	}
 	
 	void OnGUI () {
