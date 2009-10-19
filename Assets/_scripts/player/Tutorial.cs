@@ -31,7 +31,7 @@ public class Tutorial : MonoBehaviour {
 	}
 	
 	void BeginTutorial(){
-	    sm.MoveTo(new HealthState(this));
+	    sm.MoveTo(new SwimState(this));
 	}
 	
 	void FixedUpdate(){

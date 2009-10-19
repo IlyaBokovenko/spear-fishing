@@ -131,10 +131,10 @@ public class FishAI : GenericScript, IHittable
                  if(!beh.enabled)
                      continue;
          
-         SteeringOutput steering = beh.GetSteering();
+         AddActiveBehaviour(beh);
+         SteeringOutput steering = beh.GetSteering();         
          if(steering.Significant())
              steering.ApplyTo(gameObject, deltaTime);             
-             AddActiveBehaviour(beh);
         }
 	
 		// execute arbitrated behaviours
@@ -148,14 +148,15 @@ public class FishAI : GenericScript, IHittable
 			foreach(FishBehaviour beh in behs){
                 if(!beh.enabled)
                     continue;
+                    
+                AddActiveBehaviour(beh);
 		
                 SteeringOutput steering  =  beh.GetSteering();        
                 
                 if(!steering.Significant())
                     continue;
 		
-                steering.ApplyTo(gameObject, deltaTime);
-                AddActiveBehaviour(beh);
+                steering.ApplyTo(gameObject, deltaTime);                
 				isAlreadyApplied = true;		
 			}
 	    }
