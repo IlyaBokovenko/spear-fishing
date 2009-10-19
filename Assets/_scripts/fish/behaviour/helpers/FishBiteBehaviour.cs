@@ -16,12 +16,15 @@ public class FishBiteBehaviour : FishBehaviour {
 	{
 	    get{return _target;}
 	    set{_target = value;
+	        targetTransform = _target.transform;
 	        SetBitables(value);
 	        targetAI = (FishAI)value.GetComponent(typeof(FishAI));}
 	}
 	private FishAI targetAI;
 	private IBitable[] bitables;
 	
+	private Transform _transform;
+	private Transform targetTransform;
 	
 	private bool _bited = false;
 	public bool bited
@@ -39,7 +42,8 @@ public class FishBiteBehaviour : FishBehaviour {
 	}
 	
 	void Awake(){
-	    nose = ((Nose)GetComponent(typeof(Nose))).position;	    
+	    nose = ((Nose)GetComponent(typeof(Nose))).position;	  
+	    _transform = transform;  
 	}	
 	
 	void Update(){
@@ -48,7 +52,7 @@ public class FishBiteBehaviour : FishBehaviour {
                 return;
         }
         
-        float distanceToTarget = Vector3.Distance(transform.TransformPoint(nose), target.transform.position);			    
+        float distanceToTarget = Vector3.Distance(_transform.TransformPoint(nose), targetTransform.position);			    
       	if(distanceToTarget < biteDistance){
       	    DoBite();
   	    }        

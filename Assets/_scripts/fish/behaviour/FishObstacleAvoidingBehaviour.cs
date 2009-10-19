@@ -16,6 +16,9 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     
     public float  raycastPeriod = 0.3f;
     private float lastCastTime = 0.0f;
+
+    private Transform _transform;
+    private Transform seekingTargetTransform;
     
     enum State{
         Idle,
@@ -61,13 +64,15 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         nose = _nose.position;	    
         children = new FishBehaviour[1]{seeking};
         seekingTarget = new GameObject("collision avoidance target");
+        seekingTargetTransform = seekingTarget.transform;        
     }
 	
 	void Start () {	    
 	    SetObstaclesLayerMask();    
 	    
-	    seekingTarget.transform.parent = transform;
-	    seeking.target = seekingTarget;	    
+	    _transform = transform;
+	    seekingTargetTransform.parent = _transform;
+	    seeking.target = seekingTarget;
 
 	    whiskers = CreateWhiskers();
 	
@@ -146,14 +151,14 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
                 break;
             case State.Avoiding:
             case State.PostAvoiding:
-                seekingTarget.transform.position = hit.point + hit.normal * minDistance;
+                seekingTargetTransform.position = hit.point + hit.normal * minDistance;
                 steering = seeking.GetSteering();            
                 break;
         }        
 	}
 	
 	private bool Cast(Line line, out RaycastHit hit) {
-        Line worldLine = line.ToWorldFrom(transform);
+        Line worldLine = line.ToWorldFrom(_transform);
 	    bool collided = Physics.Raycast (worldLine.from, worldLine.direction, out hit, worldLine.length, obstaclesLayerMask);	    
 	    return collided;
 	}
@@ -180,19 +185,19 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	    if(state != State.Idle){
 	        Gizmos.color = Color.green;
 	        Gizmos.DrawSphere(hit.point, 0.1f);
-	        Gizmos.DrawLine(hit.point, seekingTarget.transform.position);
+	        Gizmos.DrawLine(hit.point, seekingTargetTransform.position);
 	    }
     }    
     
     void OnDrawGizmosSelected(){
         Gizmos.color = Color.blue;
-        Line mainRay = MainRay().ToWorldFrom(transform);
+        Line mainRay = MainRay().ToWorldFrom(_transform);
         Gizmos.DrawLine(mainRay.from, mainRay.to);
         
         if(whiskers != null){
             Gizmos.color = Color.magenta;
             foreach(Line line in whiskers){
-                Line worldLine = line.ToWorldFrom(transform);
+                Line worldLine = line.ToWorldFrom(_transform);
                 Gizmos.DrawLine(worldLine.from, worldLine.to); 
             }                    
         }        

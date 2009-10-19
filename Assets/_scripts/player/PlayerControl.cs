@@ -15,6 +15,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	public GameObject[] ignoreObjects;
 	
 	private Transform goTransform;
+	private Transform gunTransform;
 	private Vector3 defaultPosition;
 	private Transform defaultTransform;
 	
@@ -31,6 +32,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	
 	void Awake () {
 		goTransform = transform;
+		gunTransform = gun.transform;
 	}
 	
 	void Start() {
@@ -38,7 +40,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 			Physics.IgnoreCollision(element.collider, collider);
 		}
 		if(gun)
-			defaultGunPosition = gun.transform.localRotation;
+			defaultGunPosition = gunTransform.localRotation;
 		defaultPosition = new Vector3(-0.7f, 0.0f, -0.7f);
 		gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));	
@@ -48,19 +50,19 @@ public class PlayerControl : MonoBehaviour, IBitable {
 		if(!gun.animation.isPlaying && isEnabled) {
 			if(Application.platform == RuntimePlatform.OSXEditor) {
 				if(Input.GetMouseButton(0)) {
-					transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
-					transform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
+					goTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
+					goTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
 				}
 				if(gun && Input.GetKey(KeyCode.LeftShift)) {
-					gun.transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
-					gun.transform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
-					Vector3 point = camera.WorldToScreenPoint(gun.transform.TransformPoint(- Vector3.forward * 5.0f));
+					gunTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
+					gunTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
+					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 					buttonAim.setDown(true);
 					if(hud)
 						hud.setCrosshair(new Vector2(point.x,point.y));
 				} else {
-					gun.transform.localRotation = defaultGunPosition;
-					Vector3 point = camera.WorldToScreenPoint(gun.transform.TransformPoint(- Vector3.forward * 5.0f));
+					gunTransform.localRotation = defaultGunPosition;
+					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 					buttonAim.setDown(false);
 					if(hud)
 						hud.setCrosshair(new Vector2(point.x,point.y));
@@ -74,9 +76,9 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
 				goTransform.Rotate( Vector3.right * accelerator.x * Time.deltaTime * sensitivity);
 				
-				if(gun.transform.localRotation != defaultGunPosition) {	
-					gun.transform.localRotation = defaultGunPosition;
-					Vector3 point = camera.WorldToScreenPoint(gun.transform.TransformPoint(- Vector3.forward * 5.0f));
+				if(gunTransform.localRotation != defaultGunPosition) {	
+					gunTransform.localRotation = defaultGunPosition;
+					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 					if(hud)
 						hud.setCrosshair(new Vector2(point.x,point.y));
 				}
@@ -87,9 +89,9 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				
 				if(buttonAim.isDown){
 					Vector2 deltaAim = new Vector2(buttonAim.touchPos.x - (buttonAim.rect.x + buttonAim.rect.width/2), buttonAim.touchPos.y - (buttonAim.rect.y + buttonAim.rect.height/2)); 
-					gun.transform.Rotate(Vector3.up * deltaAim.x * 0.5f, Space.World);
-					gun.transform.Rotate( - Vector3.right * deltaAim.y * 0.5f);
-					Vector3 point = camera.WorldToScreenPoint(gun.transform.TransformPoint(- Vector3.forward * 5.0f));
+					gunTransform.Rotate(Vector3.up * deltaAim.x * 0.5f, Space.World);
+					gunTransform.Rotate( - Vector3.right * deltaAim.y * 0.5f);
+					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 					if(hud)
 						hud.setCrosshair(new Vector2(point.x,point.y));				    
 				}				
