@@ -9,14 +9,14 @@ public class HighlightableControlButton : ControlButton {
     private bool isBlinking = false;
     
     public HighlightableControlButton(MonoBehaviour _context, Rect _rect, Texture2D _textureOn, Texture2D _textureOff, Texture2D _textureHighlight)
-        : base(_rect, _textureOff, _textureOff){
+        : base(_rect, _textureOn, _textureOff){
             context = _context;
             textureHighlight = _textureHighlight;
         }
 
-	virtual public void Draw(){
-	    if(highlighted){
-	        if(textureHighlight) GUI.DrawTexture(rect, textureHighlight);	        
+	override public void Draw(){
+	    if(highlighted && textureHighlight){
+	        GUI.DrawTexture(rect, textureHighlight);	        
 	    }
 	    else
 	        base.Draw();

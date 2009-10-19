@@ -80,7 +80,7 @@ public class GameMaster : MonoBehaviour {
 		
 		if(depthMeter > 0.0) {
 			float airStep = Time.deltaTime;
-			if(playerControl && playerControl.IsBoost())
+			if(playerControl && playerControl.isBoost)
 				airStep *= 4.0f;
 			airTimer -= airStep;
 		} else {

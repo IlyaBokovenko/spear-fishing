@@ -24,7 +24,10 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	
 	private bool isEnabled = true;
 	//Keys
-	private bool isBoost = false;
+	public bool isBoost
+	{
+	    get{return buttonBoost != null && buttonBoost.isDown;}
+	}
 	
 	void Awake () {
 		goTransform = transform;
@@ -41,9 +44,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));	
 	}
 	
-	void Update () {
-	    
-		isBoost = false;
+	void Update () {	    
 		if(!gun.animation.isPlaying && isEnabled) {
 			if(Application.platform == RuntimePlatform.OSXEditor) {
 				if(Input.GetMouseButton(0)) {
@@ -64,20 +65,10 @@ public class PlayerControl : MonoBehaviour, IBitable {
 					if(hud)
 						hud.setCrosshair(new Vector2(point.x,point.y));
 				}
-				if(Input.GetKeyUp ("space")) {
-					Fire();
-					if(buttonFire != null)
-						buttonFire.setDown(true);
-				} else {
-					buttonFire.setDown(false);
-				}
-				if(Input.GetMouseButton(1)) {
-					isBoost = true;
-					if(buttonBoost != null)
-						buttonBoost.setDown(true);
-				} else {
-					buttonBoost.setDown(false);
-				}
+				
+				buttonFire.setDown(Input.GetKeyUp ("space"));				
+				buttonBoost.setDown(Input.GetMouseButton(1));
+				
 			} else {
 				Vector3 accelerator = gravityFilter(iPhoneInput.acceleration - defaultPosition);
 				goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
@@ -90,31 +81,20 @@ public class PlayerControl : MonoBehaviour, IBitable {
 						hud.setCrosshair(new Vector2(point.x,point.y));
 				}
 				
-				buttonFire.setDown(false);
+				buttonBoost.ProcessTouches();				
+				buttonAim.ProcessTouches();
+				buttonFire.ProcessTouches();			
 				
-				foreach(iPhoneTouch touch in iPhoneInput.touches) {
-					if(touch.phase == iPhoneTouchPhase.Ended) {
-						buttonBoost.setDown(false);
-						buttonAim.setDown(false);
-					} else {
-						if(buttonBoost.Contains(new Vector2(touch.position.x, Screen.height - touch.position.y))) {
-							isBoost = true;
-						}
-						if(buttonFire.Contains(new Vector2(touch.position.x, Screen.height - touch.position.y))) {
-							Fire();
-						}
-						if(buttonAim.Contains(new Vector2(touch.position.x, Screen.height - touch.position.y))) {
-							Vector2 deltaAim = new Vector2(touch.position.x - (buttonAim.rect.x + buttonAim.rect.width/2), (Screen.height - touch.position.y) - (buttonAim.rect.y + buttonAim.rect.height/2)); 
-							gun.transform.Rotate(Vector3.up * deltaAim.x * 0.5f, Space.World);
-							gun.transform.Rotate( - Vector3.right * deltaAim.y * 0.5f);
-							Vector3 point = camera.WorldToScreenPoint(gun.transform.TransformPoint(- Vector3.forward * 5.0f));
-							if(hud)
-								hud.setCrosshair(new Vector2(point.x,point.y));
-						}
-					}
-				}
+				if(buttonAim.isDown){
+					Vector2 deltaAim = new Vector2(buttonAim.touchPos.x - (buttonAim.rect.x + buttonAim.rect.width/2), buttonAim.touchPos.y - (buttonAim.rect.y + buttonAim.rect.height/2)); 
+					gun.transform.Rotate(Vector3.up * deltaAim.x * 0.5f, Space.World);
+					gun.transform.Rotate( - Vector3.right * deltaAim.y * 0.5f);
+					Vector3 point = camera.WorldToScreenPoint(gun.transform.TransformPoint(- Vector3.forward * 5.0f));
+					if(hud)
+						hud.setCrosshair(new Vector2(point.x,point.y));				    
+				}				
 			}
-			goTransform.Translate(Vector3.forward * (isBoost ? boostSpeed : swimSpeed) * Time.deltaTime);
+			goTransform.Translate(Vector3.forward * (this.isBoost ? boostSpeed : swimSpeed) * Time.deltaTime);
 		}
 	}
 	
@@ -127,7 +107,10 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	
 	
 	public void setAimButtonControl(ControlButton arg) { buttonAim = arg; }
-	public void setFireButtonControl(ControlButton arg) { buttonFire = arg; }
+	public void setFireButtonControl(ControlButton arg) {
+	     buttonFire = arg; 
+	     buttonFire.AddPressedDelegate(new OnPressedDelegate(this.OnFire));    
+    }
 	public void setBoostButtonControl(ControlButton arg) { buttonBoost = arg; }
 
 	public void OnHit(Spear spear) {}
@@ -138,6 +121,11 @@ public class PlayerControl : MonoBehaviour, IBitable {
 		if(gameMaster)
 			gameMaster.DoBite();
 	} 
+	
+	void OnFire(bool down){
+	    if(down)
+	        Fire();
+	}
 
 	void Fire(){	    
         if(gun && !gameMaster.isSurface) {

@@ -88,7 +88,7 @@ public class Spawner : MonoBehaviour {
         ArrayList live = LiveChildren();        
         int objectsToSpawn = population - live.Count;
         for(int i = 0; i < objectsToSpawn; i++) {            
-            GameObject instance = Spawn();
+            Spawn();
             // print(string.Format("spawned additional {0}", instance.name));
         }
     }

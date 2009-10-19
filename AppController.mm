@@ -574,7 +574,11 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 					   (int)_fixedUpdateCountPB.minV, (int)_fixedUpdateCountPB.maxV);
 		printf_console("mono-scripts>  update: %4.1f   fixedUpdate: %4.1f coroutines: %4.1f \n", MachToMillisecondsDelta(_dynamicBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_fixedBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_coroutinePB.avgV / EachNthFrame));
 		printf_console("mono-memory>   used heap: %d allocated heap: %d  max number of collections: %d collection total duration: %4.1f\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
-		printf_console("----------------------------------------\n");
+		printf_console("----------------------------------------\n");		
+//		NSString* log = [FBPlayerPrefs getString: @"log" orDefault:@""];
+//		NSLog(@"\n\n!!!!!!!!\n\n %@\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n", log );
+//		[FBPlayerPrefs setString: @""  withKey: @"log" ];			
+		
 	}
 	ProfilerBlock_Update(&_framePB, _frameDelta, (_frameId == 0));
 	ProfilerBlock_Update(&_swapPB, _swapDelta, (_frameId == 0));

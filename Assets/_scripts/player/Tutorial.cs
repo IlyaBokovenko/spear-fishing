@@ -4,7 +4,7 @@ using System.Collections;
 public class Tutorial : MonoBehaviour {    
 	StateMachine sm;
     
-    GameMaster gameMaster;
+    GameMaster gameMaster;    
     
     bool isBlinkingDepthText = false;    
 
@@ -14,7 +14,8 @@ public class Tutorial : MonoBehaviour {
 	GUIStyle depthText;
 	GUIStyle healthText;
 	
-    public Texture2D arrow;    
+    public Texture2D arrow2D;
+    public GameObject arrow3D;
 	
 	internal float depth
 	{
@@ -228,7 +229,7 @@ public class Tutorial : MonoBehaviour {
 
         public override void Enter(){
             context.gameMaster.setAir(0.75f);
-            buttonArrow =  new HighlightableControlButton(context, new Rect(115, 150, 64, 64), null, null, context.arrow);
+            buttonArrow =  new HighlightableControlButton(context, new Rect(115, 150, 64, 64), null, null, context.arrow2D);
             buttonArrow.StartBlinking();
         }
 
@@ -245,9 +246,13 @@ public class Tutorial : MonoBehaviour {
     }
     
    class HealthState : TutorialState{
-        bool isBlinkingHealthText = false;
+        GameObject player;
+        GameObject arrow;
+        bool isBlinkingHealthText = false;        
 
-        public HealthState(Tutorial context):base(context){}
+        public HealthState(Tutorial context):base(context){
+            player = GameObject.FindWithTag("Player");
+        }
 
         public override void OnGUI(){
             GUI.Box(new Rect(80, 113, 320, 34), "If your health run low,\njust find health icon near the bottom and eat it");        
@@ -256,10 +261,14 @@ public class Tutorial : MonoBehaviour {
         public override void Enter(){ 
             context.gameMaster.setHealth(90f);
             StartBlinkingHealthText();
+            arrow = (GameObject)Instantiate(context.arrow3D, Vector3.zero, Quaternion.identity);            
+            arrow.transform.parent = player.transform;
+            arrow.transform.localPosition = new Vector3(-0.15f, 0f, 0.3f);
         }
 
         public override void Exit(){
             StopBlinkingHealthText();
+            Destroy(arrow);
         }
 
         public override void Do(){
