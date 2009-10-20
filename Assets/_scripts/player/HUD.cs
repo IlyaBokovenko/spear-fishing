@@ -66,14 +66,6 @@ public class HUD : MonoBehaviour {
 	private Rect rcWatch;
 	private Rect rcStatus;
 	
-	//States
-	public static int GAME = 0;
-	public static int PAUSE = 1;
-	public static int FAIL = 2;
-	public static int GALLERY = 3;
-	public static int BENCHMARK = 4;
-	public static int HIDEHUD = 5;
-	
 	private bool isComplete = false;
 	
 	private int lives = 0;
@@ -82,7 +74,27 @@ public class HUD : MonoBehaviour {
 	private FishInfo fishInfo;
 	private GameMaster gameMaster = null;
 	private int weight = 0;
-	private int state;
+	
+	public enum GameState
+	{
+    	GAME,
+    	PAUSE,
+    	FAIL,
+    	GALLERY,
+    	BENCHMARK,
+    	HIDEHUD	    
+	}
+	
+	private GameState _state;
+	public GameState state
+	{
+	    get{return _state;}
+	}
+	
+	public bool isGame
+	{
+	    get{return _state == GameState.GAME;}
+	}
 	
 	void Awake() {
 		useGUILayout = false;
@@ -95,7 +107,7 @@ public class HUD : MonoBehaviour {
 	void Start () {
 		GUIInit();
 		InitControlButton();
-		state = hideHud ? HIDEHUD : GAME;
+		_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 		gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
 	}	
 
@@ -122,8 +134,8 @@ public class HUD : MonoBehaviour {
 	void OnGUI() {
         PlayerPrefs.SetInt("game", 0);
 	    
-		switch(state) {
-			case 0 : //GAME
+		switch(_state) {
+			case GameState.GAME :
                 PlayerPrefs.SetInt("game", 1);
 			    
 				if(crosshair)
@@ -148,7 +160,7 @@ public class HUD : MonoBehaviour {
 				
 				if(menuButton && GUI.Button(btMenu, menuButton, menuStyle)) {
 					gameObject.SendMessage("Pause", true);
-					state = PAUSE;
+					_state = GameState.PAUSE;
 				}
 				if(buttonFire != null)
 					buttonFire.Draw();
@@ -169,29 +181,29 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(rcStatus.x + 120, rcStatus.y, 48, rcStatus.height), "" + weight, statusText);
 				GUI.Label(new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height), "" + lives, statusText);
 				break;
-			case 1 : //PAUSE
+			case GameState.PAUSE :
 				if(bgMenu)
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgMenu);
 				if(GUI.Button(btPesume, "", buttonResume)) {
 					if(gameMaster)
 						gameMaster.Pause(false);
-					state = hideHud ? HIDEHUD : GAME;
+					_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 				}
 				if(GUI.Button(btGallery, "", buttonGallery)) {
 					fishInfo = new FishInfo(fishes);
-					state = GALLERY;
+					_state = GameState.GALLERY;
 				}
 				if(GUI.Button(btMainMenu, "", buttonMainMenu)) {
 					if(gameMaster)
 						gameMaster.goMainMenu();
 				}
 				break;
-			case 2 : //FAIL
+			case GameState.FAIL :
 				if(lives > 0) {
 					if(GUI.Button(btFail, "", buttonContinue)) {
 						if(gameMaster)
 							gameMaster.Continue();
-						state = hideHud ? HIDEHUD : GAME;
+						_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 					}
 				} else {
 					if(GUI.Button(btFail, "", buttonTryAgain)) {
@@ -200,7 +212,7 @@ public class HUD : MonoBehaviour {
 					}
 				}
 				break;
-			case 3 : //Gallery
+			case GameState.GALLERY :
 				if(bgGallery)
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgGallery);
 				
@@ -230,10 +242,10 @@ public class HUD : MonoBehaviour {
 						} else  
 							Application.LoadLevel(0);
 					} else
-						state = PAUSE;
+						_state = GameState.PAUSE;
 				}
 				break;
-			case 4 : //BenchMark
+			case GameState.BENCHMARK :
 				if(benchString != "") {
 					GUI.Label(new Rect(1, 64, Screen.width,26), benchString,  galleryText);
 				}
@@ -241,7 +253,7 @@ public class HUD : MonoBehaviour {
 					Application.LoadLevel(0);
 				}
 				break;
-			case 5 : //HideHUD
+			case GameState.HIDEHUD :
 				break;
 		}
 	}
@@ -255,17 +267,17 @@ public class HUD : MonoBehaviour {
 	}
 	
 	
-	public void showFail() { state = FAIL;}
+	public void showFail() { _state = GameState.FAIL;}
 	
-	public void showGame() { state = hideHud ? HIDEHUD : GAME; }
+	public void showGame() { _state = hideHud ? GameState.HIDEHUD : GameState.GAME; }
 	
 	public void showComplete() {
 		fishInfo = new FishInfo(fishes);
 		isComplete = true;
-		state = GALLERY;		
+		_state = GameState.GALLERY;		
 	}
 	
-	public void showBenchResult(string arg) { benchString = arg; state = BENCHMARK; }
+	public void showBenchResult(string arg) { benchString = arg; _state = GameState.BENCHMARK; }
 	
 	public void setCrosshair(Vector2 arg) {
 		rcCrosshair.x = arg.x - (rcCrosshair.width / 2);

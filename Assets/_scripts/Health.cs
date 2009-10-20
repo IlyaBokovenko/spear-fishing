@@ -5,8 +5,9 @@ public class Health : MonoBehaviour {
     public float driftPeriod = 10f;
     public float rotationPeriod = 3f;
     public float heightDrift = 0.1f;
+    public float reappearInterval = 180;
     
-    private Transform _transform;
+    private Transform _transform;    
 
 	// Use this for initialization
 	void Start () {
@@ -21,5 +22,14 @@ public class Health : MonoBehaviour {
         
         float rotationPhase = 360 * Time.time / rotationPeriod;
         _transform.rotation = Quaternion.Euler(0, rotationPhase, 0);
+    }
+    
+    public void Yam(){
+        gameObject.active = false;
+        Invoke("Reappear", reappearInterval);
+    }
+    
+    private void Reappear(){
+        gameObject.active = true;
     }
 }

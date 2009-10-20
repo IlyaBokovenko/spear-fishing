@@ -101,8 +101,8 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	}
 	
 	void OnTriggerEnter(Collider other){
-	    if(other.name.Equals("health") ){
-	        Destroy(other.gameObject);
+	    if(other.tag.Equals("Health") ){	        
+	        other.gameObject.SendMessage("Yam");
 	        gameMaster.AddHealth();
 	    }
 	}

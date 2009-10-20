@@ -4,20 +4,21 @@ using System.Collections;
 public class Tutorial : MonoBehaviour {    
 	StateMachine sm;
     
-    GameMaster gameMaster;    
+    GameMaster gameMaster;   
+    HUD hud; 
     
     bool isBlinkingDepthText = false;    
 
-	internal HighlightableControlButton buttonFire;
-	internal HighlightableControlButton buttonAim;
-	internal HighlightableControlButton buttonBoost;
+	HighlightableControlButton buttonFire;
+	HighlightableControlButton buttonAim;
+	HighlightableControlButton buttonBoost;
 	GUIStyle depthText;
 	GUIStyle healthText;
 	
     public Texture2D arrow2D;
     public GameObject arrow3D;
 	
-	internal float depth
+	float depth
 	{
 	    get{return gameMaster.getDepth();}
 	}
@@ -26,6 +27,7 @@ public class Tutorial : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	    gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
+	    hud = (HUD)GetComponent(typeof(HUD));
 	    
 	    sm = new StateMachine();
 	    Invoke("BeginTutorial", 3.0f);	    
@@ -40,7 +42,7 @@ public class Tutorial : MonoBehaviour {
     }
     	
 	void OnGUI() {
-	    sm.OnGUI();
+	    if(hud.isGame)  sm.OnGUI();
     }
     
     
