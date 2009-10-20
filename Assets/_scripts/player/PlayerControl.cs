@@ -52,10 +52,11 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				if(Input.GetMouseButton(0)) {
 					goTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
 					goTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
+					RestrictRotation();
 				}
 				if(gun && Input.GetKey(KeyCode.LeftShift)) {
 					gunTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
-					gunTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
+					gunTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);					
 					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 					buttonAim.setDown(true);
 					if(hud)
@@ -75,6 +76,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				Vector3 accelerator = gravityFilter(iPhoneInput.acceleration - defaultPosition);
 				goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
 				goTransform.Rotate( Vector3.right * accelerator.x * Time.deltaTime * sensitivity);
+				RestrictRotation();
 				
 				if(gunTransform.localRotation != defaultGunPosition) {	
 					gunTransform.localRotation = defaultGunPosition;
@@ -145,5 +147,16 @@ public class PlayerControl : MonoBehaviour, IBitable {
 		result.y = Mathf.Round(arg.y * 100.0f);
 		result.z = Mathf.Round(arg.z * 100.0f);
 		return result;
+	}
+	
+	void RestrictRotation(){
+	    Vector3 angles = goTransform.eulerAngles;
+		float pitch = goTransform.eulerAngles.x;
+		pitch = Utils.DegToShifted(pitch);
+		print(Utils.DegToShifted(angles));
+		pitch = Mathf.Min(Mathf.Abs(pitch), 75) * Mathf.Sign(pitch);					
+		angles.x = pitch;
+		angles.z = 0;
+		goTransform.eulerAngles = angles;		
 	}
 }
