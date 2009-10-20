@@ -6,12 +6,16 @@ public class GenericSeekingBehaviour : FishBehaviour {
     public VelocityMatching velocityMatcher;
     public OrientationMatching orientationMatcher;    
     
+    public float maxSpeed = 2;      
+    
     private GameObject _target;
+    protected Transform _transform;
     public GameObject target
     {
         get{return _target;}
         set{_target = value; targetTransform = value.transform;}
     }
+    protected Transform targetTransform;
     
     public Vector3 center
     {
@@ -24,10 +28,6 @@ public class GenericSeekingBehaviour : FishBehaviour {
         get{return _transform.TransformPoint(noseRelative);}
     }
     
-    public float maxSpeed = 2;    
-
-    protected Transform _transform;
-    protected Transform targetTransform;
     
     protected virtual void Awake(){
         children = new FishBehaviour[2]{velocityMatcher, orientationMatcher};
@@ -44,7 +44,11 @@ public class GenericSeekingBehaviour : FishBehaviour {
     
     public virtual Vector3 Direction(){
         return (To() - From()).normalized;
-    }    
+    } 
+    
+    public virtual float Distance(){
+        return Vector3.Distance(To(), From());
+    }   
 
     protected override void PrivateDrawGizmosSelected(){
         if(targetTransform == null)
