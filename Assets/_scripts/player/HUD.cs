@@ -86,7 +86,7 @@ public class HUD : MonoBehaviour {
 	
 	void Awake() {
 		useGUILayout = false;
-		buttonFire = new HighlightableControlButton(this, new Rect(Screen.width - 76, Screen.height - 90, 68, 68), fireButtonOn, fireButtonOff, fireButtonHighlight);
+		 buttonFire = new HighlightableControlButton(this, new Rect(Screen.width - 76, Screen.height - 90, 68, 68), fireButtonOn, fireButtonOff, fireButtonHighlight);
 		buttonBoost = new HighlightableControlButton(this, new Rect(Screen.width - 150, Screen.height - 72, 68, 68), boostButtonOn, boostButtonOff, boostButtonHighlight);
 		buttonAim =  new HighlightableControlButton(this, new Rect(0, Screen.height - 128, 128, 128), aimButtonOn, aimButtonOff, aimButtonHighlight);		
 		fishes = new ArrayList();
@@ -204,7 +204,7 @@ public class HUD : MonoBehaviour {
 				if(bgGallery)
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgGallery);
 				
-				GUI.Label(new Rect(292,125,64,4), "" + fishInfo.getCount(FishInfo.YELLOWFINTUNA), galleryText);
+				GUI.Label(new Rect(292,125,64,24), "" + fishInfo.getCount(FishInfo.YELLOWFINTUNA), galleryText);
 				GUI.Label(new Rect(348,125,64,24), "" + fishInfo.getWeight(FishInfo.YELLOWFINTUNA), galleryText);
 				
 				GUI.Label(new Rect(292,172,64,24), "" + fishInfo.getCount(FishInfo.REDSNAPPER), galleryText);
