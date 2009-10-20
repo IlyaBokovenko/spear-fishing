@@ -217,10 +217,9 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(386,262,64,24), "" + (int)weight, galleryText);
 				
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
-				    PlayerPrefs.SetInt("totalCount", fishes.Count);
+				    PlayerPrefs.SetInt("totalFishes", fishes.Count);
 				    PlayerPrefs.SetInt("totalWeight", weight);				    
 				    PlayerPrefs.SetInt("upload", 1);
-				    print("upload button pressed");
 				}
 				
 				if(GUI.Button(new Rect(0,0,Screen.width, Screen.height), "", buttonNull)) {
