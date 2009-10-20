@@ -5,7 +5,7 @@ using System;
 [RequireComponent (typeof (Nose))]
 public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {   
 
-    public GenericSeekingBehaviour seeking;     
+    public GenericSeekingBehaviour seeking;
     
     public float timeToThinkAhead = 3f;
     public float minDistance = 2f;
@@ -23,7 +23,8 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     enum State{
         Idle,
         Avoiding,
-        PostAvoiding    
+        PostAvoiding,
+        Turning
     }
     
     private State state = State.Idle;
@@ -64,7 +65,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         nose = _nose.position;	    
         children = new FishBehaviour[1]{seeking};
         seekingTarget = new GameObject("collision avoidance target");
-        seekingTargetTransform = seekingTarget.transform;        
+        seekingTargetTransform = seekingTarget.transform;   
     }
 	
 	void Start () {	    
@@ -79,10 +80,20 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 		lastCastTime = Time.time;
 	}
 	
+    // void OnCollisionEnter(Collision col){
+    //     if(!_transform) return;    
+    //     
+    //         state = State.Turning;
+    //         seeking.orientationMatcher.orientation = -_transform.forward;
+    //         
+    //         print(_transform.position);
+    //         Debug.Break();
+    // }
+	
 	public override SteeringOutput GetSteering(){
 	    Profiler.StartProfile(PT.CollisionAvoiding);
 	    
-	    if(!seeking || Utils.Approximately(rigidbody.velocity.magnitude, 0.0f))
+	    if(!seeking)
 	        steering = SteeringOutput.empty;
 	    else{
 	        TryCheckCollisions();
@@ -92,7 +103,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         
         Profiler.EndProfile(PT.CollisionAvoiding);
         
-        return steering;
+        return steering;        
 	}
 	
 	public override void SelfDestroy(){
@@ -127,9 +138,17 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	    }	
 	    
 	    return ret;    
-	}
+	}	
 	
-	private void ChangeState(){	    
+	private void ChangeState(){
+	    
+	    if(state == State.Turning){
+	        float angle = Vector3.Angle(_transform.forward, seeking.orientationMatcher.orientation);
+	        if(angle < 5) state = State.Idle;
+	        	    
+	        return;
+	    }
+	    
         if(isCollided){
             state = State.Avoiding;
             lastCollisionTime = Time.time;
@@ -145,13 +164,16 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	}
 	
 	private void ProcessState(){
-	    switch(state){
+	    switch(state){	        
             case State.Idle:
                 steering = SteeringOutput.empty;
                 break;
+            case State.Turning:
+                steering = seeking.orientationMatcher.GetSteering();
+                break;
             case State.Avoiding:
             case State.PostAvoiding:
-                seekingTargetTransform.position = hit.point + hit.normal * minDistance;
+                UpdateSeekingTarget();
                 steering = seeking.GetSteering();            
                 break;
         }        
@@ -190,6 +212,9 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     }    
     
     void OnDrawGizmosSelected(){
+        if(!_transform)
+            return;
+        
         Gizmos.color = Color.blue;
         Line mainRay = MainRay().ToWorldFrom(_transform);
         Gizmos.DrawLine(mainRay.from, mainRay.to);
@@ -202,6 +227,10 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
             }                    
         }        
     }
+    
+    private void UpdateSeekingTarget(){
+	     seekingTargetTransform.position = hit.point + hit.normal * minDistance;
+	}	
     
 }
 

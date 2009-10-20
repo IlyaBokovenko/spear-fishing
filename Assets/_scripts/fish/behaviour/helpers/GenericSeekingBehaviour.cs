@@ -58,4 +58,5 @@ public class GenericSeekingBehaviour : FishBehaviour {
         Gizmos.DrawSphere(targetTransform.position, 0.1f);
         Gizmos.DrawLine(From(), To());        
     }
+    
 }

@@ -14,6 +14,9 @@ public class Nose : MonoBehaviour {
 	    if(!enabled)
 	        return;
 	        
+	    if(!_transform)
+	        return;
+	        
 	    Gizmos.color = Color.red;
 	    Gizmos.DrawSphere(_transform.TransformPoint(position), 0.01f);	    
     }

@@ -36,20 +36,20 @@ public class Profiler
     }
     public static void StartProfile(PT tag)
     {
-        profiles[(int)tag].lastRecorded = DateTime.UtcNow;
+        // profiles[(int)tag].lastRecorded = DateTime.UtcNow;
     }
 
     public static void EndProfile(PT etag)
     {
-        int tag = (int)etag;
-        profiles[tag].totalTime += DateTime.UtcNow - profiles[tag].lastRecorded;
-        ++profiles[tag].totalCalls;
+        // int tag = (int)etag;
+        // profiles[tag].totalTime += DateTime.UtcNow - profiles[tag].lastRecorded;
+        // ++profiles[tag].totalCalls;
     }
 
     public static void Reset()
     {
-        profiles = new ProfilePoint[Enum.GetValues(typeof(PT)).Length];
-        startTime = DateTime.UtcNow;
+        // profiles = new ProfilePoint[Enum.GetValues(typeof(PT)).Length];
+        // startTime = DateTime.UtcNow;
     }
 
     public static void PrintResults()
