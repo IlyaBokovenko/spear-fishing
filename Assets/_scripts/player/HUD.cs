@@ -109,6 +109,8 @@ public class HUD : MonoBehaviour {
 		InitControlButton();
 		_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 		gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
+		
+		PlayerPrefs.SetInt("free_version", isFreeVersion ? 1 : 0);
 	}	
 
 	void GUIInit() {
