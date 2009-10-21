@@ -457,9 +457,9 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	EAGLView* view = [[EAGLView alloc] initWithFrame:rect];
 	[_window addSubview:view];
 	
-	//_adController = [AdwhirlController createAdwhirlControllerWith: _window];
-	//[_adController showDummyBanner];
-	//[_adController adjustViewSize];
+	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
+	[_adController showDummyBanner];
+	[_adController adjustViewSize];
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];

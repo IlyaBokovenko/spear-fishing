@@ -98,7 +98,7 @@ public class HighScores : MonoBehaviour {
 		public void Show() {
 			GUI.Label(new Rect(rect.x, rect.y, rect.width - 150, rect.height), (id + 1) + ". " + name, textStyle);
 			GUI.Label(new Rect(rect.x + (rect.width - 150), rect.y, 60, rect.height), count, textStyle);
-			GUI.Label(new Rect(rect.x + (rect.width - 90), rect.y, 90, rect.height), weight, textStyle);
+			GUI.Label(new Rect(rect.x + (rect.width - 90), rect.y, 90, rect.height), string.Format("{0,1:00.0}", float.Parse(weight)), textStyle);
 		}
 		
 		public int getWeight() {
