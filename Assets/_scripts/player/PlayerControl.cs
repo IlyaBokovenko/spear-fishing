@@ -153,7 +153,6 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	    Vector3 angles = goTransform.eulerAngles;
 		float pitch = goTransform.eulerAngles.x;
 		pitch = Utils.DegToShifted(pitch);
-		print(Utils.DegToShifted(angles));
 		pitch = Mathf.Min(Mathf.Abs(pitch), 75) * Mathf.Sign(pitch);					
 		angles.x = pitch;
 		angles.z = 0;

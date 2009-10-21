@@ -1,14 +1,36 @@
 #import "FacebookController.h"
 #import "UIAlertView+Utils.h"
+#import "FBLoginButton.h"
 
 static NSString* API_KEY = @"1bb54f067729f2933a888d9f7e871e21";
 static NSString* SHARE_PERMISSION = @"share_item";
+
+@interface FacebookController()
+
+@property(readonly) FBLoginButton* loginButton;
+
+@end
+
 
 @implementation FacebookController
 
 @synthesize isExternalGuiShown;
 
 #pragma mark private
+
+-(FBLoginButton*)createLoginButton{
+	FBLoginButton* btn = [[FBLoginButton alloc] initWithFrame: CGRectMake(230, 300, 100, 100)];	
+	btn.session = session;
+	btn.style = FBLoginButtonStyleNormal;
+	[[[UIApplication sharedApplication] keyWindow] addSubview: btn];
+	return btn;
+}
+
+-(FBLoginButton*)loginButton{
+	if(!loginButton)
+		loginButton = [self createLoginButton];
+	return loginButton;	
+}
 
 -(NSString*)comment{
 	return [NSString stringWithFormat:@"Yossi is playing Speargun Hunter 3D!\nCaught %d fish and total weight of %dLbs. Beat that!", fishes, weight];
@@ -53,6 +75,7 @@ static NSString* SHARE_PERMISSION = @"share_item";
 }
 
 - (void) dealloc{
+	[loginButton release];
 	[permissionChecker release];
 	[super dealloc];
 }
@@ -155,5 +178,9 @@ static NSString* SHARE_PERMISSION = @"share_item";
     [UIAlertView showAlertViewWithTitle:@"Permissions dialog error" message:[error localizedDescription]];    
 }
 
+
+-(void)showLoginButton:(BOOL)show{
+	self.loginButton.hidden = !show;
+}
 
 @end

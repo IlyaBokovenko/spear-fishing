@@ -1,6 +1,8 @@
 #import "FBConnect.h"
 #import "FacebookPermissionChecker.h"
 
+@class FBLoginButton;
+
 @interface FacebookController : UIViewController<FBSessionDelegate, FBRequestDelegate, FacebookPermissionCheckerDelegate, FBDialogDelegate>{
 	FBSession* session;
 	FacebookPermissionChecker* permissionChecker;
@@ -9,6 +11,8 @@
 	int weight;
 	
 	BOOL isExternalGuiShown;
+	
+	FBLoginButton* loginButton;
 }
 
 @property(readonly, nonatomic) BOOL isExternalGuiShown;
