@@ -217,13 +217,13 @@ public class HUD : MonoBehaviour {
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgGallery);
 				
 				GUI.Label(new Rect(292,125,64,24), "" + fishInfo.getCount(FishInfo.YELLOWFINTUNA), galleryText);
-				GUI.Label(new Rect(348,125,64,24), "" + fishInfo.getWeight(FishInfo.YELLOWFINTUNA), galleryText);
+				GUI.Label(new Rect(348,125,64,24), "" + fishInfo.getWeightString(FishInfo.YELLOWFINTUNA), galleryText);
 				
 				GUI.Label(new Rect(292,172,64,24), "" + fishInfo.getCount(FishInfo.REDSNAPPER), galleryText);
-				GUI.Label(new Rect(348,172,64,24), "" + fishInfo.getWeight(FishInfo.REDSNAPPER), galleryText);
+				GUI.Label(new Rect(348,172,64,24), "" + fishInfo.getWeightString(FishInfo.REDSNAPPER), galleryText);
 				
 				GUI.Label(new Rect(292,219,64,24), "" + fishInfo.getCount(FishInfo.GROUPER), galleryText);
-				GUI.Label(new Rect(348,219,64,24), "" + fishInfo.getWeight(FishInfo.GROUPER), galleryText);
+				GUI.Label(new Rect(348,219,64,24), "" + fishInfo.getWeightString(FishInfo.GROUPER), galleryText);
 				
 				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);
 				GUI.Label(new Rect(386,262,64,24), "" + (int)weight, galleryText);
@@ -234,7 +234,7 @@ public class HUD : MonoBehaviour {
 				    PlayerPrefs.SetInt("upload", 1);
 				}
 				
-				if(GUI.Button(new Rect(0,0,Screen.width, Screen.height), "", buttonNull)) {
+				if(GUI.Button(btMenu, menuButton, menuStyle)) {
 					if(isComplete) {
 						if(Application.levelCount > 2) {
 							PlayerPrefs.SetString("player", "Player:" + fishes.Count + ":" + weight);

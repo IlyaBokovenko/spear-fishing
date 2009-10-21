@@ -49,7 +49,7 @@ public class Ropes : MonoBehaviour {
 			Mesh mesh = meshFilter.mesh;
 	        mesh.Clear();
 			Vector3[] vertices = new Vector3[points.Count * 4];
-			int[] triangles = new int[8 * (points.Count - 1)];		
+			//int[] triangles = new int[8 * (points.Count - 1)];		
 			for(int index = 0; index < points.Count; index ++) {
 				Vector3[] tmpVertices = ((RopePoint)points[index]).getVertices();
 				vertices[index*4] = tmpVertices[0];

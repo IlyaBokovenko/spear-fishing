@@ -58,7 +58,7 @@ public class HighScores : MonoBehaviour {
 		if(keyboard != null)
 			players[newPlayerPosition].name = keyboard.text;
 		
-		if(GUI.Button(new Rect(Screen.width - 68,Screen.height - 68,68,68), "", btBack)) {
+		if(GUI.Button(new Rect(0, 0, 48, 48), "", btBack)) {
 			Save();
 			Application.LoadLevel(0);
 		}
