@@ -45,11 +45,11 @@ public class MainMenu : MonoBehaviour {
 	}
 	
 	//Rects
-	private Vector2 btSize = new Vector2(238,32);
+	private static Vector2 btSize = new Vector2(238,32);
 	private Rect rectResume;
 	private Rect rectStart;
-	private Rect rectSettings;
 	private Rect rectHighScores;
+	private Rect rectSettings;	
 	private Rect rectBenchMark;
 	private Rect rectHelp;
 	private Rect rectMoreGames;
@@ -70,7 +70,7 @@ public class MainMenu : MonoBehaviour {
 	// Use this for initialization
 	
 	void Start () {
-		int yLayout = 134;
+		int yLayout = 102;
 		state = State.MENU;
 		isResume = PlayerPrefs.HasKey("health")? true : false;
 		
@@ -79,9 +79,10 @@ public class MainMenu : MonoBehaviour {
 			yLayout += (int)btSize.y + 4;
 		}
 		rectStart = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
-		yLayout += (int)btSize.y + 4;
-		//rectSettings = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
+		yLayout += (int)btSize.y + 4;		
 		rectHighScores = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
+		yLayout += (int)btSize.y + 4;
+		rectSettings = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		yLayout += (int)btSize.y + 4;
 		rectHelp = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		//rectBenchMark = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
@@ -118,15 +119,14 @@ public class MainMenu : MonoBehaviour {
 						Application.LoadLevel(1);
 					}
 				}
-				/*
-				if(GUI.Button(rectSettings,"",btSettings)) {
-					
-				}*/
 				if(GUI.Button(rectHighScores,"",btHighScores)) {
 					if(Application.levelCount > 2) {
 						state = State.LOADING;
 						Application.LoadLevel(Application.levelCount - 1);
 					}
+				}				
+				if(GUI.Button(rectSettings,"",btSettings)) {
+					state = State.SETTINGS;
 				}
 				if(GUI.Button(rectHelp,"",btHelp)) {
 					state = State.HELP;
@@ -142,12 +142,7 @@ public class MainMenu : MonoBehaviour {
 				}*/
 				if(GUI.Button(rectMoreGames,"",lnMoreGames)) {
 
-				}
-				
-				if(GUI.Button(new Rect(1, 20, 80, 32), "SETTINGS")){
-				    state = State.SETTINGS;
-				}
-				
+				}				
 				break;				
 			case State.SETTINGS :
                 GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgSettings);
