@@ -4,17 +4,16 @@ using System.Collections;
 public class FishOrientationDrivenArriveBehaviour : FishOrientationDrivenSeekingBehaviour {
     public float satisfactionRadius = 2;
     
-    float originalMaxSpeed;
-    
-    protected override void Awake(){
-        base.Awake();
-        originalMaxSpeed = maxSpeed;
+    protected override float ComputeMaxSpeed(){
+        float distance = Distance();
+        float speed = base.ComputeMaxSpeed();
+        if(distance < satisfactionRadius) speed *= distance / satisfactionRadius;
+        return speed;
     }
     
     public override SteeringOutput GetSteering(){
-        float distance = Distance();
-        maxSpeed = distance >= satisfactionRadius ? originalMaxSpeed : distance / satisfactionRadius;
-        return base.GetSteering();        
-    }
+        maxSpeed = ComputeMaxSpeed();
+        return base.GetSteering();
+    }    
      
  }

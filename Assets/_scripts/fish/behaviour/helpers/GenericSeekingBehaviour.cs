@@ -6,7 +6,9 @@ public class GenericSeekingBehaviour : FishBehaviour {
     public VelocityMatching velocityMatcher;
     public OrientationMatching orientationMatcher;    
     
-    public float maxSpeed = 2;      
+    public float maxSpeed = 2;    
+    private float originalMaxSpeed; 
+    private float cachedComputedMaxSpeed; 
     
     private GameObject _target;
     protected Transform _transform;
@@ -33,6 +35,12 @@ public class GenericSeekingBehaviour : FishBehaviour {
         children = new FishBehaviour[2]{velocityMatcher, orientationMatcher};
         noseRelative = ((Nose)GetComponent(typeof(Nose))).position;        
         _transform = transform;
+        
+        originalMaxSpeed = cachedComputedMaxSpeed = maxSpeed;
+    }
+    
+    protected virtual float ComputeMaxSpeed(){
+        return cachedComputedMaxSpeed;
     }
     
     public virtual Vector3 From(){        
@@ -57,6 +65,12 @@ public class GenericSeekingBehaviour : FishBehaviour {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(targetTransform.position, 0.1f);
         Gizmos.DrawLine(From(), To());        
+    }
+    
+    protected void SetDifficulty(int difficulty){
+        float speedUnit = originalMaxSpeed / 2;
+        cachedComputedMaxSpeed = speedUnit * (difficulty + 1);
+        maxSpeed = ComputeMaxSpeed();
     }
     
 }

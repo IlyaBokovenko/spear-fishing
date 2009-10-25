@@ -47,7 +47,7 @@ public class FishAI : GenericScript, IHittable
 	}
 	
 
-	void Start(){
+	protected virtual void Start(){
         lastUpdateTime = Time.time;
 		GatherRootBehaviours(); 
         //PrintBehaviours();
@@ -56,6 +56,8 @@ public class FishAI : GenericScript, IHittable
         if(!Utils.Approximately(size, 0.0f)) {
             updateScale();    
         }
+        
+        SendMessage("SetDifficulty", PlayerPrefs.GetInt("difficulty", 1));
 	}
 	
 	void FixedUpdate () {

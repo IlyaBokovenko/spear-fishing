@@ -27,7 +27,11 @@ public class Spawner : MonoBehaviour {
 
     ////////////////////////////////////////////////////////////////////////
 	GameObject Spawn(){
-        Quaternion rotation = Random.rotation;        
+        Quaternion rotation = Random.rotation;
+        Vector3 euler = rotation.eulerAngles;
+        euler.z = euler.x = 0;
+        rotation = Quaternion.Euler(euler);
+        
         GameObject instance  = (GameObject)Instantiate(sample, new Vector3(10000, 10000, 10000), rotation);
         cloneName = instance.name = sample.name;          
         instance.SendMessage("SetSize", RandomSize(), SendMessageOptions.DontRequireReceiver);

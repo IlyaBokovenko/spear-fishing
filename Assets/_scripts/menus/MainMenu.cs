@@ -1,9 +1,11 @@
-using UnityEngine;
+    using UnityEngine;
 using System.Collections;
 
+// [ExecuteInEditMode]
 public class MainMenu : MonoBehaviour {
 	public Texture2D bgTexture;
 	public Texture2D bgHelp;
+	public Texture2D bgSettings;
 	//Buttons
 	public GUIStyle btResume;
 	public GUIStyle btStart;
@@ -13,7 +15,34 @@ public class MainMenu : MonoBehaviour {
 	public GUIStyle btBack;
 	public GUIStyle btBenchMark;
 	public GUIStyle lnMoreGames;
-	public GUIStyle btHighScores;
+	public GUIStyle btHighScores;	
+	
+	public GUIStyle controlStyle;
+	public GUIStyle labelStyle;
+	
+	private int minutesToBreath
+	{
+	    get{return PlayerPrefs.HasKey("minutesToBreath") ? PlayerPrefs.GetInt("minutesToBreath") : 2;}
+	    set{PlayerPrefs.SetInt("minutesToBreath", value);}
+	}
+	
+	private int difficulty	
+	{
+	    get{return PlayerPrefs.HasKey("difficulty") ? PlayerPrefs.GetInt("difficulty") : 1;}
+	    set{PlayerPrefs.SetInt("difficulty", value);}
+	}
+	
+	private float sound
+	{
+	    get{return PlayerPrefs.HasKey("sound") ? PlayerPrefs.GetFloat("sound") : 0.5f;}
+	    set{PlayerPrefs.SetFloat("sound", value);}
+	}
+	
+	private int graphicsLevel
+	{
+	    get{return PlayerPrefs.HasKey("graphicsLevel") ? PlayerPrefs.GetInt("graphicsLevel") : 1;}
+	    set{PlayerPrefs.SetInt("graphicsLevel", value);}
+	}
 	
 	//Rects
 	private Vector2 btSize = new Vector2(238,32);
@@ -25,20 +54,24 @@ public class MainMenu : MonoBehaviour {
 	private Rect rectHelp;
 	private Rect rectMoreGames;
 	
-	public static int MENU = 0;
-	public static int SETTINGS = 1;
-	public static int HELP = 2;
-	public static int LOADING = 3;
+	enum State
+	{
+        MENU,
+        SETTINGS,
+        HELP,
+        LOADING	    
+	}
 	
-	private int state;
+	private State state;
 	//Test
 	private bool isResume;
 	private int count;
+	
 	// Use this for initialization
 	
 	void Start () {
 		int yLayout = 134;
-		state = MENU;
+		state = State.MENU;
 		isResume = PlayerPrefs.HasKey("health")? true : false;
 		
 		if(isResume) {
@@ -54,19 +87,26 @@ public class MainMenu : MonoBehaviour {
 		//rectBenchMark = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		rectMoreGames = new Rect((Screen.width - btSize.x) / 2, Screen.height - 6 - btSize.y, btSize.x, btSize.y);
 		
-         PlayerPrefs.SetInt("game", 0);
+         PlayerPrefs.SetInt("game", 0);         
+         
 	}
 	// Update is called once per frame
 	void OnGUI () {
+
+   
+        // controlStyle = new GUIStyle(GUI.skin.button);
+   
+        // labelStyle = new GUIStyle(controlStyle);
+	    
 		switch(state) {
-			case 0 :
+			case State.MENU :
 				if(bgTexture != null) 
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgTexture);
 
 				if(isResume) {
 					if(GUI.Button(rectResume,"",btResume)) {
 						if(Application.levelCount > 1) {
-							state = LOADING;
+							state = State.LOADING;
 							Application.LoadLevel(1);
 						}
 					}
@@ -74,7 +114,7 @@ public class MainMenu : MonoBehaviour {
 				if(GUI.Button(rectStart,"",btStart)) {
 					if(Application.levelCount > 1) {
 						CleanPlayerPrefs();
-						state = LOADING;
+						state = State.LOADING;
 						Application.LoadLevel(1);
 					}
 				}
@@ -84,12 +124,12 @@ public class MainMenu : MonoBehaviour {
 				}*/
 				if(GUI.Button(rectHighScores,"",btHighScores)) {
 					if(Application.levelCount > 2) {
-						state = LOADING;
+						state = State.LOADING;
 						Application.LoadLevel(Application.levelCount - 1);
 					}
 				}
 				if(GUI.Button(rectHelp,"",btHelp)) {
-					state = HELP;
+					state = State.HELP;
 				}
 				/*
 				if(GUI.Button(rectBenchMark,"",btBenchMark)) {
@@ -103,16 +143,45 @@ public class MainMenu : MonoBehaviour {
 				if(GUI.Button(rectMoreGames,"",lnMoreGames)) {
 
 				}
-				break;
-			case 2 :
+				
+				if(GUI.Button(new Rect(1, 20, 80, 32), "SETTINGS")){
+				    state = State.SETTINGS;
+				}
+				
+				break;				
+			case State.SETTINGS :
+                GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgSettings);
+			    
+    			if(GUI.Button(new Rect(0, 0, 48, 48), "", btBack)) {
+    				state = State.MENU;
+    			}
+			    
+			    GUI.BeginGroup(new Rect(40, 80, 400, 240));
+			
+			    GUI.Label(new Rect(0, 0, 380, 24), "BREATH TIME", labelStyle);
+			    minutesToBreath = GUI.SelectionGrid(new Rect(0,30, 400, 24), minutesToBreath - 1, new string[3]{"1 min", "2 min", "3 min"}, 3, controlStyle) + 1;			    
+
+			    GUI.Label(new Rect(0, 60, 380, 24), "DIFFICULTY", labelStyle);
+			    difficulty = GUI.SelectionGrid(new Rect(0,90, 400, 24), difficulty, new string[3]{"easy", "normal", "hard"}, 3, controlStyle);
+			    
+			    GUI.Label(new Rect(0, 120, 380, 24), "VOLUME", labelStyle);
+			    sound = GUI.HorizontalSlider(new Rect(0,150, 400, 24), sound, 0.0f, 1.0f);
+			    
+			    GUI.Label(new Rect(0, 170, 380, 24), "GRAPHICS LEVEL", labelStyle);
+			    graphicsLevel = GUI.SelectionGrid(new Rect(0,200, 400, 24), graphicsLevel, new string[3]{"low", "medium", "high"}, 3, controlStyle);
+			    
+			    GUI.EndGroup();
+			    
+			    break;
+			case State.HELP :
 				if(bgHelp) {
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgHelp);
 				}
-				if(GUI.Button(new Rect(Screen.width - 68,Screen.height - 68,68,68), "", btBack)) {
-					state = MENU;
+				if(GUI.Button(new Rect(0, 0, 48, 48), "", btBack)) {
+					state = State.MENU;
 				}
 				break;
-			case 3 :
+			case State.LOADING :
 				if(bgTexture != null) 
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgTexture);
 				break;

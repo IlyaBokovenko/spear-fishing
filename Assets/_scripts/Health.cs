@@ -16,12 +16,7 @@ public class Health : MonoBehaviour {
 	}
 	
     void FixedUpdate(){
-        float driftPhase = 2 * Mathf.PI * Time.time / driftPeriod;
-        float heightShift = heightDrift * Mathf.Cos(driftPhase);
-        _transform.localPosition += new Vector3(0, heightShift * Time.deltaTime, 0);
-        
-        float rotationPhase = 360 * Time.time / rotationPeriod;
-        _transform.rotation = Quaternion.Euler(0, rotationPhase, 0);
+        Animate();
     }
     
     public void Yam(){
@@ -31,5 +26,14 @@ public class Health : MonoBehaviour {
     
     private void Reappear(){
         gameObject.active = true;
+    }
+    
+    private void Animate(){
+        float driftPhase = 2 * Mathf.PI * Time.time / driftPeriod;
+        float heightShift = heightDrift * Mathf.Cos(driftPhase);
+        _transform.localPosition += new Vector3(0, heightShift * Time.deltaTime, 0);
+        
+        float rotationPhase = 360 * Time.time / rotationPeriod;
+        _transform.rotation = Quaternion.Euler(0, rotationPhase, 0);        
     }
 }

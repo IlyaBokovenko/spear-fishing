@@ -64,31 +64,20 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         Nose _nose  = (Nose)GetComponent(typeof(Nose)); 
         nose = _nose.position;	    
         children = new FishBehaviour[1]{seeking};
+        _transform = transform;
         seekingTarget = new GameObject("collision avoidance target");
         seekingTargetTransform = seekingTarget.transform;   
+	    seeking.target = seekingTarget;	    
     }
 	
 	void Start () {	    
 	    SetObstaclesLayerMask();    
 	    
-	    _transform = transform;
-	    seekingTargetTransform.parent = _transform;
-	    seeking.target = seekingTarget;
 
 	    whiskers = CreateWhiskers();
 	
 		lastCastTime = Time.time;
 	}
-	
-    // void OnCollisionEnter(Collision col){
-    //     if(!_transform) return;    
-    //     
-    //         state = State.Turning;
-    //         seeking.orientationMatcher.orientation = -_transform.forward;
-    //         
-    //         print(_transform.position);
-    //         Debug.Break();
-    // }
 	
 	public override SteeringOutput GetSteering(){
 	    Profiler.StartProfile(PT.CollisionAvoiding);
@@ -96,7 +85,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	    if(!seeking)
 	        steering = SteeringOutput.empty;
 	    else{
-	        TryCheckCollisions();
+            TryCheckCollisions();
             ChangeState();
             ProcessState();
 	    }        
@@ -122,12 +111,12 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	}
 	
 	private Line MainRay(){
-	    float distance = rigidbody.velocity.magnitude * timeToThinkAhead;
+        float distance = rigidbody.velocity.magnitude * timeToThinkAhead;
 	    return new Line(nose, nose + Vector3.forward * distance);
 	}
 
 	private Line[] CreateWhiskers(){
-	    Line[] ret = new Line[4];	    
+	    Line[] ret = new Line[4];
 	    Vector3 whisker = Quaternion.Euler(whiskersAngle, 0, 0) *  Vector3.forward;
 	    for(int i = 0, angle = 0; i < 4; i++, angle += 90){
 	        Quaternion rotation = Quaternion.Euler(0, 0, angle);
@@ -141,14 +130,6 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	}	
 	
 	private void ChangeState(){
-	    
-	    if(state == State.Turning){
-	        float angle = Vector3.Angle(_transform.forward, seeking.orientationMatcher.orientation);
-	        if(angle < 5) state = State.Idle;
-	        	    
-	        return;
-	    }
-	    
         if(isCollided){
             state = State.Avoiding;
             lastCollisionTime = Time.time;
@@ -158,6 +139,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
             }else if(state == State.PostAvoiding){
                 if(Time.time - lastCollisionTime > timeToKeepAvoiding){
                     state = State.Idle;
+                    seekingTargetTransform.position = _transform.position;
                 }
             }
         }        
@@ -173,7 +155,6 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
                 break;
             case State.Avoiding:
             case State.PostAvoiding:
-                UpdateSeekingTarget();
                 steering = seeking.GetSteering();            
                 break;
         }        
@@ -193,7 +174,9 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
                 if(isCollided)
                     break;
             }
-        }        
+        }  
+        
+        
 	}
 	
 	private void TryCheckCollisions(){
@@ -217,7 +200,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
         
         Gizmos.color = Color.blue;
         Line mainRay = MainRay().ToWorldFrom(_transform);
-        Gizmos.DrawLine(mainRay.from, mainRay.to);
+        Gizmos.DrawLine(mainRay.from, mainRay.to);        
         
         if(whiskers != null){
             Gizmos.color = Color.magenta;
@@ -226,12 +209,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
                 Gizmos.DrawLine(worldLine.from, worldLine.to); 
             }                    
         }        
-    }
-    
-    private void UpdateSeekingTarget(){
-	     seekingTargetTransform.position = hit.point + hit.normal * minDistance;
-	}	
-    
+    }    
 }
 
 struct Line{
@@ -245,7 +223,7 @@ struct Line{
     
     public float length
     {
-        get {return (to - from).magnitude;}
+        get {return Vector3.Distance(from, to);}
     }
     
     public Line(Vector3 _from, Vector3 _to){
@@ -256,7 +234,11 @@ struct Line{
     public Line ToWorldFrom(Transform t){
         Line ret = new Line();
         ret.from = t.TransformPoint(from);
-        ret.to = t.TransformPoint(to);
+        ret.to = ret.from + t.TransformDirection(to - from);
         return ret;
+    }
+    
+    override public string ToString(){
+        return string.Format("from: {0}; to: {1}", from, to);
     }
 }
