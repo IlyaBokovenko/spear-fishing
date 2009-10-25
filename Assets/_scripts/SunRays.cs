@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SunRays : MonoBehaviour {
     
-    public WaterEffects waterEffects;
+    public GameMaster gameMaster;
     bool sunRaysEnabled = true;
     
     void Start(){
@@ -11,7 +11,7 @@ public class SunRays : MonoBehaviour {
         sunRaysEnabled = graphicsLevel > 0;
         gameObject.SetActiveRecursively(sunRaysEnabled);
         
-        waterEffects.AddSurfaceDelegate(new SurfaceDelegate(this.OnSurface));
+        gameMaster.AddSurfaceDelegate(new SurfaceDelegate(this.OnSurface));
     }
 
     void OnSurface(bool isSurface){

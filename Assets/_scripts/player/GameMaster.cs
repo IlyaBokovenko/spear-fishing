@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
+public delegate void SurfaceDelegate(bool isSurface);
+
 public class GameMaster : MonoBehaviour {
 	private bool benchMark = false;
 	public GameObject[] bmPoints;
@@ -14,7 +16,7 @@ public class GameMaster : MonoBehaviour {
 	private int bmMinFPS;
 	private int bmMaxFPS;
 	
-	private float underwaterLevel = 3.0f;
+	public float underwaterLevel = 3.0f;
 	private float airMax;
 	private float healthMax = 100.0f;
 	private float gameTimer = 600.0f;
@@ -29,9 +31,26 @@ public class GameMaster : MonoBehaviour {
 	private FadeEffect fade;
 	private int state;
 	
+	bool _isSurface = true;
 	public bool isSurface
 	{
-	    get{return depthMeter <= 0;}
+	    get{return _isSurface;}
+	    private set{
+	        bool needCall = _isSurface != value;
+	         _isSurface = value;
+	        if(needCall)
+	            CallSurfaceDelegates();	        
+	    }
+	}	
+	
+	private SurfaceDelegate surfaceDelegate;
+	public void AddSurfaceDelegate(SurfaceDelegate d){
+	    if(surfaceDelegate != null) surfaceDelegate += d;
+	    else surfaceDelegate = d;
+	}
+	void CallSurfaceDelegates(){	    
+	    if(surfaceDelegate != null)    
+	        surfaceDelegate(isSurface);
 	}
 	
 	public void AddHealth(){
@@ -80,8 +99,9 @@ public class GameMaster : MonoBehaviour {
 			Fail();
 		}
 		depthMeter = (int)((underwaterLevel - playerTransform.position.y)/0.3);
+		isSurface = depthMeter <= 0;
 		
-		if(depthMeter > 0.0) {
+		if(isSurface) {
 			float airStep = Time.deltaTime;
 			if(playerControl && playerControl.isBoost)
 				airStep *= 4.0f;
@@ -123,11 +143,7 @@ public class GameMaster : MonoBehaviour {
 				Pause(true);
 			}
 		}
-	}
-	
-	void setUnderwaterLevel(float arg) {
-		underwaterLevel = arg;
-	}
+	}	
 	
 	public void Complete() {
 		if(hud)
