@@ -6,6 +6,8 @@ public delegate void IsGameDelegate(bool isGame);
 public delegate void OxygenLowDelegate(bool isLow);
 
 public class GameMaster : MonoBehaviour {
+    public AudioClip arrghSound;
+    
 	private bool benchMark = false;
 	public GameObject[] bmPoints;
 	private float benchSpeed = 4.0f; 
@@ -225,6 +227,8 @@ public class GameMaster : MonoBehaviour {
 		health -= 1.0f;
 		if(fade)
 			fade.setFadeAlpha(0.6f);
+			
+		audio.PlayOneShot(arrghSound);
 	}
 	
 	void Save () {

@@ -69,7 +69,7 @@ public class FishBiteBehaviour : FishBehaviour {
 	}
 	
 	private void DoBite(){	
-	    //AnimateAgony();
+	    audio.Play();
 		_bited = true;    
 	    foreach(IBitable b in bitables){
 	        if(b != null)

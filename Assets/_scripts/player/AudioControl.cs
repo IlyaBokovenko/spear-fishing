@@ -3,21 +3,27 @@ using System.Collections;
 
 public class AudioControl : MonoBehaviour {    
     GameMaster gameMaster;
-    public AudioClip oxygenLow;
+    public AudioClip boostSound;
+    public AudioClip scarySound;
     
     void Awake(){        
         gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
         gameMaster.AddSurfaceDelegate(new SurfaceDelegate(this.OnSurface));
         gameMaster.AddIsGameDelegate(new IsGameDelegate(this.OnGame));   
-        gameMaster.AddOxygenLowDelegate(new OxygenLowDelegate(this.OnOxygenLow));   
+        gameMaster.AddOxygenLowDelegate(new OxygenLowDelegate(this.OnOxygenLow));        
         
         if(JukeBox.instance)
             JukeBox.AttachTo(this);
     }
+    
+    void setBoostButtonControl(HighlightableControlButton arg) {
+        arg.AddPressedDelegate(new OnPressedDelegate(this.OnBoost));
+    }
 
 
-	void Start () {
-	    
+	void OnBoost(bool isBoost){
+	    if(isBoost)
+	        audio.PlayOneShot(boostSound);
 	}
 	
 	void OnOxygenLow(bool isLow){
@@ -32,6 +38,10 @@ public class AudioControl : MonoBehaviour {
 	void OnGame(bool isGame){
         SetClip();
 	}	
+	
+	void OnHunted(){
+	    audio.PlayOneShot(scarySound);
+	}
 	
 	void SetClip(){
 	    if(!JukeBox.instance)

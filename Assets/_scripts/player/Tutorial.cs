@@ -34,7 +34,7 @@ public class Tutorial : MonoBehaviour {
 	}
 	
 	void BeginTutorial(){
-	    sm.MoveTo(new RefuilingState(this));
+	    sm.MoveTo(new SwimState(this));
 	}
 	
 	void FixedUpdate(){
@@ -50,15 +50,9 @@ public class Tutorial : MonoBehaviour {
     
     // Property setters
 	
-	public void setAimButtonControl(HighlightableControlButton arg) { 
-	    buttonAim = arg; 
-	}
-	public void setFireButtonControl(HighlightableControlButton arg) { 
-	    buttonFire = arg; 
-	}
-	public void setBoostButtonControl(HighlightableControlButton arg) {
-	    buttonBoost = arg; 
-	}
+	public void setAimButtonControl(HighlightableControlButton arg) {buttonAim = arg;}
+	public void setFireButtonControl(HighlightableControlButton arg) {buttonFire = arg;}
+	public void setBoostButtonControl(HighlightableControlButton arg) {buttonBoost = arg;}
 	
 	public void setDepthTextStyle(GUIStyle _depthText){
 	    depthText = _depthText;
