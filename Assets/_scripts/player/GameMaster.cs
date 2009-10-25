@@ -15,7 +15,7 @@ public class GameMaster : MonoBehaviour {
 	private int bmMaxFPS;
 	
 	private float underwaterLevel = 3.0f;
-	private float airMax = 240.0f;
+	private float airMax;
 	private float healthMax = 100.0f;
 	private float gameTimer = 600.0f;
 	private float currentTimer = 0.0f;
@@ -43,6 +43,9 @@ public class GameMaster : MonoBehaviour {
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
 		fade = (FadeEffect)gameObject.GetComponent(typeof(FadeEffect));
+		
+		int minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
+		airMax = minutesToBreath * 60;
 		airTimer = airMax;
 		health = healthMax;
 		currentTimer = 0.0f;
