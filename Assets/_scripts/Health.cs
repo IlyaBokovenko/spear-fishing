@@ -23,7 +23,7 @@ public class Health : MonoBehaviour {
         if(isAnimationEnabled)  Animate();
     }
     
-    public void Yam(){
+    public void Yam(){        
         gameObject.active = false;
         Invoke("Reappear", reappearInterval);
     }

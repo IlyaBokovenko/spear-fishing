@@ -11,6 +11,8 @@ public class HighScores : MonoBehaviour {
 	private int newPlayerPosition = 0;
 	private string text = "";
 	
+	public AudioClip menuTap;
+	
 	void Start () {
 		players = new PlayerScore[maxPlayer];
 		int index = 0;
@@ -44,7 +46,7 @@ public class HighScores : MonoBehaviour {
 			MainMenu.CleanPlayerPrefs();
 		}
 		
-        PlayerPrefs.SetInt("game", 0);
+		GameMaster.SetGame(false);
 	}
 	
 	void OnGUI () {
@@ -59,6 +61,7 @@ public class HighScores : MonoBehaviour {
 			players[newPlayerPosition].name = keyboard.text;
 		
 		if(GUI.Button(new Rect(0, 0, 48, 48), "", btBack)) {
+		    JukeBox.Tap();
 			Save();
 			Application.LoadLevel(0);
 		}

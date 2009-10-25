@@ -1,10 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-public class Bubbles : MonoBehaviour {
+public class Speargun : MonoBehaviour {
     public ParticleEmitter bubbles;
     bool isBubblesEnabled = true;
     static bool isSubscribed = false;
+    
+    public AudioClip fireSound;
+    public GameObject spear;
     
     void Awake(){
 
@@ -21,11 +24,14 @@ public class Bubbles : MonoBehaviour {
 	
 	}
 	
+	public void Fire(){
+	    spear.audio.Play();
+        audio.Play();	    
+	    animation.Play();
+	}
+	
 	void StartBubbles(){
-	    if(!isBubblesEnabled) return;
-	    
-	    print("emitting bubbles");
-	    
+	    if(!isBubblesEnabled) return;	    
 	    bubbles.emit = true; 
         // bubbles.Emit(10);
 	}

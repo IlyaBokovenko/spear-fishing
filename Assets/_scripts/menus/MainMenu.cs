@@ -20,27 +20,29 @@ public class MainMenu : MonoBehaviour {
 	public GUIStyle controlStyle;
 	public GUIStyle labelStyle;
 	
+	public AudioClip menuTap;
+	
 	private int minutesToBreath
 	{
-	    get{return PlayerPrefs.HasKey("minutesToBreath") ? PlayerPrefs.GetInt("minutesToBreath") : 2;}
+	    get{return PlayerPrefs.GetInt("minutesToBreath", 2);}
 	    set{PlayerPrefs.SetInt("minutesToBreath", value);}
 	}
 	
 	private int difficulty	
 	{
-	    get{return PlayerPrefs.HasKey("difficulty") ? PlayerPrefs.GetInt("difficulty") : 1;}
+	    get{return PlayerPrefs.GetInt("difficulty", 1);}
 	    set{PlayerPrefs.SetInt("difficulty", value);}
 	}
 	
 	private float sound
 	{
-	    get{return PlayerPrefs.HasKey("sound") ? PlayerPrefs.GetFloat("sound") : 0.5f;}
+	    get{return PlayerPrefs.GetFloat("sound", 0.5f);}
 	    set{PlayerPrefs.SetFloat("sound", value);}
 	}
 	
 	private int graphicsLevel
 	{
-	    get{return PlayerPrefs.HasKey("graphicsLevel") ? PlayerPrefs.GetInt("graphicsLevel") : 1;}
+	    get{return PlayerPrefs.GetInt("graphicsLevel", 1);}
 	    set{PlayerPrefs.SetInt("graphicsLevel", value);}
 	}
 	
@@ -88,8 +90,9 @@ public class MainMenu : MonoBehaviour {
 		//rectBenchMark = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		rectMoreGames = new Rect((Screen.width - btSize.x) / 2, Screen.height - 6 - btSize.y, btSize.x, btSize.y);
 		
-         PlayerPrefs.SetInt("game", 0);         
-         
+		GameMaster.SetGame(false);
+        JukeBox.AttachTo(this);
+		JukeBox.PlayMenu();
 	}
 	// Update is called once per frame
 	void OnGUI () {
@@ -104,8 +107,9 @@ public class MainMenu : MonoBehaviour {
 				if(bgTexture != null) 
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgTexture);
 
-				if(isResume) {
+				if(isResume) {				    
 					if(GUI.Button(rectResume,"",btResume)) {
+					    JukeBox.Tap();
 						if(Application.levelCount > 1) {
 							state = State.LOADING;
 							Application.LoadLevel(1);
@@ -113,6 +117,7 @@ public class MainMenu : MonoBehaviour {
 					}
 				}
 				if(GUI.Button(rectStart,"",btStart)) {
+				    JukeBox.Tap();
 					if(Application.levelCount > 1) {
 						CleanPlayerPrefs();
 						state = State.LOADING;
@@ -120,15 +125,18 @@ public class MainMenu : MonoBehaviour {
 					}
 				}
 				if(GUI.Button(rectHighScores,"",btHighScores)) {
+				    JukeBox.Tap();
 					if(Application.levelCount > 2) {
 						state = State.LOADING;
 						Application.LoadLevel(Application.levelCount - 1);
 					}
 				}				
 				if(GUI.Button(rectSettings,"",btSettings)) {
+				    JukeBox.Tap();
 					state = State.SETTINGS;
 				}
 				if(GUI.Button(rectHelp,"",btHelp)) {
+				    JukeBox.Tap();
 					state = State.HELP;
 				}
 				/*
@@ -141,13 +149,14 @@ public class MainMenu : MonoBehaviour {
 					}
 				}*/
 				if(GUI.Button(rectMoreGames,"",lnMoreGames)) {
-
+                    JukeBox.Tap();
 				}				
 				break;				
 			case State.SETTINGS :
                 GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgSettings);
 			    
     			if(GUI.Button(new Rect(0, 0, 48, 48), "", btBack)) {
+    			    JukeBox.Tap();
     				state = State.MENU;
     			}
 			    
@@ -174,6 +183,7 @@ public class MainMenu : MonoBehaviour {
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgHelp);
 				}
 				if(GUI.Button(new Rect(0, 0, 48, 48), "", btBack)) {
+				    JukeBox.Tap();
 					state = State.MENU;
 				}
 				break;

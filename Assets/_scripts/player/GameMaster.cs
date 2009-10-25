@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 public delegate void SurfaceDelegate(bool isSurface);
+public delegate void IsGameDelegate(bool isGame);
+public delegate void OxygenLowDelegate(bool isLow);
 
 public class GameMaster : MonoBehaviour {
 	private bool benchMark = false;
@@ -24,14 +26,71 @@ public class GameMaster : MonoBehaviour {
 	private int lives = 0;
 
 	private float health = 0.0f;
-	private float airTimer = 0.0f;
-	private float depthMeter = 0.0f;
+	
 	private HUD hud = null;
 	private PlayerControl playerControl;
 	private FadeEffect fade;
 	private int state;
 	
-	bool _isSurface = true;
+	private bool airLocked = false;
+	public const float airTreshold = 0.33f;
+	private float _airTimer = 0.0f;	
+	private float airTimer
+	{
+	    get{return _airTimer;}
+	    set{
+	        float treshold = airMax*airTreshold;
+	        bool needCall = value != treshold && 
+	                        (treshold - _airTimer) * (treshold - value) <= 0;
+	        _airTimer = value;
+	        if(needCall) CallOxygenLowDelegates();	        
+	    }
+	}
+	private OxygenLowDelegate oxygenLowDelegate;
+	public void AddOxygenLowDelegate(OxygenLowDelegate d){
+	    if(oxygenLowDelegate != null) oxygenLowDelegate += d;
+	    else oxygenLowDelegate = d;
+	}
+	void CallOxygenLowDelegates(){	    
+	    if(oxygenLowDelegate != null)    
+	        oxygenLowDelegate(getAir() <= airTreshold);
+	}	
+	
+	public bool isGame
+	{
+	    get{return IsGame();}
+	    set{
+	        bool needCall = isGame != value;
+	        SetGame(value);
+	        if(needCall) CallIsGameDelegates();
+	    }
+	}	
+	private IsGameDelegate isGameDelegate;
+	public void AddIsGameDelegate(IsGameDelegate d){
+	    if(isGameDelegate != null) isGameDelegate += d;
+	    else isGameDelegate = d;
+	}
+	void CallIsGameDelegates(){	    
+	    if(isGameDelegate != null)    
+	        isGameDelegate(isGame);
+	}
+	
+	// only use if no GameMaster component in scene
+	public static void SetGame(bool _isGame){
+	    PlayerPrefs.SetInt("game", _isGame ? 1 : 0);
+	}
+	public static bool IsGame(){
+	    return PlayerPrefs.GetInt("game", 0) == 1;
+	}
+	
+	private float _depthMeter = 0.0f;
+	private float depthMeter
+	{
+	    get{return _depthMeter;}
+	    set{_depthMeter = value; isSurface = value <= 0;}
+	}
+	
+	bool _isSurface = false;
 	public bool isSurface
 	{
 	    get{return _isSurface;}
@@ -87,6 +146,7 @@ public class GameMaster : MonoBehaviour {
             // Load();
 		}
 		Pause(false);
+		CallSurfaceDelegates();
 	}
 	
 	void Update () {
@@ -99,13 +159,14 @@ public class GameMaster : MonoBehaviour {
 			Fail();
 		}
 		depthMeter = (int)((underwaterLevel - playerTransform.position.y)/0.3);
-		isSurface = depthMeter <= 0;
 		
-		if(isSurface) {
-			float airStep = Time.deltaTime;
-			if(playerControl && playerControl.isBoost)
-				airStep *= 4.0f;
-			airTimer -= airStep;
+		if(!isSurface) {
+		    if(!airLocked){
+    			float airStep = Time.deltaTime;
+    			if(playerControl && playerControl.isBoost)
+    				airStep *= 4.0f;
+    			airTimer -= airStep;		        
+		    }
 		} else {
 			if(airTimer < airMax)
 				airTimer += 1.0f;
@@ -231,8 +292,13 @@ public class GameMaster : MonoBehaviour {
 		return (airTimer/airMax);
 	}
 	
-	public void setAir(float air){
-	    airTimer = air*airMax;
+	public void LockOxygenLow(){	    
+	    airLocked = true;
+	    airTimer = airTreshold*airMax - 0.1f;
+	}
+	
+	public void UnlockOxygen(){
+	    airLocked = false;
 	}
 	
 	public int getLives() {

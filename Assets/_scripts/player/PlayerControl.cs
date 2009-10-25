@@ -11,8 +11,10 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	private HUD hud = null;
 	
 	public GUIStyle menuTextStyle;
-	public GameObject gun;
+	public Speargun gun;
 	public GameObject[] ignoreObjects;
+	
+	public AudioClip yam;
 	
 	private Transform goTransform;
 	private Transform gunTransform;
@@ -103,7 +105,8 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	}
 	
 	void OnTriggerEnter(Collider other){
-	    if(other.tag.Equals("Health") ){	        
+	    if(other.tag.Equals("Health") ){
+	        audio.PlayOneShot(yam);
 	        other.gameObject.SendMessage("Yam");
 	        gameMaster.AddHealth();
 	    }
@@ -132,8 +135,8 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	}
 
 	void Fire(){	    
-        if(gun && !gameMaster.isSurface) {
-			gun.animation.Play();
+        if(gun && !gameMaster.isSurface) {            
+			gun.Fire();
 		}
 	}
 	

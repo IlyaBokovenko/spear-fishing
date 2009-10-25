@@ -34,7 +34,7 @@ public class Tutorial : MonoBehaviour {
 	}
 	
 	void BeginTutorial(){
-	    sm.MoveTo(new SwimState(this));
+	    sm.MoveTo(new RefuilingState(this));
 	}
 	
 	void FixedUpdate(){
@@ -230,12 +230,13 @@ public class Tutorial : MonoBehaviour {
         }
 
         public override void Enter(){
-            context.gameMaster.setAir(0.75f);
-            buttonArrow =  new HighlightableControlButton(context, new Rect(115, 150, 64, 64), null, null, context.arrow2D);
+            context.gameMaster.LockOxygenLow();
+            buttonArrow =  new HighlightableControlButton(context, new Rect(95, 190, 64, 64), null, null, context.arrow2D);
             buttonArrow.StartBlinking();
         }
 
         public override void Exit(){
+            context.gameMaster.UnlockOxygen();
             buttonArrow.StopBlinking();
         }
 

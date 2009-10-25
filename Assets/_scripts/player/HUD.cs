@@ -41,7 +41,8 @@ public class HUD : MonoBehaviour {
 	public GUIStyle buttonTryAgain;
 	public GUIStyle buttonContinue;
 	public GUIStyle buttonNull;
-	//Rects
+
+    public AudioClip menuTap;
 	
 	//Menu
 	private Vector2 btSize = new Vector2(238,32);
@@ -133,12 +134,12 @@ public class HUD : MonoBehaviour {
 		btFail = new Rect((Screen.width - btSize.x) / 2, (Screen.height - btSize.y)/2, btSize.x, btSize.y);
 	}
 
-	void OnGUI() {
-        PlayerPrefs.SetInt("game", 0);
+	void OnGUI() {	    
+	    bool isGame = false;
 	    
 		switch(_state) {
 			case GameState.GAME :
-                PlayerPrefs.SetInt("game", 1);
+			    isGame = true;                
 			    
 				if(crosshair)
 					GUI.DrawTexture(rcCrosshair, crosshair);
@@ -187,15 +188,18 @@ public class HUD : MonoBehaviour {
 				if(bgMenu)
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgMenu);
 				if(GUI.Button(btPesume, "", buttonResume)) {
+				    JukeBox.Tap();
 					if(gameMaster)
 						gameMaster.Pause(false);
 					_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 				}
 				if(GUI.Button(btGallery, "", buttonGallery)) {
+				    JukeBox.Tap();
 					fishInfo = new FishInfo(fishes);
 					_state = GameState.GALLERY;
 				}
 				if(GUI.Button(btMainMenu, "", buttonMainMenu)) {
+				    JukeBox.Tap();
 					if(gameMaster)
 						gameMaster.goMainMenu();
 				}
@@ -203,12 +207,14 @@ public class HUD : MonoBehaviour {
 			case GameState.FAIL :
 				if(lives > 0) {
 					if(GUI.Button(btFail, "", buttonContinue)) {
+					    JukeBox.Tap();
 						if(gameMaster)
 							gameMaster.Continue();
 						_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 					}
 				} else {
 					if(GUI.Button(btFail, "", buttonTryAgain)) {
+					    JukeBox.Tap();
 						MainMenu.CleanPlayerPrefs();
 						Application.LoadLevel(Application.loadedLevel);
 					}
@@ -231,12 +237,14 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(386,262,64,24), "" + (int)weight, galleryText);
 				
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
+				    JukeBox.Tap();
 				    PlayerPrefs.SetInt("totalFishes", fishes.Count);
 				    PlayerPrefs.SetInt("totalWeight", weight);				    
 				    PlayerPrefs.SetInt("upload", 1);
 				}
 				
 				if(GUI.Button(btMenu, menuButton, menuStyle)) {
+				    JukeBox.Tap();
 					if(isComplete) {
 						if(Application.levelCount > 2) {
 							PlayerPrefs.SetString("player", "Player:" + fishes.Count + ":" + weight);
@@ -258,6 +266,8 @@ public class HUD : MonoBehaviour {
 			case GameState.HIDEHUD :
 				break;
 		}
+		
+		gameMaster.isGame = isGame;
 	}
 	
 	public void InitControlButton() {
