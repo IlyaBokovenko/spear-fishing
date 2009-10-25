@@ -7,16 +7,20 @@ public class Health : MonoBehaviour {
     public float heightDrift = 0.1f;
     public float reappearInterval = 180;
     
-    private Transform _transform;    
+    private Transform _transform;
+    
+    private bool isAnimationEnabled = true;
 
 	// Use this for initialization
 	void Start () {
 	    _transform = transform;
 	    _transform.rotation = Quaternion.identity;
+	    
+	    isAnimationEnabled = PlayerPrefs.GetInt("graphicsLevel", 1) > 0;
 	}
 	
     void FixedUpdate(){
-        Animate();
+        if(isAnimationEnabled)  Animate();
     }
     
     public void Yam(){

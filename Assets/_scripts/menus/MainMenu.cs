@@ -168,7 +168,7 @@ public class MainMenu : MonoBehaviour {
 			    sound = GUI.HorizontalSlider(new Rect(0,150, 400, 24), sound, 0.0f, 1.0f);
 			    
 			    GUI.Label(new Rect(0, 170, 380, 24), "GRAPHICS LEVEL", labelStyle);
-			    graphicsLevel = GUI.SelectionGrid(new Rect(0,200, 400, 24), graphicsLevel, new string[3]{"low", "medium", "high"}, 3, controlStyle);
+			    graphicsLevel = GUI.SelectionGrid(new Rect(0,200, 400, 24), graphicsLevel, new string[2]{"low", "high"}, 2, controlStyle);
 			    
 			    GUI.EndGroup();
 			    
