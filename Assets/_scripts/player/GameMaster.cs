@@ -6,6 +6,7 @@ public delegate void IsGameDelegate(bool isGame);
 public delegate void OxygenLowDelegate(bool isLow);
 
 public class GameMaster : MonoBehaviour {
+    public bool isFreeVersion = false;
     public AudioClip arrghSound;
     
 	private bool benchMark = false;
@@ -56,7 +57,11 @@ public class GameMaster : MonoBehaviour {
 	}
 	void CallOxygenLowDelegates(){	    
 	    if(oxygenLowDelegate != null)    
-	        oxygenLowDelegate(getAir() <= airTreshold);
+	        oxygenLowDelegate(isOxygenLow);
+	}
+	public bool isOxygenLow
+	{
+	    get{return getAir() <= airTreshold;}
 	}	
 	
 	
@@ -125,6 +130,7 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Start () {	    
+	    PlayerPrefs.SetInt("free_version", isFreeVersion ? 1 : 0);
 		playerTransform = gameObject.transform;
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));

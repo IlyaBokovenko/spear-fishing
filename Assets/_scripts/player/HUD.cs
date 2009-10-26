@@ -3,7 +3,7 @@ using System.Collections;
 
 public class HUD : MonoBehaviour {
 	public bool hideHud = false;
-	public bool isFreeVersion = false;
+
 	//Textures
 	//GUI
 	public Texture2D crosshair;
@@ -106,12 +106,10 @@ public class HUD : MonoBehaviour {
 	}	
 	
 	void Start () {
+	    gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
 		GUIInit();
 		InitControlButton();
 		_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
-		gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
-		
-		PlayerPrefs.SetInt("free_version", isFreeVersion ? 1 : 0);
 	}	
 
 	void GUIInit() {
@@ -121,7 +119,7 @@ public class HUD : MonoBehaviour {
 		rcAirTank = new Rect(Screen.width / 2 - 120, Screen.height - 150, 100,150);
 		rcWatch = new Rect(Screen.width / 2 - 64, Screen.height - 130, 128 , 128);
 		
-		float statusHeight = isFreeVersion ? 50 : 0;
+		float statusHeight = gameMaster.isFreeVersion ? 50 : 0;
 		rcStatus = new Rect(Screen.width / 2 - 115, statusHeight, 229, 26);
 		
 		int yLayout = 134;

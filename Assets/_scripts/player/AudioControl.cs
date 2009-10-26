@@ -27,23 +27,23 @@ public class AudioControl : MonoBehaviour {
 	}
 	
 	void OnOxygenLow(bool isLow){
-	    if(isLow) audio.Play();
-	    else audio.Stop();
+	    SetOxygen();
 	}
 	
 	void OnSurface(bool isSurface){
-	    SetClip();
+	    SetBackgroundSound();
 	}
 	
 	void OnGame(bool isGame){
-        SetClip();
+        SetBackgroundSound();
+        SetOxygen();
 	}	
 	
 	void OnHunted(){
 	    audio.PlayOneShot(scarySound);
 	}
 	
-	void SetClip(){
+	void SetBackgroundSound(){
 	    if(!JukeBox.instance)
 	        return;
     
@@ -55,5 +55,12 @@ public class AudioControl : MonoBehaviour {
 	        else
 	            JukeBox.PlayUnderwater();
 	    }
+	}
+	
+	void SetOxygen(){
+	    if(gameMaster.isGame && gameMaster.isOxygenLow)
+	        audio.Play();
+	     else
+    	    audio.Stop();  
 	}	
 }
