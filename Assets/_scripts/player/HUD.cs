@@ -309,7 +309,7 @@ public class HUD : MonoBehaviour {
 		}
 	}
 	
-	public void loadFishes() {
+	public void loadFishes() {	    
 		int index = 0;
 		string key = "";
 		while(true) {

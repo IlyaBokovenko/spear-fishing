@@ -68,7 +68,7 @@ public class HighScores : MonoBehaviour {
 	}
 	
 	void Save() {
-		for(int index = 0; index < maxPlayer; index++) {
+	    for(int index = 0; index < maxPlayer; index++) {
 			PlayerPrefs.SetString("player" + index, players[index].getData());
 		}
 	}

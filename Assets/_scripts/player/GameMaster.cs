@@ -125,6 +125,8 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Start () {
+	    AudioListener.volume = PlayerPrefs.GetFloat("sound", 0.5f);
+	    
 		playerTransform = gameObject.transform;
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
@@ -149,9 +151,8 @@ public class GameMaster : MonoBehaviour {
 			bmMinFPS = 100;
 			bmMaxFPS = 0;
 			bmFPSCount = 0;
-		} else {
-			lives = 3;
-            // Load();
+		} else {			
+            Load();
 		}
 		Pause(false);
 		CallSurfaceDelegates();
@@ -250,10 +251,10 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Load() {
-		health = PlayerPrefs.HasKey("health") ? PlayerPrefs.GetFloat("health") : health;
-		airTimer = PlayerPrefs.HasKey("air") ? PlayerPrefs.GetFloat("air") : airTimer;
-		currentTimer = PlayerPrefs.HasKey("timer") ? PlayerPrefs.GetFloat("timer") : currentTimer;
-		lives = PlayerPrefs.HasKey("lives") ? PlayerPrefs.GetInt("lives") : lives;
+		health = PlayerPrefs.GetFloat("health", health);
+		airTimer = PlayerPrefs.GetFloat("air", airTimer);
+		currentTimer = PlayerPrefs.GetFloat("timer", currentTimer);
+		lives = PlayerPrefs.GetInt("lives", lives);
 		
 		if(PlayerPrefs.HasKey("transform"))
 			setPosition(PlayerPrefs.GetString("transform"));
