@@ -20,7 +20,7 @@ public class Tutorial : MonoBehaviour {
 	
 	float depth
 	{
-	    get{return gameMaster.getDepth();}
+	    get{return gameMaster.depth;}
 	}
 	
 

@@ -152,7 +152,7 @@ public class HUD : MonoBehaviour {
 				
 				if(gameMaster) {
 					index = (int)((gameMaster.getAir() * airTank.Length));
-					depth = gameMaster.getDepth();
+					depth = (int)gameMaster.depth;
 					health = gameMaster.getHealth();
 					lives = gameMaster.getLives();
 				}

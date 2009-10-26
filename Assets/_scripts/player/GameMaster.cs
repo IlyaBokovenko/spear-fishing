@@ -34,8 +34,9 @@ public class GameMaster : MonoBehaviour {
 	private FadeEffect fade;
 	private int state;
 	
+	// oxygen
 	private bool airLocked = false;
-	public const float airTreshold = 0.33f;
+	private const float airTreshold = 0.33f;
 	private float _airTimer = 0.0f;	
 	private float airTimer
 	{
@@ -58,6 +59,8 @@ public class GameMaster : MonoBehaviour {
 	        oxygenLowDelegate(getAir() <= airTreshold);
 	}	
 	
+	
+	// is player in game or menu
 	public bool isGame
 	{
 	    get{return IsGame();}
@@ -85,13 +88,15 @@ public class GameMaster : MonoBehaviour {
 	    return PlayerPrefs.GetInt("game", 0) == 1;
 	}
 	
+	// depth
 	private float _depthMeter = 0.0f;
-	private float depthMeter
+	public float depth
 	{
 	    get{return _depthMeter;}
-	    set{_depthMeter = value; isSurface = value <= 0;}
+	    private set{_depthMeter = value; isSurface = value <= 0;}
 	}
 	
+	// is player on surface
 	bool _isSurface = false;
 	public bool isSurface
 	{
@@ -103,16 +108,17 @@ public class GameMaster : MonoBehaviour {
 	            CallSurfaceDelegates();	        
 	    }
 	}	
-	
 	private SurfaceDelegate surfaceDelegate;
 	public void AddSurfaceDelegate(SurfaceDelegate d){
 	    if(surfaceDelegate != null) surfaceDelegate += d;
 	    else surfaceDelegate = d;
 	}
-	void CallSurfaceDelegates(){	    
+	void CallSurfaceDelegates(){
 	    if(surfaceDelegate != null)    
 	        surfaceDelegate(isSurface);
 	}
+	
+	//////////////////////////////////////////////////////////////////////
 	
 	public void AddHealth(){
 	    health = Mathf.Min(health + 10, healthMax);
@@ -160,7 +166,7 @@ public class GameMaster : MonoBehaviour {
 		if(airTimer <= 0.0 || health < 1.0) {
 			Fail();
 		}
-		depthMeter = (int)((underwaterLevel - playerTransform.position.y)/0.3);
+		depth = (underwaterLevel - playerTransform.position.y)/0.3f;
 		
 		if(!isSurface) {
 		    if(!airLocked){
@@ -288,10 +294,6 @@ public class GameMaster : MonoBehaviour {
 		health = _health;
 	}
 
-	public int getDepth() {
-		return (int)depthMeter;
-	}
-	
 	public float getAir() {
 		return (airTimer/airMax);
 	}

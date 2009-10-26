@@ -18,6 +18,8 @@ function Start () {
 }
 
 function Update () {
+    return;
+    
 	var meshFilter : MeshFilter = GetComponent(MeshFilter);
 	var mesh : Mesh = meshFilter.mesh;
    
