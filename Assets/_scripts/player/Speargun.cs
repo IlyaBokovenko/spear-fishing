@@ -7,6 +7,7 @@ public class Speargun : MonoBehaviour {
     static bool isSubscribed = false;
     
     public AudioClip fireSound;
+    public AudioClip bubblesSound;
     public GameObject spear;
     
     void Awake(){
@@ -25,8 +26,8 @@ public class Speargun : MonoBehaviour {
 	}
 	
 	public void Fire(){
-	    spear.audio.Play();
-        audio.Play();	    
+	    audio.PlayOneShot(fireSound);
+        audio.PlayOneShot(bubblesSound);
 	    animation.Play();
 	}
 	

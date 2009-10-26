@@ -150,7 +150,7 @@ public class MainMenu : MonoBehaviour {
 				}*/
 				if(GUI.Button(rectMoreGames,"",lnMoreGames)) {
                     JukeBox.Tap();                    
-                    Application.OpenURL("itms://itunes.apple.com/WebObjects/MZStore.woa/wa/viewArtist?id=309940476&uo=6");
+                    Application.OpenURL("http://phobos.apple.com/WebObjects/MZSearch.woa/wa/search?submit=seeAllLockups&media=software&entity=software&term=yossi+malki");
                     // PlayerPrefs.SetInt("moregames", 1);
 				}				
 				break;				
