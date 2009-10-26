@@ -124,17 +124,16 @@ public class GameMaster : MonoBehaviour {
 	    health = Mathf.Min(health + 10, healthMax);
 	}
 	
-	void Start () {
-	    AudioListener.volume = PlayerPrefs.GetFloat("sound", 0.5f);
-	    
+	void Start () {	    
 		playerTransform = gameObject.transform;
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
 		fade = (FadeEffect)gameObject.GetComponent(typeof(FadeEffect));
 		
 		int minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
-		airMax = minutesToBreath * 60;
-		airTimer = airMax;
+        airMax = minutesToBreath * 60;
+        airTimer = airMax;
+        airTimer = 20;
 		health = healthMax;
 		currentTimer = 0.0f;
 		
@@ -181,41 +180,45 @@ public class GameMaster : MonoBehaviour {
 				airTimer += 1.0f;
 		}
 		
-		if(benchMark) {
-			if(bmPointIndex < bmPoints.Length) {
-				if(bmPoints[bmPointIndex]) {
-					float distance = Vector3.Distance(playerTransform.position, bmPoints[bmPointIndex].transform.position);
-					if(distance > 0.0f) {
-						Vector3 step = ( bmPoints[bmPointIndex].transform.position - playerTransform.position).normalized * benchSpeed * Time.deltaTime;
-						if(step.magnitude > distance) {
-							playerTransform.position = bmPoints[bmPointIndex].transform.position;
-						} else {
-							playerTransform.rotation = Quaternion.Slerp(playerTransform.rotation, bmPoints[bmPointIndex].transform.rotation, Time.deltaTime * 1 / distance);
-							playerTransform.position += step;
-						}
+		if(benchMark)
+            Benchmark();		
+	}
+	
+	void Benchmark(){
+		if(bmPointIndex < bmPoints.Length) {
+			if(bmPoints[bmPointIndex]) {
+				float distance = Vector3.Distance(playerTransform.position, bmPoints[bmPointIndex].transform.position);
+				if(distance > 0.0f) {
+					Vector3 step = ( bmPoints[bmPointIndex].transform.position - playerTransform.position).normalized * benchSpeed * Time.deltaTime;
+					if(step.magnitude > distance) {
+						playerTransform.position = bmPoints[bmPointIndex].transform.position;
 					} else {
-						bmPointIndex ++;
-						Debug.Log("Distance : " + distance + " Go to point " + bmPointIndex);
-						Debug.Break();
+						playerTransform.rotation = Quaternion.Slerp(playerTransform.rotation, bmPoints[bmPointIndex].transform.rotation, Time.deltaTime * 1 / distance);
+						playerTransform.position += step;
 					}
-				} 
-				bmFPS = (int)(1 / Time.deltaTime);
-				if(bmMaxFPS < bmFPS && bmFPS < 101)
-					bmMaxFPS = bmFPS;
-				if(bmMinFPS > bmFPS)
-					bmMinFPS = bmFPS;
-				bmFPSCount ++;
-			} else {
-				Debug.Log("Show Result");
-				bmFPS = (int)(bmFPSCount / currentTimer);
-				if(hud)
-					hud.showBenchResult("FPS : " + bmFPS + " (" + bmMinFPS + "/" + bmMaxFPS + ")");
-				Pause(true);
-			}
-		}
+				} else {
+					bmPointIndex ++;
+					Debug.Log("Distance : " + distance + " Go to point " + bmPointIndex);
+					Debug.Break();
+				}
+			} 
+			bmFPS = (int)(1 / Time.deltaTime);
+			if(bmMaxFPS < bmFPS && bmFPS < 101)
+				bmMaxFPS = bmFPS;
+			if(bmMinFPS > bmFPS)
+				bmMinFPS = bmFPS;
+			bmFPSCount ++;
+		} else {
+			Debug.Log("Show Result");
+			bmFPS = (int)(bmFPSCount / currentTimer);
+			if(hud)
+				hud.showBenchResult("FPS : " + bmFPS + " (" + bmMinFPS + "/" + bmMaxFPS + ")");
+			Pause(true);
+		}	    
 	}	
 	
 	public void Complete() {
+	    Pause(true);
 		if(hud)
 			hud.showComplete();
 	}
@@ -251,10 +254,10 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Load() {
-		health = PlayerPrefs.GetFloat("health", health);
-		airTimer = PlayerPrefs.GetFloat("air", airTimer);
-		currentTimer = PlayerPrefs.GetFloat("timer", currentTimer);
-		lives = PlayerPrefs.GetInt("lives", lives);
+		health = PlayerPrefs.GetFloat("health", healthMax);
+		airTimer = PlayerPrefs.GetFloat("air", airMax);
+		currentTimer = PlayerPrefs.GetFloat("timer", 0.0f);
+		lives = PlayerPrefs.GetInt("lives", 3);
 		
 		if(PlayerPrefs.HasKey("transform"))
 			setPosition(PlayerPrefs.GetString("transform"));

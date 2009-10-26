@@ -11,7 +11,7 @@ public class Speargun : MonoBehaviour {
     
     void Awake(){
 
-        if(!isSubscribed){
+        if(!isSubscribed || Application.platform != RuntimePlatform.OSXEditor){
           SubscribeToAnimation();
           isSubscribed = true;  
         } 

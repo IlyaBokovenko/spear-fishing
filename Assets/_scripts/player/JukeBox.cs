@@ -18,6 +18,7 @@ public class JukeBox : MonoBehaviour {
         if(!_instance){
             GameObject.DontDestroyOnLoad(gameObject);    
             _instance = this;
+            AudioListener.volume = PlayerPrefs.GetFloat("sound", 0.5f);
         }else{
             Destroy(gameObject);
         }

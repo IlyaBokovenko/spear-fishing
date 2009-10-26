@@ -579,7 +579,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 		printf_console("mono-memory>   used heap: %d allocated heap: %d  max number of collections: %d collection total duration: %4.1f\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
 		printf_console("----------------------------------------\n");		
 //		NSString* log = [FBPlayerPrefs getString: @"log" orDefault:@""];
-//		NSLog(@"\n\n!!!!!!!!\n\n %@\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n", log );
+//		NSLog(@"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n %@\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n", log );
 //		[FBPlayerPrefs setString: @""  withKey: @"log" ];			
 		
 	}
