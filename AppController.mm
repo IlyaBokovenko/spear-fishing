@@ -730,6 +730,11 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 			[_facebookController uploadScoreFishes: fishes weight:weight];		
 		}		
 	}
+	
+//	if([FBPlayerPrefs getInt:@"moregames" orDefault:0]){		
+//		[FBPlayerPrefs setInt:0 withKey:@"moregames"];
+//		[[UIApplication sharedApplication] openURL: [NSURL URLWithString:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewArtist?id=309940476&uo=6"]];
+//	}
 }
 
 - (void) applicationWillResignActive:(UIApplication*)application

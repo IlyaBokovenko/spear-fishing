@@ -149,7 +149,9 @@ public class MainMenu : MonoBehaviour {
 					}
 				}*/
 				if(GUI.Button(rectMoreGames,"",lnMoreGames)) {
-                    JukeBox.Tap();
+                    JukeBox.Tap();                    
+                    Application.OpenURL("itms://itunes.apple.com/WebObjects/MZStore.woa/wa/viewArtist?id=309940476&uo=6");
+                    // PlayerPrefs.SetInt("moregames", 1);
 				}				
 				break;				
 			case State.SETTINGS :
