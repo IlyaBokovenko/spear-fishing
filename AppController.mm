@@ -84,7 +84,7 @@
 #define CALL_EAGL_FUNCTION(__FUNC__, ...) ({ EAGLError __error = __FUNC__( __VA_ARGS__ ); if(__error != kEAGLErrorSuccess) printf("%s() called from %s returned error %i\n", #__FUNC__, __FUNCTION__, __error); (__error ? 0 : 1); })
 #define CHECK_GL_ERROR() ({ GLenum __error = glGetError(); if(__error) printf_console("OpenGLES error 0x%04X in %s\n", __error, __FUNCTION__); (__error ? NO : YES); })
 #define EAGL_ERROR(action) ({ printf_console("Failed to %s. Called from %s\n", action, __FUNCTION__);})
-
+ 
 
 void UnityPlayerLoop();
 void UnityFinishRendering();
@@ -455,14 +455,10 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	// Create a full-screen window
 	_window = [[UIWindow alloc] initWithFrame:rect];
 	EAGLView* view = [[EAGLView alloc] initWithFrame:rect];
-	[_window addSubview:view];
+	[_window addSubview:view];	
 	
-	BOOL isFree = [FBPlayerPrefs getInt:@"free_version" orDefault:0];	
-	if(isFree){
-		_adController = [AdwhirlController createAdwhirlControllerWith: _window];
-		[_adController showDummyBanner];
-		[_adController adjustViewSize];		
-	}
+	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
+	[_adController createAd];
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
@@ -578,10 +574,10 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 		printf_console("mono-scripts>  update: %4.1f   fixedUpdate: %4.1f coroutines: %4.1f \n", MachToMillisecondsDelta(_dynamicBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_fixedBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_coroutinePB.avgV / EachNthFrame));
 		printf_console("mono-memory>   used heap: %d allocated heap: %d  max number of collections: %d collection total duration: %4.1f\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
 		printf_console("----------------------------------------\n");		
+		
 //		NSString* log = [FBPlayerPrefs getString: @"log" orDefault:@""];
 //		NSLog(@"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n %@\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n", log );
-//		[FBPlayerPrefs setString: @""  withKey: @"log" ];			
-		
+//		[FBPlayerPrefs setString: @""  withKey: @"log" ];
 	}
 	ProfilerBlock_Update(&_framePB, _frameDelta, (_frameId == 0));
 	ProfilerBlock_Update(&_swapPB, _swapDelta, (_frameId == 0));
@@ -693,6 +689,13 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 
 - (void) applicationDidFinishLaunching:(UIApplication*)application
 {
+	[FBPlayerPrefs deleteKey: @"free_version"];
+	[FBPlayerPrefs deleteKey:@"game"];	
+	[FBPlayerPrefs deleteKey:@"upload"];
+	[FBPlayerPrefs deleteKey:@"moregames"];
+	[FBPlayerPrefs deleteKey:@"totalFishes"];
+	[FBPlayerPrefs deleteKey:@"totalWeight"];	
+	
 	printf_console("-> applicationDidFinishLaunching()\n");
 	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight animated:NO];
 	[self startUnity:application];	
@@ -714,6 +717,14 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 }
  
 -(void)updateUI: (NSTimer*) timer{	
+	
+	BOOL isFree = [FBPlayerPrefs getInt:@"free_version" orDefault:0];
+	if(isFree && _adController.view.hidden){		
+		NSLog(@"showing ad: %d", isFree);
+		_adController.view.hidden = NO;
+		[_adController adjustViewSize];		
+	}		
+	
 	BOOL isGameRunning = [FBPlayerPrefs getInt:@"game" orDefault:0];
 	_adController.view.hidden = !isGameRunning;
 	

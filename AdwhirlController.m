@@ -3,6 +3,7 @@
 #import "ARRollerView.h"
 
 @implementation AdwhirlController
+#pragma mark UIViewController
 
 -(id)initWith: (UIView*)_parent{
 	if(self = [super init]){
@@ -13,44 +14,32 @@
 }
 
 +(AdwhirlController*) createAdwhirlControllerWith: (UIView*)parent{
-	AdwhirlController* instance = [[self alloc] initWith: parent];
-	
-	//[instance retain]; // ARRollerView for some reason releases it's delegate
-	
-	
-//	UILabel* roller = [UILabel new];
-//	roller.text = @"TEST";
-//	roller.backgroundColor = [UIColor redColor];
-//	instance.view = roller;
-//	[parent addSubview:roller];	
-	
+	AdwhirlController* instance = [[self alloc] initWith: parent];	
 	return instance;
-}
-
--(void)showAd{
-	ARRollerView* roller = [ARRollerView requestRollerViewWithDelegate:self];	
-	self.view = roller;
-	[parent addSubview:self.view];
-}
-
--(void)showDummyBanner{
-	UIImageView* dummy = [[UIImageView alloc] initWithImage: [UIImage imageNamed: @"dummy-ad.png"]];
-	self.view = dummy;
-	[parent addSubview:self.view];	
-}
-
--(void)adjustViewSize{	
-	self.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
-}
-
-
-- (void) dealloc{	
-	[super dealloc];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+}
+
+#pragma mark controlling
+
+-(void)createAd{
+	self.view = [[ARRollerView requestRollerViewWithDelegate:self] retain];	
+	self.view.hidden = YES;	
+	[parent addSubview:self.view];	
+}
+
+-(void)createDummy{
+	self.view = [[UIImageView alloc] initWithImage: [UIImage imageNamed: @"dummy-ad.png"]];
+	self.view.hidden = YES;	
+	[parent addSubview:self.view];		
+}
+
+
+-(void)adjustViewSize{	
+	self.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
 }
 
 #pragma mark ARRollerDelegate

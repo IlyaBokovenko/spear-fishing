@@ -1,12 +1,12 @@
 #import "ARRollerProtocol.h"
 
 @interface AdwhirlController : UIViewController<ARRollerDelegate> {
-	UIView* parent;
+	UIView* parent;	
 }
 
 +(AdwhirlController*) createAdwhirlControllerWith: (UIView*)parent;
--(void)showAd;
--(void)showDummyBanner;
 -(void)adjustViewSize;
+-(void)createDummy;
+-(void)createAd;
 
 @end
