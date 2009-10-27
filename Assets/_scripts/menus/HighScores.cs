@@ -14,6 +14,11 @@ public class HighScores : MonoBehaviour {
 	public AudioClip menuTap;
 	
 	void Start () {
+        // iPhoneKeyboard.autorotateToPortrait = false;
+        //         iPhoneKeyboard.autorotateToPortraitUpsideDown  = false;
+        //         iPhoneKeyboard.autorotateToLandscapeRight  = false;
+        //         iPhoneKeyboard.autorotateToLandscapeLeft = true;
+	    
 		players = new PlayerScore[maxPlayer];
 		int index = 0;
 		string key = "";
@@ -64,7 +69,7 @@ public class HighScores : MonoBehaviour {
 		    JukeBox.Tap();
 			Save();
 			Application.LoadLevel(0);
-		}
+		}		
 	}
 	
 	void Save() {

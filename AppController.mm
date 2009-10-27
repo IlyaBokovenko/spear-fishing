@@ -58,7 +58,7 @@
 #define MAIN_LOOP_TYPE THREAD_BASED_LOOP
 //#define MAIN_LOOP_TYPE EVENT_PUMP_BASED_LOOP
 
-#define ENABLE_INTERNAL_PROFILER 1
+#define ENABLE_INTERNAL_PROFILER 0
 #define ENABLE_BLOCK_ON_GPU_PROFILER 0
 #define BLOCK_ON_GPU_EACH_NTH_FRAME 4
 #define INCLUDE_OPENGLES_IN_RENDER_TIME 0
@@ -699,7 +699,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	printf_console("-> applicationDidFinishLaunching()\n");
 	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight animated:NO];
 	[self startUnity:application];	
-	[NSTimer scheduledTimerWithTimeInterval: 2.0 target: _adController selector: @selector(adjustViewSize) userInfo: nil repeats: NO];
+	//[NSTimer scheduledTimerWithTimeInterval: 2.0 target: _adController selector: @selector(adjustViewSize) userInfo: nil repeats: NO];
 }
 	
 - (void) applicationDidBecomeActive:(UIApplication*)application
@@ -717,7 +717,6 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 }
  
 -(void)updateUI: (NSTimer*) timer{	
-	
 	BOOL isFree = [FBPlayerPrefs getInt:@"free_version" orDefault:0];
 	if(isFree && _adController.view.hidden){		
 		NSLog(@"showing ad: %d", isFree);
@@ -740,12 +739,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 			int weight = [FBPlayerPrefs getInt:@"totalWeight" orDefault:0];
 			[_facebookController uploadScoreFishes: fishes weight:weight];		
 		}		
-	}
-	
-//	if([FBPlayerPrefs getInt:@"moregames" orDefault:0]){		
-//		[FBPlayerPrefs setInt:0 withKey:@"moregames"];
-//		[[UIApplication sharedApplication] openURL: [NSURL URLWithString:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewArtist?id=309940476&uo=6"]];
-//	}
+	}	
 }
 
 - (void) applicationWillResignActive:(UIApplication*)application

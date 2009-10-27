@@ -3,6 +3,18 @@
 #import "ARRollerView.h"
 
 @implementation AdwhirlController
+
+@synthesize view;
+
+#pragma mark private
+
+-(void) setupView{
+	view.hidden = YES;	
+	view.transform = CGAffineTransformMakeRotation(M_PI/2);
+	[parent addSubview:view];			
+}
+
+
 #pragma mark UIViewController
 
 -(id)initWith: (UIView*)_parent{
@@ -18,28 +30,26 @@
 	return instance;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+- (void) dealloc{
+	[view release];
+	[super dealloc];
 }
+
 
 #pragma mark controlling
 
 -(void)createAd{
-	self.view = [[ARRollerView requestRollerViewWithDelegate:self] retain];	
-	self.view.hidden = YES;	
-	[parent addSubview:self.view];	
+	view = [[ARRollerView requestRollerViewWithDelegate:self] retain];	
+	[self setupView];
 }
 
 -(void)createDummy{
-	self.view = [[UIImageView alloc] initWithImage: [UIImage imageNamed: @"dummy-ad.png"]];
-	self.view.hidden = YES;	
-	[parent addSubview:self.view];		
+	view = [[[UIImageView alloc] initWithImage: [UIImage imageNamed: @"dummy-ad.png"]] autorelease];
+	[self setupView];
 }
 
-
 -(void)adjustViewSize{	
-	self.view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
+	view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
 }
 
 #pragma mark ARRollerDelegate
