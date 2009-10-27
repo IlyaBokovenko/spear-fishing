@@ -63,8 +63,12 @@ public class FishInfo {
 		return 0;
 	}
 	
+	public static string formatWeight(int value){
+	    return string.Format("{0,1:00.0}", (float)value);
+	}
+	
 	public string getWeightString(string type){
-	     return string.Format("{0,1:00.0}", (float)getWeight(type));
+	     return formatWeight(getWeight(type));
 	}
 	
 	public static int getCount(string type, ArrayList fishes) {

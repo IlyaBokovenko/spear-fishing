@@ -260,7 +260,10 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Load() {
-		health = PlayerPrefs.GetFloat("health", healthMax);
+	    if(Application.platform == RuntimePlatform.OSXEditor)
+	        return;
+	    
+        health = PlayerPrefs.GetFloat("health", healthMax);
 		airTimer = PlayerPrefs.GetFloat("air", airMax);
 		currentTimer = PlayerPrefs.GetFloat("timer", 0.0f);
 		lives = PlayerPrefs.GetInt("lives", 3);

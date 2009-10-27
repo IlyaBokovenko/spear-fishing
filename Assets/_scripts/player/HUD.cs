@@ -178,8 +178,8 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(216, 230, 48, 26), "" + depth + " ft", depthText);
 				GUI.Label(new Rect(216, 264, 48, 26), health + "", healthText);
 				//Status
-				GUI.Label(new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height), "" +fishes.Count, statusText);
-				GUI.Label(new Rect(rcStatus.x + 120, rcStatus.y, 48, rcStatus.height), "" + weight, statusText);
+				GUI.Label(new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height), "" + fishes.Count, statusText);
+				GUI.Label(new Rect(rcStatus.x + 120, rcStatus.y, 48, rcStatus.height), FishInfo.formatWeight(weight), statusText);
 				GUI.Label(new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height), "" + lives, statusText);
 				break;
 			case GameState.PAUSE :
@@ -232,7 +232,7 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(348,219,64,24), "" + fishInfo.getWeightString(FishInfo.GROUPER), galleryText);
 				
 				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);
-				GUI.Label(new Rect(386,262,64,24), "" + (int)weight, galleryText);
+				GUI.Label(new Rect(386,262,64,24), "" + FishInfo.formatWeight(weight), galleryText);
 				
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
 				    JukeBox.Tap();
