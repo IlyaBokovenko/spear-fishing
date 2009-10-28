@@ -22,65 +22,10 @@ public class MainMenu : MonoBehaviour {
 	
 	public AudioClip menuTap;
 	
-	int _minutesToBreath = -1;
-	private int minutesToBreath
-	{
-	    get{
-	        if(_minutesToBreath == -1)
-	            _minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
-	        return _minutesToBreath;    
-	    }
-	    set{
-	            if(value != _minutesToBreath)
-	                PlayerPrefs.SetInt("minutesToBreath", value);
-	            _minutesToBreath = value;
-	        }
-	}
-	
-	int _difficulty = -1;
-	private int difficulty	
-	{
-	    get{
-	        if(_difficulty == -1)
-	            _difficulty = PlayerPrefs.GetInt("difficulty", 1);
-	        return _difficulty;
-	    }
-	    set{
-	        if(value != _difficulty)
-	            PlayerPrefs.SetInt("difficulty", value);
-	        _difficulty = value;
-	    }
-	}
-	
-	float _sound = -1f;
-	private float sound
-	{
-	    get{
-	        if(_sound < 0)
-	            _sound = PlayerPrefs.GetFloat("sound", 0.5f);
-	        return _sound;
-	    }
-	    set{
-	        if(value != _sound)
-	            PlayerPrefs.SetFloat("sound", value);
-	        _sound = value;
-	    }       
-	}
-	
-	int _graphicsLevel = -1;
-	private int graphicsLevel
-	{
-	    get{
-	        if(_graphicsLevel == -1)
-	            _graphicsLevel = PlayerPrefs.GetInt("graphicsLevel", 1);
-	        return _graphicsLevel;
-	    }
-	    set{
-	        if(value != _graphicsLevel)	            
-	            PlayerPrefs.SetInt("graphicsLevel", value);
-	        _graphicsLevel = value;
-	    }
-	}
+	private PrefHolder minutesToBreath;	
+	private PrefHolder difficulty;	
+	private PrefHolder sound;
+	private PrefHolder graphicsLevel;
 	
 	//Rects
 	private static Vector2 btSize = new Vector2(238,32);
@@ -106,6 +51,13 @@ public class MainMenu : MonoBehaviour {
 	private int count;
 	
 	// Use this for initialization
+	
+	void Awake(){
+	    minutesToBreath = PrefHolder.newInt("minutesToBreath", 2);
+	    difficulty = PrefHolder.newInt("difficulty", 1);
+	    sound = PrefHolder.newFloat("sound", 0.5f);
+	    graphicsLevel = PrefHolder.newInt("graphicsLevel", 1);
+	}
 	
 	void Start () {
 		int yLayout = 102;
@@ -187,7 +139,6 @@ public class MainMenu : MonoBehaviour {
 				if(GUI.Button(rectMoreGames,"",lnMoreGames)) {
                     JukeBox.Tap();                    
                     Application.OpenURL("http://phobos.apple.com/WebObjects/MZSearch.woa/wa/search?submit=seeAllLockups&media=software&entity=software&term=yossi+malki");
-                    // PlayerPrefs.SetInt("moregames", 1);
 				}				
 				break;				
 			case State.SETTINGS :
@@ -201,17 +152,17 @@ public class MainMenu : MonoBehaviour {
 			    GUI.BeginGroup(new Rect(40, 80, 400, 240));
 			
 			    GUI.Label(new Rect(0, 0, 380, 24), "BREATH TIME", labelStyle);
-			    minutesToBreath = GUI.SelectionGrid(new Rect(0,30, 400, 24), minutesToBreath - 1, new string[3]{"1 min", "2 min", "3 min"}, 3, controlStyle) + 1;			    
+			    minutesToBreath.value = GUI.SelectionGrid(new Rect(0,30, 400, 24), minutesToBreath - 1, new string[3]{"1 min", "2 min", "3 min"}, 3, controlStyle) + 1;			    
 
 			    GUI.Label(new Rect(0, 60, 380, 24), "DIFFICULTY", labelStyle);
-			    difficulty = GUI.SelectionGrid(new Rect(0,90, 400, 24), difficulty, new string[3]{"easy", "normal", "hard"}, 3, controlStyle);
+			    difficulty.value = GUI.SelectionGrid(new Rect(0,90, 400, 24), difficulty, new string[3]{"easy", "normal", "hard"}, 3, controlStyle);
 			    
 			    GUI.Label(new Rect(0, 120, 380, 24), "VOLUME", labelStyle);
-			    sound = GUI.HorizontalSlider(new Rect(0,150, 400, 24), sound, 0.0f, 1.0f);
+			    sound.value = GUI.HorizontalSlider(new Rect(0,150, 400, 24), sound, 0.0f, 1.0f);
 			    AudioListener.volume = sound;
 			    
 			    GUI.Label(new Rect(0, 170, 380, 24), "GRAPHICS LEVEL", labelStyle);
-			    graphicsLevel = GUI.SelectionGrid(new Rect(0,200, 400, 24), graphicsLevel, new string[2]{"low", "high"}, 2, controlStyle);
+			    graphicsLevel.value = GUI.SelectionGrid(new Rect(0,200, 400, 24), graphicsLevel, new string[2]{"low", "high"}, 2, controlStyle);
 			    
 			    GUI.EndGroup();
 			    

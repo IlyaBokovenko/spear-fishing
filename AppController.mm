@@ -58,7 +58,7 @@
 #define MAIN_LOOP_TYPE THREAD_BASED_LOOP
 //#define MAIN_LOOP_TYPE EVENT_PUMP_BASED_LOOP
 
-#define ENABLE_INTERNAL_PROFILER 0
+#define ENABLE_INTERNAL_PROFILER 1
 #define ENABLE_BLOCK_ON_GPU_PROFILER 0
 #define BLOCK_ON_GPU_EACH_NTH_FRAME 4
 #define INCLUDE_OPENGLES_IN_RENDER_TIME 0
@@ -458,7 +458,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	[_window addSubview:view];	
 	
 	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
-	[_adController createAd];
+	[_adController createDummy];
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
@@ -541,11 +541,68 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 #if ENABLE_INTERNAL_PROFILER
 	Prof_Int64 playerDelta = (playerTime1 - playerTime0) - _swapDelta - _gpuDelta - _unityFrameStats.drawCallTime;
 	
-	const int EachNthFrame = 30;
+	const int EachNthFrame = 100;
 	if (_frameId == EachNthFrame)
 	{
 		_frameId = 0;
 		
+#define TAB_SEPARATED_PRINT 1
+		
+#if TAB_SEPARATED_PRINT
+//		printf_console("iPhone Unity internal profiler stats:\n");
+//		printf_console("\tmin\tmax\tavg\tbatched\n");
+//		printf_console("cpu-player\t%4.1f\t%4.1f\t%4.1f\t\n", MachToMillisecondsDelta(_playerPB.minV), MachToMillisecondsDelta(_playerPB.maxV), MachToMillisecondsDelta(_playerPB.avgV / EachNthFrame));
+//		printf_console("cpu-ogles-drv\t%4.1f\t%4.1f\t%4.1f\t\n", MachToMillisecondsDelta(_oglesPB.minV), MachToMillisecondsDelta(_oglesPB.maxV), MachToMillisecondsDelta(_oglesPB.avgV / EachNthFrame));
+//#if ENABLE_BLOCK_ON_GPU_PROFILER
+//		printf_console("gpu\t%4.1f\t%4.1f\t%4.1f\t\n", MachToMillisecondsDelta(_gpuPB.minV), MachToMillisecondsDelta(_gpuPB.maxV), MachToMillisecondsDelta((BLOCK_ON_GPU_EACH_NTH_FRAME*(int)_gpuPB.avgV) / EachNthFrame));
+//#endif
+//		printf_console("cpu-present\t%4.1f\t%4.1f\t%4.1f\t\n", MachToMillisecondsDelta(_swapPB.minV), MachToMillisecondsDelta(_swapPB.maxV), MachToMillisecondsDelta(_swapPB.avgV / EachNthFrame));
+//		printf_console("frametime\t%4.1f\t%4.1f\t%4.1f\t\n", MachToMillisecondsDelta(_framePB.minV), MachToMillisecondsDelta(_framePB.maxV), MachToMillisecondsDelta(_framePB.avgV / EachNthFrame));
+//		
+//		printf_console("draw-call #\t%3d\t%3d\t%3d\t%5d\n", (int)_drawCallCountPB.minV, (int)_drawCallCountPB.maxV, (int)(_drawCallCountPB.avgV / EachNthFrame), (int)(_batchedDrawCallCountPB.avgV / EachNthFrame));
+//		printf_console("tris #\t%5d\t%5d\t%5d\t%5d\n", (int)_triCountPB.minV, (int)_triCountPB.maxV, (int)(_triCountPB.avgV / EachNthFrame), (int)(_batchedTriCountPB.avgV / EachNthFrame));
+//		printf_console("verts #\t%5d\t%5d\t%5d\t%5d\n", (int)_vertCountPB.minV, (int)_vertCountPB.maxV, (int)(_vertCountPB.avgV / EachNthFrame), (int)(_batchedVertCountPB.avgV / EachNthFrame));
+//		
+//		printf_console("\tphysx\tanimation\tculling\tskinning\tbatching\trender\tfixed-update-count-min\tfixed-update-count-max\n");
+//		printf_console("player-detail\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%d\t%d\n", 
+//					   MachToMillisecondsDelta((int)_fixedPhysicsManagerPB.avgV / EachNthFrame),
+//					   MachToMillisecondsDelta((int)_animationUpdatePB.avgV / EachNthFrame),
+//					   MachToMillisecondsDelta((int)_unityCullingPB.avgV / EachNthFrame),
+//					   MachToMillisecondsDelta((int)_skinMeshUpdatePB.avgV / EachNthFrame),
+//					   MachToMillisecondsDelta((int)_batchPB.avgV / EachNthFrame),
+//#if INCLUDE_OPENGLES_IN_RENDER_TIME
+//					   MachToMillisecondsDelta((int)(_unityRenderLoopPB.avgV - _batchPB.avgV - _unityCullingPB.avgV) / EachNthFrame),
+//#else   
+//					   MachToMillisecondsDelta((int)(_unityRenderLoopPB.avgV - _oglesPB.avgV - _batchPB.avgV - _unityCullingPB.avgV) / EachNthFrame),
+//#endif
+//					   (int)_fixedUpdateCountPB.minV, (int)_fixedUpdateCountPB.maxV);
+//		printf_console("\tupdate\tfixedUpdate\tcoroutines\n");
+//		printf_console("mono-scripts\t%4.1f\t%4.1f\t%4.1f\n", MachToMillisecondsDelta(_dynamicBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_fixedBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_coroutinePB.avgV / EachNthFrame));
+//		printf_console("\tused heap\tallocated heap\tmax number of collections\tcollection total duration\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
+//		printf_console("mono-memory\t%d\t%d\t%d\t%4.1f\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
+//		printf_console("fps\tframetime\tphysx\trender\tfixedUpdate\tupdate\tcoroutines\tanimation\tculling\tskinning\tbatching\tcpu-ogles-drv\tcpu-present\n");
+		printf_console("%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\n", 
+					   1000.0f/(float)MachToMillisecondsDelta(_framePB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta(_framePB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta((int)_fixedPhysicsManagerPB.avgV / EachNthFrame),
+#if INCLUDE_OPENGLES_IN_RENDER_TIME
+					   MachToMillisecondsDelta((int)(_unityRenderLoopPB.avgV - _batchPB.avgV - _unityCullingPB.avgV) / EachNthFrame),
+#else   
+					   MachToMillisecondsDelta((int)(_unityRenderLoopPB.avgV - _oglesPB.avgV - _batchPB.avgV - _unityCullingPB.avgV) / EachNthFrame),
+#endif
+					   MachToMillisecondsDelta(_fixedBehaviourManagerPB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta(_dynamicBehaviourManagerPB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta(_coroutinePB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta((int)_animationUpdatePB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta((int)_unityCullingPB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta((int)_skinMeshUpdatePB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta((int)_batchPB.avgV / EachNthFrame),	
+					   MachToMillisecondsDelta(_oglesPB.avgV / EachNthFrame),
+					   MachToMillisecondsDelta(_swapPB.avgV / EachNthFrame)
+					   );
+//		printf_console("----------------------------------------\n");		
+		
+#else
 		printf_console("iPhone Unity internal profiler stats:\n");
 		printf_console("cpu-player>    min: %4.1f   max: %4.1f   avg: %4.1f\n", MachToMillisecondsDelta(_playerPB.minV), MachToMillisecondsDelta(_playerPB.maxV), MachToMillisecondsDelta(_playerPB.avgV / EachNthFrame));
 		printf_console("cpu-ogles-drv> min: %4.1f   max: %4.1f   avg: %4.1f\n", MachToMillisecondsDelta(_oglesPB.minV), MachToMillisecondsDelta(_oglesPB.maxV), MachToMillisecondsDelta(_oglesPB.avgV / EachNthFrame));
@@ -574,6 +631,9 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 		printf_console("mono-scripts>  update: %4.1f   fixedUpdate: %4.1f coroutines: %4.1f \n", MachToMillisecondsDelta(_dynamicBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_fixedBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_coroutinePB.avgV / EachNthFrame));
 		printf_console("mono-memory>   used heap: %d allocated heap: %d  max number of collections: %d collection total duration: %4.1f\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
 		printf_console("----------------------------------------\n");		
+		
+#endif
+		
 		
 //		NSString* log = [FBPlayerPrefs getString: @"log" orDefault:@""];
 //		NSLog(@"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n %@\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n", log );
@@ -719,7 +779,6 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 -(void)updateUI: (NSTimer*) timer{	
 	BOOL isFree = [FBPlayerPrefs getInt:@"free_version" orDefault:0];
 	if(isFree && _adController.view.hidden){		
-		NSLog(@"showing ad: %d", isFree);
 		_adController.view.hidden = NO;
 		[_adController adjustViewSize];		
 	}		

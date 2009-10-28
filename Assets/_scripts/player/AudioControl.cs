@@ -63,9 +63,9 @@ public class AudioControl : MonoBehaviour {
 	}
 	
 	void SetOxygen(){
-	    if(gameMaster.isGame && gameMaster.isOxygenLow)
-	        audio.Play();
-	     else
-    	    audio.Stop();  
+        if(gameMaster.isGame && gameMaster.isOxygenLow)
+            audio.Play();
+         else
+            audio.Stop();
 	}	
 }

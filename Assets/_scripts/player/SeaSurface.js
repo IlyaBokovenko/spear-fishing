@@ -18,19 +18,19 @@ function Start () {
 }
 
 function Update () {        
-	var meshFilter : MeshFilter = GetComponent(MeshFilter);
-	var mesh : Mesh = meshFilter.mesh;
-   
-	if (baseHeight == null)
-		baseHeight = mesh.vertices;
-   	
-	var vertices = new Vector3[baseHeight.Length];
-	for (var i=0;i<vertices.Length;i++) {
-		var vertex = baseHeight[i];
-		vertex.y += Mathf.Sin(Time.time * speed + baseHeight[i].x + baseHeight[i].y + baseHeight[i].z) * scale;
-		vertices[i] = vertex;
-	}
-	mesh.vertices = vertices;
-	mesh.RecalculateNormals();
-	var meshCollider : MeshCollider = GetComponent(MeshCollider);
+    var meshFilter : MeshFilter = GetComponent(MeshFilter);
+    var mesh : Mesh = meshFilter.mesh;
+       
+    if (baseHeight == null)
+     baseHeight = mesh.vertices;
+         
+    var vertices = new Vector3[baseHeight.Length];
+    for (var i=0;i<vertices.Length;i++) {
+     var vertex = baseHeight[i];
+     vertex.y += Mathf.Sin(Time.time * speed + baseHeight[i].x + baseHeight[i].y + baseHeight[i].z) * scale;
+     vertices[i] = vertex;
+    }
+    mesh.vertices = vertices;
+    mesh.RecalculateNormals();
+    var meshCollider : MeshCollider = GetComponent(MeshCollider);
 }
