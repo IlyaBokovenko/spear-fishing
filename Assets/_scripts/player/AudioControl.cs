@@ -6,14 +6,19 @@ public class AudioControl : MonoBehaviour {
     public AudioClip boostSound;
     public AudioClip scarySound;
     
-    void Awake(){        
+    void Start(){        
         gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
-        gameMaster.AddSurfaceDelegate(new SurfaceDelegate(this.OnSurface));
-        gameMaster.AddIsGameDelegate(new IsGameDelegate(this.OnGame));   
-        gameMaster.AddOxygenLowDelegate(new OxygenLowDelegate(this.OnOxygenLow));        
+        gameMaster.isSurface.Subscribe(this.OnSurface);
+        gameMaster.isGame.Subscribe(this.OnGame);   
+        gameMaster.isOxygenLow.Subscribe(this.OnOxygenLow);        
         
         if(JukeBox.instance)
             JukeBox.AttachTo(this);
+    }
+    
+    
+    void Update(){
+        
     }
     
     void setBoostButtonControl(HighlightableControlButton arg) {
@@ -26,16 +31,16 @@ public class AudioControl : MonoBehaviour {
 	        audio.PlayOneShot(boostSound);
 	}
 	
-	void OnOxygenLow(bool isLow){
+	void OnOxygenLow(object isLow){
 	    SetOxygen();
 	}
 	
-	void OnSurface(bool isSurface){
+	void OnSurface(object isSurface){
 	    SetBackgroundSound();
 	}
 	
-	void OnGame(bool isGame){
-        SetBackgroundSound();
+	void OnGame(object isGame){
+        SetBackgroundSound();        	    	    
         SetOxygen();
 	}	
 	

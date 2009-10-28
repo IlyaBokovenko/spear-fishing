@@ -22,28 +22,64 @@ public class MainMenu : MonoBehaviour {
 	
 	public AudioClip menuTap;
 	
+	int _minutesToBreath = -1;
 	private int minutesToBreath
 	{
-	    get{return PlayerPrefs.GetInt("minutesToBreath", 2);}
-	    set{PlayerPrefs.SetInt("minutesToBreath", value);}
+	    get{
+	        if(_minutesToBreath == -1)
+	            _minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
+	        return _minutesToBreath;    
+	    }
+	    set{
+	            if(value != _minutesToBreath)
+	                PlayerPrefs.SetInt("minutesToBreath", value);
+	            _minutesToBreath = value;
+	        }
 	}
 	
+	int _difficulty = -1;
 	private int difficulty	
 	{
-	    get{return PlayerPrefs.GetInt("difficulty", 1);}
-	    set{PlayerPrefs.SetInt("difficulty", value);}
+	    get{
+	        if(_difficulty == -1)
+	            _difficulty = PlayerPrefs.GetInt("difficulty", 1);
+	        return _difficulty;
+	    }
+	    set{
+	        if(value != _difficulty)
+	            PlayerPrefs.SetInt("difficulty", value);
+	        _difficulty = value;
+	    }
 	}
 	
+	float _sound = -1f;
 	private float sound
 	{
-	    get{return PlayerPrefs.GetFloat("sound", 0.5f);}
-	    set{PlayerPrefs.SetFloat("sound", value);}
+	    get{
+	        if(_sound < 0)
+	            _sound = PlayerPrefs.GetFloat("sound", 0.5f);
+	        return _sound;
+	    }
+	    set{
+	        if(value != _sound)
+	            PlayerPrefs.SetFloat("sound", value);
+	        _sound = value;
+	    }       
 	}
 	
+	int _graphicsLevel = -1;
 	private int graphicsLevel
 	{
-	    get{return PlayerPrefs.GetInt("graphicsLevel", 1);}
-	    set{PlayerPrefs.SetInt("graphicsLevel", value);}
+	    get{
+	        if(_graphicsLevel == -1)
+	            _graphicsLevel = PlayerPrefs.GetInt("graphicsLevel", 1);
+	        return _graphicsLevel;
+	    }
+	    set{
+	        if(value != _graphicsLevel)	            
+	            PlayerPrefs.SetInt("graphicsLevel", value);
+	        _graphicsLevel = value;
+	    }
 	}
 	
 	//Rects

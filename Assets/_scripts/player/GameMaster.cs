@@ -1,10 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-public delegate void SurfaceDelegate(bool isSurface);
-public delegate void IsGameDelegate(bool isGame);
-public delegate void OxygenLowDelegate(bool isLow);
-
 public class GameMaster : MonoBehaviour {
     public bool isFreeVersion = false;
     public AudioClip arrghSound;
@@ -44,89 +40,48 @@ public class GameMaster : MonoBehaviour {
 	    get{return _airTimer;}
 	    set{
 	        float treshold = airMax*airTreshold;
-	        bool needCall = value != treshold && 
+	        bool oxygenLowChanged = value != treshold && 
 	                        (treshold - _airTimer) * (treshold - value) <= 0;
 	        _airTimer = value;
-	        if(needCall) CallOxygenLowDelegates();	        
+	        if(oxygenLowChanged) isOxygenLow.value = _airTimer <= treshold;	        
 	    }
 	}
-	private OxygenLowDelegate oxygenLowDelegate;
-	public void AddOxygenLowDelegate(OxygenLowDelegate d){
-	    if(oxygenLowDelegate != null) oxygenLowDelegate += d;
-	    else oxygenLowDelegate = d;
-	}
-	void CallOxygenLowDelegates(){	    
-	    if(oxygenLowDelegate != null)    
-	        oxygenLowDelegate(isOxygenLow);
-	}
-	public bool isOxygenLow
-	{
-	    get{return getAir() <= airTreshold;}
-	}	
+	public ValueHolder isOxygenLow;	
 	
-	
-	// is player in game or menu
-	public bool isGame
-	{
-	    get{return IsGame();}
-	    set{
-	        bool needCall = isGame != value;
-	        SetGame(value);
-	        if(needCall) CallIsGameDelegates();
-	    }
-	}	
-	private IsGameDelegate isGameDelegate;
-	public void AddIsGameDelegate(IsGameDelegate d){
-	    if(isGameDelegate != null) isGameDelegate += d;
-	    else isGameDelegate = d;
-	}
-	void CallIsGameDelegates(){	    
-	    if(isGameDelegate != null)    
-	        isGameDelegate(isGame);
-	}
+	// is player in game or in menu
+	public PrefHolder isGame;
 	
 	// only use if no GameMaster component in scene
-	public static void SetGame(bool _isGame){
-	    PlayerPrefs.SetInt("game", _isGame ? 1 : 0);
+	public static void SetGame(bool value){
+	    PrefHolder.newBool("game", false).value = value;
 	}
 	public static bool IsGame(){
-	    return PlayerPrefs.GetInt("game", 0) == 1;
-	}
-	
+	    return PrefHolder.newBool("game", false);
+	}	
+
+
+		
 	// depth
 	private float _depthMeter = 0.0f;
 	public float depth
 	{
 	    get{return _depthMeter;}
-	    private set{_depthMeter = value; isSurface = value <= 0;}
+	    private set{_depthMeter = value; isSurface.value = value <= 0;}
 	}
 	
 	// is player on surface
-	bool _isSurface = false;
-	public bool isSurface
-	{
-	    get{return _isSurface;}
-	    private set{
-	        bool needCall = _isSurface != value;
-	         _isSurface = value;
-	        if(needCall)
-	            CallSurfaceDelegates();	        
-	    }
-	}	
-	private SurfaceDelegate surfaceDelegate;
-	public void AddSurfaceDelegate(SurfaceDelegate d){
-	    if(surfaceDelegate != null) surfaceDelegate += d;
-	    else surfaceDelegate = d;
-	}
-	void CallSurfaceDelegates(){
-	    if(surfaceDelegate != null)    
-	        surfaceDelegate(isSurface);
-	}
+	public ValueHolder isSurface;
 	
 	//////////////////////////////////////////////////////////////////////
 	
 	public void AddHealth(){
 	    health = Mathf.Min(health + 10, healthMax);
+	}
+	
+	void Awake(){
+	    isGame = PrefHolder.newBool("game", false);
+	    isOxygenLow = new ValueHolder(false);
+	    isSurface = new ValueHolder(false);
 	}
 	
 	void Start () {	    
@@ -160,7 +115,6 @@ public class GameMaster : MonoBehaviour {
             Load();
 		}
 		Pause(false);
-		CallSurfaceDelegates();
 	}
 	
 	void Update () {
@@ -260,8 +214,8 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Load() {
-	    if(Application.platform == RuntimePlatform.OSXEditor)
-	        return;
+        // if(Application.platform == RuntimePlatform.OSXEditor)
+        //     return;
 	    
         health = PlayerPrefs.GetFloat("health", healthMax);
 		airTimer = PlayerPrefs.GetFloat("air", airMax);

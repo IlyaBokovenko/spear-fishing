@@ -265,7 +265,7 @@ public class HUD : MonoBehaviour {
 				break;
 		}
 		
-		gameMaster.isGame = isGame;
+		gameMaster.isGame.value = isGame;
 	}
 	
 	public void InitControlButton() {

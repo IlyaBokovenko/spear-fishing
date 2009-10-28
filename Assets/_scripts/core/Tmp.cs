@@ -2,14 +2,29 @@ using UnityEngine;
 using System.Collections;
 
 public class Tmp : MonoBehaviour {
+    
+    PrefHolder vh;
 
-	// Use this for initialization
 	void Start () {
-	    
+        vh = PrefHolder.newBool("test", false);
+        //         vh.Subscribe(this.OnChanged);
+        //         vh.value = 13;
+        //         vh.value = 14;
+        //         vh.Unsubscribe(this.OnChanged);
+        //         vh.value = 15;
+        // print(PlayerPrefs.GetInt("test", -1));
+        vh.value = false;
+        print(vh.value);
+        vh.value = true;
+        print(vh.value);
 	}
 	
-	// Update is called once per frame
+	void OnChanged(object value){
+	    int v = (int)value;
+	    print(v);
+	}
+	
 	void Update () {
-	    print(  Vector3.Angle(transform.forward, Vector3.forward));
+	    
 	}
 }

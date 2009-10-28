@@ -19,8 +19,6 @@ public class WaterEffects : MonoBehaviour {
 	private GameMaster gameMaster;
 	
     void Awake() {
-	    gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
-	    gameMaster.AddSurfaceDelegate(new SurfaceDelegate(this.OnSurface));
 		goTransform = transform;
 		if(lowLight) {
 			GameObject light = GameObject.Find("Light");
@@ -31,10 +29,13 @@ public class WaterEffects : MonoBehaviour {
 	}
 	
 	void Start() {
+	    gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
+	    gameMaster.isSurface.Subscribe(this.OnSurface);
 		defaultfarClipPlane = camera.farClipPlane;
 	}	
 	
-	void OnSurface(bool isSurface){
+	void OnSurface(object _isSurface){
+	    bool isSurface = (bool)_isSurface;
 		if(camera)
 			camera.clearFlags = isSurface ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
 		RenderSettings.fog = isSurface ? defaultFog : true;

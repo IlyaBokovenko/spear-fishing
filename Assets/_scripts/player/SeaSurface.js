@@ -17,9 +17,7 @@ function Start () {
 	this.player = GameObject.Find("Player");
 }
 
-function Update () {
-    return;
-    
+function Update () {        
 	var meshFilter : MeshFilter = GetComponent(MeshFilter);
 	var mesh : Mesh = meshFilter.mesh;
    

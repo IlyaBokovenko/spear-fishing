@@ -11,12 +11,12 @@ public class SunRays : MonoBehaviour {
         sunRaysEnabled = graphicsLevel > 0;
         gameObject.SetActiveRecursively(sunRaysEnabled);
         
-        gameMaster.AddSurfaceDelegate(new SurfaceDelegate(this.OnSurface));
+        gameMaster.isSurface.Subscribe(this.OnSurface);
     }
 
-    void OnSurface(bool isSurface){
+    void OnSurface(object isSurface){
         if(!sunRaysEnabled) return;
-        gameObject.SetActiveRecursively(!isSurface);    
+        gameObject.SetActiveRecursively(!(bool)isSurface);    
     }
     
 }
