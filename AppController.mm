@@ -580,8 +580,12 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 //		printf_console("mono-scripts\t%4.1f\t%4.1f\t%4.1f\n", MachToMillisecondsDelta(_dynamicBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_fixedBehaviourManagerPB.avgV / EachNthFrame), MachToMillisecondsDelta(_coroutinePB.avgV / EachNthFrame));
 //		printf_console("\tused heap\tallocated heap\tmax number of collections\tcollection total duration\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
 //		printf_console("mono-memory\t%d\t%d\t%d\t%4.1f\n", mono_gc_get_used_size(), mono_gc_get_heap_size(), (int)_GCCountPB.avgV, MachToMillisecondsDelta(_GCDurationPB.avgV));
-//		printf_console("fps\tframetime\tphysx\trender\tfixedUpdate\tupdate\tcoroutines\tanimation\tculling\tskinning\tbatching\tcpu-ogles-drv\tcpu-present\n");
-		printf_console("%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\n", 
+		static BOOL isFirstTime = YES;
+		if(isFirstTime){
+			isFirstTime = NO;			
+			printf_console("fps\tframetime\tphysx\trender\tfixedUpdate\tupdate\tcoroutines\tanimation\tculling\tskinning\tbatching\tcpu-ogles-drv\tcpu-present\tdraw call\tdraw call batched\n");	
+		}		
+		printf_console("%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%4.1f\t%3d\t%5d\n", 
 					   1000.0f/(float)MachToMillisecondsDelta(_framePB.avgV / EachNthFrame),
 					   MachToMillisecondsDelta(_framePB.avgV / EachNthFrame),
 					   MachToMillisecondsDelta((int)_fixedPhysicsManagerPB.avgV / EachNthFrame),
@@ -598,7 +602,9 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 					   MachToMillisecondsDelta((int)_skinMeshUpdatePB.avgV / EachNthFrame),
 					   MachToMillisecondsDelta((int)_batchPB.avgV / EachNthFrame),	
 					   MachToMillisecondsDelta(_oglesPB.avgV / EachNthFrame),
-					   MachToMillisecondsDelta(_swapPB.avgV / EachNthFrame)
+					   MachToMillisecondsDelta(_swapPB.avgV / EachNthFrame),
+					   (int)(_drawCallCountPB.avgV / EachNthFrame), 
+					   (int)(_batchedDrawCallCountPB.avgV / EachNthFrame)
 					   );
 //		printf_console("----------------------------------------\n");		
 		

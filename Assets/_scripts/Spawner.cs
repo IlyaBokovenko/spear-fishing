@@ -17,7 +17,7 @@ public class Spawner : MonoBehaviour {
 
         MaintainPopulation();
         
-        InvokeRepeating("MaintainPopulation", 0.0f, 5.0f);
+        // InvokeRepeating("MaintainPopulation", 0.0f, 5.0f);
     }
     
     private void OnDrawGizmosSelected(){    
@@ -34,7 +34,7 @@ public class Spawner : MonoBehaviour {
         
         GameObject instance  = (GameObject)Instantiate(sample, new Vector3(10000, 10000, 10000), rotation);
         cloneName = instance.name = sample.name;          
-        instance.SendMessage("SetSize", RandomSize(), SendMessageOptions.DontRequireReceiver);
+        instance.transform.localScale *= RandomSize();
         if(!MoveToClearWater(instance))
             Destroy(instance);        
         AddChild(instance);
@@ -57,7 +57,7 @@ public class Spawner : MonoBehaviour {
         Vector3 point = Vector3.zero;
         for(int i = 0; i < 100; i++){
             point = SpawnPoint();
-            Collider[] cs = Physics.OverlapSphere(point, objSize * 2);
+            Collider[] cs = Physics.OverlapSphere(point, objSize * 1.5f);
             if(cs.Length == 0){
                 obj.transform.position = point;
                 return true;

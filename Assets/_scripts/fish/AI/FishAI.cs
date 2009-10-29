@@ -13,9 +13,6 @@ public class FishAI : GenericScript, IHittable
 	    get{return _isDead;}
 	}
 	
-	private Vector3 originalScale;
-	private float size = 0.0f;
-
     private FishBehaviour[] rawActiveBehaviours;
     private int activeBehaviourCount;
 	private FishBehaviour[] rootNonArbitratedBehaviours;
@@ -50,12 +47,7 @@ public class FishAI : GenericScript, IHittable
 	protected virtual void Start(){
         lastUpdateTime = Time.time;
 		GatherRootBehaviours(); 
-        //PrintBehaviours();
-		
-		originalScale = transform.localScale;
-        if(!Utils.Approximately(size, 0.0f)) {
-            updateScale();    
-        }
+        //PrintBehaviours();		
         
         SendMessage("SetDifficulty", PlayerPrefs.GetInt("difficulty", 1));
 	}
@@ -86,17 +78,6 @@ public class FishAI : GenericScript, IHittable
             msg += beh.ToStringWithChildren() + "\n";
         }
         return msg;
-	}
-    
-
-	public void SetSize(float sz){    
-	    size = sz;
-	    if(originalScale != Vector3.zero)
-	        updateScale();    
-	}
-
-	private void updateScale(){
-	    transform.localScale = originalScale * size;
 	}
 
 	public void Die(){

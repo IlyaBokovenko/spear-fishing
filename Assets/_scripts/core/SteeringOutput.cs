@@ -53,12 +53,12 @@ public struct SteeringOutput
 	}
 	
 	public void ApplyTo(GameObject gameObject, float deltaTime){
-	    if(SignificantForce())
-	        gameObject.rigidbody.AddForce(force * deltaTime, ForceMode.VelocityChange);
-	    if(SignificantTorque())
-	        gameObject.rigidbody.AddTorque(torque * deltaTime, ForceMode.VelocityChange);
-	    if(SignificantRelativeTorque())
-	        gameObject.rigidbody.AddRelativeTorque(relativeTorque * deltaTime, ForceMode.VelocityChange);       
+        if(SignificantForce())
+            gameObject.rigidbody.AddForce(force * deltaTime, ForceMode.VelocityChange);
+        if(SignificantTorque())
+            gameObject.rigidbody.AddTorque(torque * deltaTime, ForceMode.VelocityChange);
+        if(SignificantRelativeTorque())
+            gameObject.rigidbody.AddRelativeTorque(relativeTorque * deltaTime, ForceMode.VelocityChange);
 	}
 	
 	public void ApplyTo(GameObject gameObject){
