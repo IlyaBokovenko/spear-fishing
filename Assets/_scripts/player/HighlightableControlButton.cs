@@ -3,25 +3,25 @@ using System.Collections;
 
 public class HighlightableControlButton : ControlButton {
     private MonoBehaviour context;
-    private Texture2D textureHighlight;
+    private Texture textureHighlight;
     
-    public bool highlighted = false;
+    private bool _highlighted = false;
+    private bool highlighted
+    {
+        get{return _highlighted;}
+        set{
+            _highlighted = value;
+            gui.texture = _highlighted ? textureHighlight : textureOff;
+        }
+    }
     private bool isBlinking = false;
     
-    public HighlightableControlButton(MonoBehaviour _context, Rect _rect, Texture2D _textureOn, Texture2D _textureOff, Texture2D _textureHighlight)
-        : base(_rect, _textureOn, _textureOff){
+    public HighlightableControlButton(MonoBehaviour _context, GUITexture _gui, Texture _textureOn, Texture _textureOff, Texture _textureHighlight)
+        : base(_gui, _textureOn, _textureOff){
             context = _context;
             textureHighlight = _textureHighlight;
         }
 
-	override public void Draw(){
-	    if(highlighted && textureHighlight){
-	        GUI.DrawTexture(rect, textureHighlight);	        
-	    }
-	    else
-	        base.Draw();
-	}
-	
 	public void StartBlinking(){
 	    if(isBlinking) return;
 	    

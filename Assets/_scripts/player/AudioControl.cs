@@ -26,7 +26,7 @@ public class AudioControl : MonoBehaviour {
     }
 
 
-	void OnBoost(bool isBoost){
+	void OnBoost(bool isBoost){	    
 	    if(isBoost)
 	        audio.PlayOneShot(boostSound);
 	}

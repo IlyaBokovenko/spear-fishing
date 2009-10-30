@@ -4,9 +4,11 @@ using System.Collections;
 public delegate void OnPressedDelegate(bool down);
 
 public class ControlButton {
-	private Texture2D textureOn;
-	private Texture2D textureOff;
-	public Rect rect;
+    // private bool isPlayer;
+    
+    protected GUITexture gui;
+	protected Texture textureOn;
+	protected Texture textureOff;
 	private bool _isDown = false;
 	public bool isDown
 	{
@@ -21,10 +23,11 @@ public class ControlButton {
 
     private OnPressedDelegate pressedDelegate;
 	
-	public ControlButton(Rect _rect, Texture2D _textureOn, Texture2D _textureOff) {
+	public ControlButton(GUITexture _gui, Texture _textureOn, Texture _textureOff) {
+        // isPlayer = Application.platform == RuntimePlatform.OSXPlayer;        
+	    gui = _gui;
 		textureOn = _textureOn;
 		textureOff = _textureOff;
-		rect = _rect;	
 	}
 	
     public void AddPressedDelegate(OnPressedDelegate d){
@@ -38,31 +41,48 @@ public class ControlButton {
         if(pressedDelegate != null) pressedDelegate -= d;
     }
 	
-	virtual public void Draw() {
-		if((_isDown && textureOn) || (!_isDown && textureOff))
-			GUI.DrawTexture(rect, _isDown ? textureOn : textureOff);
-	}
-	
-	public bool Contains(Vector2 point) {
-		return rect.Contains(point);
-	}
-	
 	public void setDown(bool arg) {    
-	    if(arg == _isDown)  return;	    
+	    if(arg == _isDown)  return;	 
 		_isDown = arg;
+		gui.texture = _isDown ? textureOn : textureOff;
         if(pressedDelegate != null) pressedDelegate(arg);            
 	}
 	
-	public void ProcessTouches(){
+	public void UpdateState(){	    
+         // if(isPlayer){
+         //     ProcessTouches();
+         //          }else{
+         //              ProcessClicks();
+         //          }
+         
+         ProcessTouches();
+	}
+	
+	public Vector2 TouchOffset(){
+	    return new Vector2( touchPos.x - (gui.GetScreenRect().x + gui.GetScreenRect().width/2),
+	                        touchPos.y - (gui.GetScreenRect().y + gui.GetScreenRect().height/2));
+	}
+	
+	private void ProcessTouches(){                	    
 	    foreach(iPhoneTouch touch in iPhoneInput.touches){
-	        Vector2 touchCoords = new Vector2(touch.position.x, Screen.height - touch.position.y);
-	        if(touch.phase != iPhoneTouchPhase.Ended && Contains(touchCoords)){
-	            _touchPos = touchCoords;
+	        bool inside = gui.HitTest(touch.position);
+	        if(touch.phase != iPhoneTouchPhase.Ended && inside){
+	            _touchPos = touch.position;
 	            setDown(true);
 	            return;
 	        }   
 	    }
 	    setDown(false);
 	}
+	
+    // private void ProcessClicks(){       
+    //     if( Input.GetButton("Fire1") &&
+    //             gui.HitTest(Input.mousePosition)){
+    //                 _touchPos = Input.mousePosition;
+    //                 setDown(true);
+    //         }else{
+    //             setDown(false);
+    //         }
+    // }
 
 }

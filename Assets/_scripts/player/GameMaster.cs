@@ -94,13 +94,17 @@ public class GameMaster : MonoBehaviour {
 		int minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
         airMax = minutesToBreath * 60;
         airTimer = airMax;
-        airTimer = 20;
 		health = healthMax;
-		currentTimer = 0.0f;
+		currentTimer = 0.0f;	
 		
 		if(PlayerPrefs.HasKey("benchMark")) {
 			benchMark = true;
 		}
+		
+        if(PlayerPrefs.GetInt("isFirstTime", 0) == 0){
+            PlayerPrefs.SetInt("isFirstTime", 1);
+		    ((Tutorial)GetComponent(typeof(Tutorial))).enabled = true;
+        }
 		
 		if(benchMark) {
 			PlayerControl pc = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
@@ -113,7 +117,8 @@ public class GameMaster : MonoBehaviour {
 			bmFPSCount = 0;
 		} else {			
             Load();
-		}
+		}		
+		
 		Pause(false);
 	}
 	
@@ -136,7 +141,7 @@ public class GameMaster : MonoBehaviour {
     			airTimer -= airStep;		        
 		    }
 		} else {
-			if(airTimer < airMax)
+			if(airTimer + 1.0f <= airMax)
 				airTimer += 1.0f;
 		}
 		
@@ -214,8 +219,8 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Load() {
-        // if(Application.platform == RuntimePlatform.OSXEditor)
-        //     return;
+         // if(Application.platform == RuntimePlatform.OSXEditor)
+         //      return;
 	    
         health = PlayerPrefs.GetFloat("health", healthMax);
 		airTimer = PlayerPrefs.GetFloat("air", airMax);

@@ -17,7 +17,7 @@ public class Spawner : MonoBehaviour {
 
         MaintainPopulation();
         
-        // InvokeRepeating("MaintainPopulation", 0.0f, 5.0f);
+        InvokeRepeating("MaintainPopulation", 0.0f, 5.0f);
     }
     
     private void OnDrawGizmosSelected(){    
@@ -93,7 +93,7 @@ public class Spawner : MonoBehaviour {
         int objectsToSpawn = population - live.Count;
         for(int i = 0; i < objectsToSpawn; i++) {            
             Spawn();
-            // print(string.Format("spawned additional {0}", instance.name));
+            // print(string.Format("spawned additional {0}", obj.name));
         }
     }
 }

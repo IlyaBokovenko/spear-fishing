@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 public class Tutorial : MonoBehaviour {    
+    public GUITexture arrowGUI;
+    
 	StateMachine sm;
     
     GameMaster gameMaster;   
@@ -215,17 +217,19 @@ public class Tutorial : MonoBehaviour {
 	
     class RefuilingState : TutorialState{
         HighlightableControlButton buttonArrow;
+        Texture2D emptyTexture;
         
         public RefuilingState(Tutorial context):base(context){}
 
         public override void OnGUI(){
             GUI.Box(new Rect(100, 113, 280, 34), "Your oxygen level is depleting over time.\nFloat to surface to refill it.");
-            buttonArrow.Draw();
         }
 
         public override void Enter(){
+            emptyTexture = CreateEmptyTexture();
             context.gameMaster.LockOxygenLow();
-            buttonArrow =  new HighlightableControlButton(context, new Rect(95, 190, 64, 64), null, null, context.arrow2D);
+            // print(context.arrowGUI.texture);
+            buttonArrow =  new HighlightableControlButton(context, context.arrowGUI, null, emptyTexture, context.arrow2D);
             buttonArrow.StartBlinking();
         }
 
@@ -238,6 +242,13 @@ public class Tutorial : MonoBehaviour {
             if(context.gameMaster.isSurface){
                 sm.MoveTo(new HealthState(context));
             }            
+        }
+        
+        private Texture2D CreateEmptyTexture(){
+            Texture2D empty = new Texture2D(64,64);
+            empty.SetPixels(new Color[64*64], 0);
+            empty.Apply();
+            return empty;            
         }
 
     }

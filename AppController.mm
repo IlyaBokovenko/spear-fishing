@@ -74,8 +74,8 @@
 #define kMillisecondsPerFrameToProcessEvents	3
 #endif
 
-#define kFPS									30.0
-#define kAccelerometerFrequency					60.0
+#define kFPS									120.0
+#define kAccelerometerFrequency					10.0
 
 
 // --- Unity --------------------------------------------------------------------
@@ -458,7 +458,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	[_window addSubview:view];	
 	
 	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
-	[_adController createDummy];
+	[_adController createAd];
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
@@ -541,7 +541,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 #if ENABLE_INTERNAL_PROFILER
 	Prof_Int64 playerDelta = (playerTime1 - playerTime0) - _swapDelta - _gpuDelta - _unityFrameStats.drawCallTime;
 	
-	const int EachNthFrame = 100;
+	const int EachNthFrame = 30;
 	if (_frameId == EachNthFrame)
 	{
 		_frameId = 0;

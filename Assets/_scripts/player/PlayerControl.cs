@@ -50,6 +50,10 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	
 	void Update () {	    
 		if(!gun.animation.isPlaying && isEnabled) {
+		    buttonBoost.UpdateState();				
+			buttonAim.UpdateState();
+			buttonFire.UpdateState();			
+			
 			if(Application.platform == RuntimePlatform.OSXEditor) {
 				if(Input.GetMouseButton(0)) {
 					goTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
@@ -85,16 +89,12 @@ public class PlayerControl : MonoBehaviour, IBitable {
 					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 					if(hud)
 						hud.setCrosshair(new Vector2(point.x,point.y));
-				}
-				
-				buttonBoost.ProcessTouches();				
-				buttonAim.ProcessTouches();
-				buttonFire.ProcessTouches();			
+				}				
 				
 				if(buttonAim.isDown){
-					Vector2 deltaAim = new Vector2(buttonAim.touchPos.x - (buttonAim.rect.x + buttonAim.rect.width/2), buttonAim.touchPos.y - (buttonAim.rect.y + buttonAim.rect.height/2)); 
-					gunTransform.Rotate(Vector3.up * deltaAim.x * 0.5f, Space.World);
-					gunTransform.Rotate( - Vector3.right * deltaAim.y * 0.5f);
+					Vector2 deltaAim = buttonAim.TouchOffset(); 
+					gunTransform.Rotate(Vector3.up * deltaAim.x * 0.5f);
+					gunTransform.Rotate( Vector3.right * deltaAim.y * 0.5f);
 					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 					if(hud)
 						hud.setCrosshair(new Vector2(point.x,point.y));				    

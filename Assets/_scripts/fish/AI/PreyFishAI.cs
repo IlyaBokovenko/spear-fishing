@@ -8,6 +8,7 @@ public class PreyFishAI : FishAI, IBitable {
      }
      
      public void OnBite(){
+         // print("fish " + name + " were eaten");
          DestroyGameObject();
      }     
 }

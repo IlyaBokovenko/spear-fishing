@@ -18,31 +18,32 @@ public class WaterEffects : MonoBehaviour {
 	
 	private GameMaster gameMaster;
 	
-    void Awake() {
+    void Awake() {        	
 		goTransform = transform;
 		if(lowLight) {
 			GameObject light = GameObject.Find("Light");
 			if(light)
 				light.active = false;
 			RenderSettings.ambientLight = ambientLight;
-		}
+		}		
 	}
 	
-	void Start() {
-	    gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
-	    gameMaster.isSurface.Subscribe(this.OnSurface);
-		defaultfarClipPlane = camera.farClipPlane;
+	void Start() {	    
+	    defaultfarClipPlane = camera.farClipPlane;
+        gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
+        gameMaster.isSurface.Subscribe(this.OnSurface);
+        OnSurface(false);
 	}	
 	
 	void OnSurface(object _isSurface){
 	    bool isSurface = (bool)_isSurface;
-		if(camera)
-			camera.clearFlags = isSurface ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
+		
+		camera.clearFlags = isSurface ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
 		RenderSettings.fog = isSurface ? defaultFog : true;
 	    RenderSettings.fogColor = isSurface ? defaultFogColor : fogColor;
 	    RenderSettings.fogDensity = isSurface ? defaultFogDensity : fogDensity;
 	  	RenderSettings.skybox = isSurface ? skybox : null;
 		camera.farClipPlane = isSurface ? defaultfarClipPlane : farClipPlane;
-	}
+	}	
 }
 

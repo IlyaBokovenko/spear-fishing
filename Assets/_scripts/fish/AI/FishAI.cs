@@ -86,9 +86,6 @@ public class FishAI : GenericScript, IHittable
 	    foreach(GenericScript elem in behs)
 	        elem.SelfDestroy();
 		
-		foreach(GenericScript elem in GetComponentsInChildren(typeof(FishAnimation)))
-	        elem.SelfDestroy();
-	    
 		foreach(Animation elem in GetComponentsInChildren(typeof(Animation))) {
 			if(elem.isPlaying) {
 				elem.Stop();

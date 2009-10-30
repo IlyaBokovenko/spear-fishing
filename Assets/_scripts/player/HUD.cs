@@ -7,20 +7,27 @@ public class HUD : MonoBehaviour {
 	//Textures
 	//GUI
 	public Texture2D crosshair;
+	public GUITexture crosshairGUI;
 	public Texture2D mask;
 	public Texture2D[] airTank;
+	public GUITexture airTankGUI;
+	public GUITexture fireButtonGUI;
 	public Texture2D fireButtonOn;
 	public Texture2D fireButtonOff;
 	public Texture2D fireButtonHighlight;
+	public GUITexture boostButtonGUI;
 	public Texture2D boostButtonOn;
 	public Texture2D boostButtonOff;
 	public Texture2D boostButtonHighlight;
+	public GUITexture aimButtonGUI;
 	public Texture2D aimButtonOn;
 	public Texture2D aimButtonOff;
 	public Texture2D aimButtonHighlight;
-	public Texture2D menuButton;
+    public Texture2D menuButton;
+    public GUITexture menuButtonGUI; // for game mode only
 	public Texture2D watch;
 	public Texture2D status;
+	public GUITexture statusGUI;
 	
 	//Menu
 	public Texture2D bgMenu;
@@ -42,8 +49,6 @@ public class HUD : MonoBehaviour {
 	public GUIStyle buttonContinue;
 	public GUIStyle buttonNull;
 
-    public AudioClip menuTap;
-	
 	//Menu
 	private Vector2 btSize = new Vector2(238,32);
 	private Rect btPesume;
@@ -52,7 +57,7 @@ public class HUD : MonoBehaviour {
 	private Rect btFail;
 	
 	//GUI
-	private HighlightableControlButton buttonFire;
+	private HighlightableControlButton buttonFire;	
 	private HighlightableControlButton buttonAim;
 	private HighlightableControlButton buttonBoost;
 	
@@ -63,9 +68,15 @@ public class HUD : MonoBehaviour {
 	
 	private Rect rcAirTank;
 	private Rect rcCrosshair;
-	private Rect rcAirTankBar;
 	private Rect rcWatch;
 	private Rect rcStatus;
+	
+	private Rect rcMask;
+	private Rect rcDepth;
+	private Rect rcHealth;
+	private Rect rcCount; 
+	private Rect rcWeight;
+	private Rect rcLives;	
 	
 	private bool isComplete = false;
 	
@@ -75,6 +86,8 @@ public class HUD : MonoBehaviour {
 	private FishInfo fishInfo;
 	private GameMaster gameMaster = null;
 	private int weight = 0;
+	
+	private ValueHolder airTankLevel;
 	
 	public enum GameState
 	{
@@ -95,15 +108,23 @@ public class HUD : MonoBehaviour {
 	public bool isGame
 	{
 	    get{return _state == GameState.GAME;}
-	}
+	}	
 	
 	void Awake() {
 		useGUILayout = false;
-		 buttonFire = new HighlightableControlButton(this, new Rect(Screen.width - 76, Screen.height - 90, 68, 68), fireButtonOn, fireButtonOff, fireButtonHighlight);
-		buttonBoost = new HighlightableControlButton(this, new Rect(Screen.width - 150, Screen.height - 72, 68, 68), boostButtonOn, boostButtonOff, boostButtonHighlight);
-		buttonAim =  new HighlightableControlButton(this, new Rect(0, Screen.height - 128, 128, 128), aimButtonOn, aimButtonOff, aimButtonHighlight);		
+		buttonFire = new HighlightableControlButton(this, fireButtonGUI, fireButtonOn, fireButtonOff, fireButtonHighlight);
+		buttonBoost = new HighlightableControlButton(this, boostButtonGUI, boostButtonOn, boostButtonOff, boostButtonHighlight);
+		buttonAim =  new HighlightableControlButton(this, aimButtonGUI, aimButtonOn, aimButtonOff, aimButtonHighlight);		
 		fishes = new ArrayList();
+		
+		airTankLevel = new ValueHolder(airTank.Length - 1);
+		airTankLevel.Subscribe(OnAirTankLevelChanged);
 	}	
+	
+	void OnAirTankLevelChanged(object value){
+	   if(airTankGUI != null) 
+	        airTankGUI.texture = airTank[(int)value];
+	}
 	
 	void Start () {
 	    gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
@@ -111,9 +132,19 @@ public class HUD : MonoBehaviour {
 		InitControlButton();
 		_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 	}	
+	
+    // Rect qqq(Rect r){
+    //     Rect ret = new Rect();
+    //     ret.width = r.width;
+    //     ret.height = r.height;
+    //     ret.x = r.x/480f;
+    //     ret.y = (320 - (r.y+r.height))/320f;
+    //     return ret;
+    // }
 
 	void GUIInit() {
 		btMenu = new Rect(0, 0, 48, 48);
+        // print("btMenu : " + qqq(btMenu));
 		
 		rcCrosshair = new Rect(Screen.width / 2 - 8, Screen.height / 2 - 8, 16, 16);
 		rcAirTank = new Rect(Screen.width / 2 - 120, Screen.height - 150, 100,150);
@@ -121,6 +152,7 @@ public class HUD : MonoBehaviour {
 		
 		float statusHeight = gameMaster.isFreeVersion ? 50 : 0;
 		rcStatus = new Rect(Screen.width / 2 - 115, statusHeight, 229, 26);
+        // print("rcStatus : " + qqq(rcStatus));
 		
 		int yLayout = 134;
 		btPesume = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
@@ -130,6 +162,17 @@ public class HUD : MonoBehaviour {
 		btMainMenu = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		
 		btFail = new Rect((Screen.width - btSize.x) / 2, (Screen.height - btSize.y)/2, btSize.x, btSize.y);
+		
+		rcMask = new Rect(0,0,Screen.width, Screen.height);
+		rcDepth = new Rect(216, 230, 48, 26);
+		rcHealth = new Rect(216, 264, 48, 26);
+		rcCount = new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height);
+		rcWeight = new Rect(rcStatus.x + 120, rcStatus.y, 48, rcStatus.height);
+		rcLives = new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height);
+		
+		Vector3 pos = statusGUI.transform.position;
+		pos.y = gameMaster.isFreeVersion ? 0.76f : 0.92f;
+		statusGUI.transform.position = pos;
 	}
 
 	void OnGUI() {	    
@@ -139,48 +182,65 @@ public class HUD : MonoBehaviour {
 			case GameState.GAME :
 			    isGame = true;                
 			    
-				if(crosshair)
-					GUI.DrawTexture(rcCrosshair, crosshair);
-				if(mask)
-					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), mask);
+                // if(crosshair)
+                //      GUI.DrawTexture(rcCrosshair, crosshair);
+                //  if(mask)
+                //      GUI.DrawTexture(rcMask, mask);
+                
+                int depth = 0;
+                int health = 0;                
+                
+                airTankLevel.value = (int)(gameMaster.getAir() * airTank.Length);
+                depth = (int)gameMaster.depth;
+                health = gameMaster.getHealth();
+                lives = gameMaster.getLives();
+                
+                // if(airTank[index])
+                //     GUI.DrawTexture(rcAirTank, airTank[index]);
+                // 
+                
+                // if(menuButton && GUI.Button(btMenu, menuButton, menuStyle)) {
+                //  gameObject.SendMessage("Pause", true);
+                //  _state = GameState.PAUSE;
+                // }
+                if(menuButtonGUI){
+                    if(Application.platform == RuntimePlatform.OSXPlayer){
+                        foreach(iPhoneTouch touch in iPhoneInput.touches){
+                	        Vector2 touchCoords = new Vector2(touch.position.x, Screen.height - touch.position.y);
+                	        if(touch.phase != iPhoneTouchPhase.Ended && menuButtonGUI.HitTest(touchCoords)){                	                           	            
+                                gameObject.SendMessage("Pause", true);
+                                _state = GameState.PAUSE;                	            
+                	            break;
+                	        }   
+                	    }
+                    }else{
+                        if(Input.GetMouseButtonDown(0) &&
+                            menuButtonGUI.HitTest(Input.mousePosition)){                                
+                             gameObject.SendMessage("Pause", true);
+                             _state = GameState.PAUSE;
+                        }                        
+                    }
+                }
+                
+                
+                // if(buttonFire != null)
+                //  buttonFire.Draw();
+                // if(buttonAim != null)
+                //  buttonAim.Draw();
+                // if(buttonBoost != null)
+                //  buttonBoost.Draw();
+                // 
+                // if(watch)
+                //  GUI.DrawTexture(rcWatch, watch);
+                // if(status)
+                //  GUI.DrawTexture(rcStatus, status);
 				
-				int index = 0;
-				int depth = 0;
-				int health = 0;
-				
-				if(gameMaster) {
-					index = (int)((gameMaster.getAir() * airTank.Length));
-					depth = (int)gameMaster.depth;
-					health = gameMaster.getHealth();
-					lives = gameMaster.getLives();
-				}
-				if(index >= airTank.Length) 
-					index = airTank.Length - 1;
-				if(airTank[index])
-					GUI.DrawTexture(rcAirTank, airTank[index]);
-				
-				if(menuButton && GUI.Button(btMenu, menuButton, menuStyle)) {
-					gameObject.SendMessage("Pause", true);
-					_state = GameState.PAUSE;
-				}
-				if(buttonFire != null)
-					buttonFire.Draw();
-				if(buttonAim != null)
-					buttonAim.Draw();
-				if(buttonBoost != null)
-					buttonBoost.Draw();
-				
-				if(watch)
-					GUI.DrawTexture(rcWatch, watch);
-				if(status)
-					GUI.DrawTexture(rcStatus, status);
-				
-				GUI.Label(new Rect(216, 230, 48, 26), "" + depth + " ft", depthText);
-				GUI.Label(new Rect(216, 264, 48, 26), health + "", healthText);
-				//Status
-				GUI.Label(new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height), "" + fishes.Count, statusText);
-				GUI.Label(new Rect(rcStatus.x + 120, rcStatus.y, 48, rcStatus.height), FishInfo.formatWeight(weight), statusText);
-				GUI.Label(new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height), "" + lives, statusText);
+                GUI.Label(rcDepth, "" + depth + " ft", depthText);
+                GUI.Label(rcHealth, health + "", healthText);
+                //Status
+                GUI.Label(rcCount, "" + fishes.Count, statusText);
+                GUI.Label(rcWeight, FishInfo.formatWeight(weight), statusText);
+                GUI.Label(rcLives, "" + lives, statusText);
 				break;
 			case GameState.PAUSE :
 				if(bgMenu)
@@ -290,8 +350,12 @@ public class HUD : MonoBehaviour {
 	public void showBenchResult(string arg) { benchString = arg; _state = GameState.BENCHMARK; }
 	
 	public void setCrosshair(Vector2 arg) {
-		rcCrosshair.x = arg.x - (rcCrosshair.width / 2);
-		rcCrosshair.y = (Screen.height - arg.y) - (rcCrosshair.height / 2);
+        // rcCrosshair.x = arg.x - (rcCrosshair.width / 2);
+        // rcCrosshair.y = (Screen.height - arg.y) - (rcCrosshair.height / 2);
+        Vector3 pos = crosshairGUI.transform.position;
+        pos.x = arg.x/Screen.width;
+        pos.y = arg.y/Screen.height;        
+        crosshairGUI.transform.position = pos;
 	}
 	
 	public void addFish(string arg) {
