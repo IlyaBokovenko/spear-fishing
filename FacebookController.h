@@ -6,9 +6,11 @@
 @interface FacebookController : UIViewController<FBSessionDelegate, FBRequestDelegate, FacebookPermissionCheckerDelegate, FBDialogDelegate>{
 	FBSession* session;
 	FacebookPermissionChecker* permissionChecker;
+	BOOL permissionsChecked;
 	
 	int fishes;
 	int weight;
+	NSString* userName;
 	
 	BOOL isExternalGuiShown;
 	

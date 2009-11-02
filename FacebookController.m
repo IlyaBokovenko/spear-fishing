@@ -8,15 +8,21 @@ static NSString* SHARE_PERMISSION = @"share_item";
 @interface FacebookController()
 
 @property(readonly) FBLoginButton* loginButton;
+@property(retain) NSString* userName;
 
 @end
-
 
 @implementation FacebookController
 
 @synthesize isExternalGuiShown;
+@synthesize userName;
 
 #pragma mark private
+
+-(void)postIfCan{
+	if(userName && permissionsChecked)
+		[self performSelectorOnMainThread:@selector(postLink) withObject:nil waitUntilDone:NO];
+}
 
 -(FBLoginButton*)createLoginButton{
 	FBLoginButton* btn = [[FBLoginButton alloc] initWithFrame: CGRectMake(230, 300, 100, 100)];	
@@ -32,8 +38,16 @@ static NSString* SHARE_PERMISSION = @"share_item";
 	return loginButton;	
 }
 
+-(void)requestName{
+	NSMutableDictionary* params = [NSMutableDictionary dictionary];
+	[params setObject:@"first_name, last_name, name, locale" forKey:@"fields"];	
+	NSString* strUid = [[NSNumber numberWithLongLong: session.uid] stringValue];	
+	[params setObject: strUid forKey:@"uids"];
+	[[FBRequest requestWithDelegate:self] call:@"facebook.users.getInfo" params: params];
+}
+
 -(NSString*)comment{
-	return [NSString stringWithFormat:@"Yossi is playing Speargun Hunter 3D!\nCaught %d fish and total weight of %dLbs. Beat that!", fishes, weight];
+	return [NSString stringWithFormat:@"%@ is playing Speargun Hunter 3D!\nCaught %d fish and total weight of %dLbs. Beat that!", userName, fishes, weight];
 }
 
 
@@ -65,7 +79,7 @@ static NSString* SHARE_PERMISSION = @"share_item";
 	if (self != nil) {
 		[self createSession];
 		permissionChecker = [[FacebookPermissionChecker alloc] initWithPermission:SHARE_PERMISSION session:session];
-		permissionChecker.delegate = self;		
+		permissionChecker.delegate = self;
 	}
 	return self;
 }
@@ -85,10 +99,12 @@ static NSString* SHARE_PERMISSION = @"share_item";
 -(void)uploadScoreFishes: (int)_fishes weight: (int)_weight{
 	fishes = _fishes;
 	weight = _weight;
-	
+
+	permissionsChecked = NO;
 	if([session isConnected]){
 		[permissionChecker performSelectorOnMainThread:@selector(check) withObject:nil waitUntilDone:NO];
 	}else{
+		self.userName = nil;
 		FBLoginDialog* dialog = [[[FBLoginDialog alloc] initWithSession:session] autorelease];	
 		dialog.delegate = self;
 		isExternalGuiShown = YES;
@@ -98,10 +114,13 @@ static NSString* SHARE_PERMISSION = @"share_item";
 
 #pragma mark FBSessionDelegate
 
-- (void)session:(FBSession*)session didLogin:(FBUID)uid{
+- (void)session:(FBSession*)_session didLogin:(FBUID)uid{	
 	isExternalGuiShown = NO;
-	NSLog(@"facebook login");
+	NSLog(@"facebook login, uid = %lld", session.uid);
+	
+	// 2 async calls
 	[permissionChecker performSelectorOnMainThread:@selector(check) withObject:nil waitUntilDone:NO];
+	[[FBRequest requestWithDelegate:self] call:@"facebook.users.getLoggedInUser" params:[NSDictionary	 dictionary]];
 }
 
 - (void)sessionDidNotLogin:(FBSession*)session{
@@ -114,36 +133,54 @@ static NSString* SHARE_PERMISSION = @"share_item";
 }
 
 - (void)sessionDidLogout:(FBSession*)session{
-		NSLog(@"facebook did login");
+		self.userName = nil;
+		NSLog(@"facebook did logout");
 }
 
 #pragma mark FBRequestDelegate
 
 - (void)requestLoading:(FBRequest*)request{
-	NSLog(@"request is loading");
+	NSLog(@"request %@ is loading", request.method);
 }
 
 - (void)request:(FBRequest*)request didReceiveResponse:(NSURLResponse*)response{
-	NSLog(@"request did receive response: %@", response);
+	NSLog(@"request %@ did receive response: %@", request.method, response);
 }
 
 - (void)request:(FBRequest*)request didFailWithError:(NSError*)error{
-	NSLog(@"request failed with error: %@", error);	
+	NSLog(@"request %@ failed with error: %@", request.method, error);	
 }
 
 - (void)request:(FBRequest*)request didLoad:(id)result{
-	NSLog(@"request did load with result: %@", result);
-	[UIAlertView showAlertViewWithTitle:@"Score sucessfully posted!"];
+	NSLog(@"request %@ did load with result: %@", request.method, result);
+		
+	if([request.method isEqual: @"facebook.users.getLoggedInUser"]){
+		NSString* uid  = (NSString*)result;
+		NSMutableDictionary* params = [NSMutableDictionary dictionary];
+		[params setObject:@"first_name" forKey:@"fields"];		
+		[params setObject: uid forKey:@"uids"];
+		[[FBRequest requestWithDelegate:self] call:@"facebook.users.getInfo" params: params];
+	}else if([request.method isEqual: @"facebook.users.getInfo"]){
+		NSArray* results = (NSArray*)result;
+		if(results.count){
+			NSDictionary* info = [results objectAtIndex: 0];		
+			self.userName = [info objectForKey: @"first_name"];		
+			[self postIfCan];			
+		}
+	}else if([request.method isEqual: @"links.post"]){
+		[UIAlertView showAlertViewWithTitle:@"Score sucessfully posted!"];
+	}
 }
 
 - (void)requestWasCancelled:(FBRequest*)request{
-	NSLog(@"request was canceled");	
+	NSLog(@"request %@ was canceled", request.method);	
 }
 
 #pragma mark FacebookPermissionCheckerDelegate
 
 - (void)userHasPermission:(NSString*)permission{
-	[self performSelectorOnMainThread:@selector(postLink) withObject:nil waitUntilDone:NO];
+	permissionsChecked = YES;
+	[self postIfCan];
 }
 
 - (void)userDoesNotHavePermission:(NSString*)permission{
