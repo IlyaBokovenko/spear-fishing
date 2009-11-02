@@ -40,7 +40,8 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     private SteeringOutput steering;
     
     private int obstaclesLayerMask;
-    public string[] layersToIgnore;
+    
+    public LayerMask ignoreAvoiding;
     
     private Vector3 nose;
     
@@ -71,8 +72,7 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
     }
 	
 	void Start () {	    
-	    SetObstaclesLayerMask();    
-	    
+	    obstaclesLayerMask = ~ignoreAvoiding.value;	    
 
 	    whiskers = CreateWhiskers();
 	
@@ -98,16 +98,6 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
 	public override void SelfDestroy(){
 	    Destroy(seekingTarget);
 	    base.SelfDestroy();
-	}
-	
-	private void SetObstaclesLayerMask(){
-        int mask = 0;
-        foreach(string name in layersToIgnore){
-            int layer = LayerMask.NameToLayer(name);
-            int lmask = 1 << layer;
-            mask |= lmask;
-        }
-        obstaclesLayerMask = ~mask;                    
 	}
 	
 	private Line MainRay(){

@@ -22,11 +22,11 @@ public class AudioControl : MonoBehaviour {
     }
     
     void setBoostButtonControl(HighlightableControlButton arg) {
-        arg.AddPressedDelegate(new OnPressedDelegate(this.OnBoost));
+        arg.AddPressedDelegate(new OnPressedDelegate(OnBoost));
     }
 
 
-	void OnBoost(bool isBoost){	    
+	void OnBoost(bool isBoost){	
 	    if(isBoost)
 	        audio.PlayOneShot(boostSound);
 	}

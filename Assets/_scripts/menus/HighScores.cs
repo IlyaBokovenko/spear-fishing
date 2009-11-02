@@ -109,8 +109,8 @@ public class HighScores : MonoBehaviour {
 			GUI.Label(new Rect(rect.x + (rect.width - 90), rect.y, 90, rect.height), string.Format("{0,1:00.0}", float.Parse(weight)), textStyle);
 		}
 		
-		public int getWeight() {
-			return int.Parse(weight);
+		public float getWeight() {
+			return float.Parse(weight);
 		}
 		
 		public void Copy(PlayerScore arg) {

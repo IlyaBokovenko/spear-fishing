@@ -31,7 +31,7 @@ public class JukeBox : MonoBehaviour {
     
     public static void AttachTo(MonoBehaviour comp){
         instance.transform.parent = comp.transform;
-        instance.transform.position = Vector3.zero;
+        instance.transform.localPosition = Vector3.zero;
     }    
     
     public static void PlayMenu(){instance.Play(instance.menu);}

@@ -9,7 +9,8 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
     public float safetyDistance  = 3;
     
     private Transform _transform;
-    private static readonly int predatorsLayerMask;        
+    public LayerMask escapeFrom;
+    private int escapeeLayerMask;        
     
     enum State{
         Escaping,
@@ -21,10 +22,6 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
     public override string ToString(){
         return base.ToString() + ": " + Enum.GetName(typeof(State), state);
     }    
-    
-    static FishPreyBehaviour(){
-        predatorsLayerMask = 1 << LayerMask.NameToLayer("Predators");
-    }
     
     FishPreyBehaviour(){
         priority = 1;
@@ -38,6 +35,7 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
     }
     
     void Awake(){
+        escapeeLayerMask = escapeFrom.value;
         children = new FishBehaviour[1] {escape};
     }
     
@@ -63,7 +61,7 @@ public class FishPreyBehaviour : FishArbitratedBehaviour {
 	}		
 	
 	private void EscapeAttempt(){
-	    Collider[] potentialPredators = Physics.OverlapSphere(_transform.position, safetyDistance, predatorsLayerMask);	    
+	    Collider[] potentialPredators = Physics.OverlapSphere(_transform.position, safetyDistance, escapeeLayerMask);	    
 	    if(potentialPredators.Length > 0){
 	        ExitCalm();
 	        EnterEscape(potentialPredators[0].gameObject);

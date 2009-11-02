@@ -22,6 +22,12 @@ public class FishHuntTargetBehaviour : FishBehaviour {
 	        return new ArrayList();
 	}
 	
+	public override string ToString(){
+	    string res = base.ToString();
+	    res += " (target: " + target + ")";
+        return res;
+     }
+	
 	void Awake(){
 	    children = new FishBehaviour[1]{seeking};	
 	}

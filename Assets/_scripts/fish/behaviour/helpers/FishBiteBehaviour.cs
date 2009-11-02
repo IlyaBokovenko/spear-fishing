@@ -68,8 +68,7 @@ public class FishBiteBehaviour : FishBehaviour {
 	    bitables = (IBitable[])_bitables.ToArray(typeof(IBitable));
 	}
 	
-	private void DoBite(){	
-	    audio.Play();
+	private void DoBite(){		    
 		_bited = true;    
 	    foreach(IBitable b in bitables){
 	        if(b != null)

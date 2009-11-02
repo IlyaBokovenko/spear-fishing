@@ -4,6 +4,7 @@ using System.Collections;
 public class GameMaster : MonoBehaviour {
     public bool isFreeVersion = false;
     public AudioClip arrghSound;
+    public AudioClip biteSound;
     
 	private bool benchMark = false;
 	public GameObject[] bmPoints;
@@ -57,10 +58,8 @@ public class GameMaster : MonoBehaviour {
 	}
 	public static bool IsGame(){
 	    return PrefHolder.newBool("game", false);
-	}	
-
-
-		
+	}
+			
 	// depth
 	private float _depthMeter = 0.0f;
 	public float depth
@@ -71,6 +70,8 @@ public class GameMaster : MonoBehaviour {
 	
 	// is player on surface
 	public ValueHolder isSurface;
+	
+	private bool isBeingBiting = false;
 	
 	//////////////////////////////////////////////////////////////////////
 	
@@ -203,7 +204,17 @@ public class GameMaster : MonoBehaviour {
 		if(fade)
 			fade.setFadeAlpha(0.6f);
 			
-		audio.PlayOneShot(arrghSound);
+		if(!isBeingBiting)
+		    StartCoroutine("PlayBiting");
+	}
+	
+	IEnumerator PlayBiting(){
+	    isBeingBiting = true;
+	    audio.PlayOneShot(biteSound);
+	    yield return new WaitForSeconds(0.5f);
+	    audio.PlayOneShot(arrghSound);
+	    yield return new WaitForSeconds(0.5f);
+	    isBeingBiting = false;
 	}
 	
 	void Save () {

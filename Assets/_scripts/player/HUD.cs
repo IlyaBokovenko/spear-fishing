@@ -167,7 +167,7 @@ public class HUD : MonoBehaviour {
 		rcDepth = new Rect(216, 230, 48, 26);
 		rcHealth = new Rect(216, 264, 48, 26);
 		rcCount = new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height);
-		rcWeight = new Rect(rcStatus.x + 120, rcStatus.y, 70, rcStatus.height);
+		rcWeight = new Rect(rcStatus.x + 123, rcStatus.y, 70, rcStatus.height);
 		rcLives = new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height);
 		
 		Vector3 pos = statusGUI.transform.position;
@@ -190,7 +190,8 @@ public class HUD : MonoBehaviour {
                 int depth = 0;
                 int health = 0;                
 
-                airTankLevel.value = (int)Mathf.Round(gameMaster.getAir() * (airTank.Length - 1));
+                int airLevel = (int)Mathf.Round(gameMaster.getAir() * (airTank.Length - 1));
+                airTankLevel.value = Mathf.Clamp(airLevel, 0, airTank.Length - 1);
                 depth = (int)gameMaster.depth;
                 health = gameMaster.getHealth();
                 lives = gameMaster.getLives();

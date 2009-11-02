@@ -49,11 +49,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	}
 	
 	void Update () {	    
-		if(!gun.animation.isPlaying && isEnabled) {
-		    buttonBoost.UpdateState();				
-			buttonAim.UpdateState();
-			buttonFire.UpdateState();			
-			
+		if(!gun.animation.isPlaying && isEnabled) {			
 			if(Application.platform == RuntimePlatform.OSXEditor) {
 				if(Input.GetMouseButton(0)) {
 					goTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
@@ -79,6 +75,10 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				buttonBoost.setDown(Input.GetMouseButton(1));
 				
 			} else {
+			    buttonBoost.UpdateState();				
+    			buttonAim.UpdateState();
+    			buttonFire.UpdateState();			
+    		    
 				Vector3 accelerator = gravityFilter(iPhoneInput.acceleration - defaultPosition);
 				goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
 				goTransform.Rotate( Vector3.right * accelerator.x * Time.deltaTime * sensitivity);

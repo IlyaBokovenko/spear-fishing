@@ -12,7 +12,8 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     public float restTime = 20f;
 
     private Transform _transform;
-    private static readonly int preysLayerMask;    
+    public LayerMask huntFor;
+    private int preysLayerMask;    
     
     private enum State
     {
@@ -22,10 +23,6 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }
     private State state;    
     private Vector3 nose;
-    
-    static FishPredatorBehaviour(){
-        preysLayerMask = 1 << LayerMask.NameToLayer("Preys");
-    }
     
     FishPredatorBehaviour(){
         priority = 1;
@@ -44,6 +41,8 @@ public class FishPredatorBehaviour : FishArbitratedBehaviour, IHittable {
     }
     
     void Awake(){
+        preysLayerMask = huntFor.value;
+        
         nose = ((Nose)GetComponent(typeof(Nose))).position;
         children = new FishBehaviour[2] {hunting, biting};
     }
