@@ -47,7 +47,7 @@ static NSString* SHARE_PERMISSION = @"share_item";
 }
 
 -(NSString*)comment{
-	return [NSString stringWithFormat:@"%@ is playing Speargun Hunter 3D!\nCaught %d fish and total weight of %dLbs. Beat that!", userName, fishes, weight];
+	return [NSString stringWithFormat:@"%@ is playing Speargun Hunter 3D!\nCaught %d %@ and total weight of %dLbs. Beat that!", userName, fishes, (fishes == 1 ? @"fish" : @"fishes"), weight];
 }
 
 

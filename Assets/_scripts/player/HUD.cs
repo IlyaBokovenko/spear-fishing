@@ -85,7 +85,7 @@ public class HUD : MonoBehaviour {
 	private ArrayList fishes;
 	private FishInfo fishInfo;
 	private GameMaster gameMaster = null;
-	private int weight = 0;
+	private float weight = 0.0f;
 	
 	private ValueHolder airTankLevel;
 	
@@ -167,7 +167,7 @@ public class HUD : MonoBehaviour {
 		rcDepth = new Rect(216, 230, 48, 26);
 		rcHealth = new Rect(216, 264, 48, 26);
 		rcCount = new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height);
-		rcWeight = new Rect(rcStatus.x + 120, rcStatus.y, 48, rcStatus.height);
+		rcWeight = new Rect(rcStatus.x + 120, rcStatus.y, 70, rcStatus.height);
 		rcLives = new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height);
 		
 		Vector3 pos = statusGUI.transform.position;
@@ -189,8 +189,8 @@ public class HUD : MonoBehaviour {
                 
                 int depth = 0;
                 int health = 0;                
-                
-                airTankLevel.value = (int)(gameMaster.getAir() * airTank.Length);
+
+                airTankLevel.value = (int)Mathf.Round(gameMaster.getAir() * (airTank.Length - 1));
                 depth = (int)gameMaster.depth;
                 health = gameMaster.getHealth();
                 lives = gameMaster.getLives();
@@ -239,7 +239,7 @@ public class HUD : MonoBehaviour {
                 GUI.Label(rcHealth, health + "", healthText);
                 //Status
                 GUI.Label(rcCount, "" + fishes.Count, statusText);
-                GUI.Label(rcWeight, FishInfo.formatWeight(weight), statusText);
+                GUI.Label(rcWeight, FishInfo.formatWeight(weight) + " lbs.", statusText);
                 GUI.Label(rcLives, "" + lives, statusText);
 				break;
 			case GameState.PAUSE :
@@ -283,21 +283,21 @@ public class HUD : MonoBehaviour {
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgGallery);
 				
 				GUI.Label(new Rect(292,125,64,24), "" + fishInfo.getCount(FishInfo.YELLOWFINTUNA), galleryText);
-				GUI.Label(new Rect(348,125,64,24), "" + fishInfo.getWeightString(FishInfo.YELLOWFINTUNA), galleryText);
+				GUI.Label(new Rect(340,125,80,24), "" + fishInfo.getWeightString(FishInfo.YELLOWFINTUNA) + " lbs.", galleryText);
 				
 				GUI.Label(new Rect(292,172,64,24), "" + fishInfo.getCount(FishInfo.REDSNAPPER), galleryText);
-				GUI.Label(new Rect(348,172,64,24), "" + fishInfo.getWeightString(FishInfo.REDSNAPPER), galleryText);
+				GUI.Label(new Rect(340,172,80,24), "" + fishInfo.getWeightString(FishInfo.REDSNAPPER) + " lbs.", galleryText);
 				
 				GUI.Label(new Rect(292,219,64,24), "" + fishInfo.getCount(FishInfo.GROUPER), galleryText);
-				GUI.Label(new Rect(348,219,64,24), "" + fishInfo.getWeightString(FishInfo.GROUPER), galleryText);
+				GUI.Label(new Rect(340,219,80,24), "" + fishInfo.getWeightString(FishInfo.GROUPER) + " lbs.", galleryText);
 				
 				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);
-				GUI.Label(new Rect(386,262,64,24), "" + FishInfo.formatWeight(weight), galleryText);
+				GUI.Label(new Rect(380,262,78,24), "" + FishInfo.formatWeight(weight) + " lbs.", galleryText);
 				
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
 				    JukeBox.Tap();
 				    PlayerPrefs.SetInt("totalFishes", fishes.Count);
-				    PlayerPrefs.SetInt("totalWeight", weight);				    
+				    PlayerPrefs.SetFloat("totalWeight", weight);				    
 				    PlayerPrefs.SetInt("upload", 1);
 				}
 				

@@ -11,21 +11,21 @@ public class FishInfo {
 	public static string YELLOWFINTUNA = "YellowFinTuna";
 	
 	private int[] fishCount;
- 	private int[] fishWeight;
+ 	private float[] fishWeight;
 
- 	public static int getInfo(string type, float koef) {
+ 	public static float getInfo(string type, float koef) {
 		if(type == GROUPER)
-			return (int)(Grouper * Mathf.Pow(koef, 3));
+			return (Grouper * Mathf.Pow(koef, 3));
 		if(type == REDSNAPPER)
-			return (int)(RedSnapper * Mathf.Pow(koef, 3));
+			return (RedSnapper * Mathf.Pow(koef, 3));
 		if(type == YELLOWFINTUNA)
-			return (int)(YellowFinTuna  * Mathf.Pow(koef, 3));
+			return (YellowFinTuna  * Mathf.Pow(koef, 3));
 		return 0;
 	}
 	
 	public FishInfo(ArrayList fishes) {
 		fishCount = new int[3];
-		fishWeight = new int[3];
+		fishWeight = new float[3];
 		foreach(string fish in fishes) {
 			string[] param = fish.Split(":"[0]);
 			if(GROUPER == param[0]) {
@@ -53,7 +53,7 @@ public class FishInfo {
 		return 0;
 	}
 	
-	public int getWeight(string type) {
+	public float getWeight(string type) {
 		if(type == GROUPER)
 			return fishWeight[0];
 		if(type == REDSNAPPER)
@@ -63,8 +63,8 @@ public class FishInfo {
 		return 0;
 	}
 	
-	public static string formatWeight(int value){
-	    return string.Format("{0,1:00.0}", (float)value);
+	public static string formatWeight(float value){
+	    return string.Format("{0,1:00.0}", value);
 	}
 	
 	public string getWeightString(string type){
