@@ -18,14 +18,13 @@ public class GameMaster : MonoBehaviour {
 	private int bmMinFPS;
 	private int bmMaxFPS;
 	
-	public float underwaterLevel = 3.0f;
-	private float airMax;
-	private float healthMax = 100.0f;
+	public float underwaterLevel = 3.0f;	
+	private const float healthMax = 100.0f;
 	private float gameTimer = 600.0f;
 	private float currentTimer = 0.0f;
 	private int lives = 0;
 
-	private float health = 0.0f;
+	private float health = healthMax;
 	
 	private HUD hud = null;
 	private PlayerControl playerControl;
@@ -33,18 +32,18 @@ public class GameMaster : MonoBehaviour {
 	private int state;
 	
 	// oxygen
+	private int minutesToBreath;
 	private bool airLocked = false;
-	private const float airTreshold = 0.33f;
-	private float _airTimer = 0.0f;	
-	private float airTimer
+	private const float airLowTreshold = 0.33f;
+	private float _airLeft = 1.0f;	
+	public float airLeft
 	{
-	    get{return _airTimer;}
-	    set{
-	        float treshold = airMax*airTreshold;
-	        bool oxygenLowChanged = value != treshold && 
-	                        (treshold - _airTimer) * (treshold - value) <= 0;
-	        _airTimer = value;
-	        if(oxygenLowChanged) isOxygenLow.value = _airTimer <= treshold;	        
+	    get{return _airLeft;}
+	    private set{
+	        bool oxygenLowChanged = value != airLowTreshold && 
+	                        (airLowTreshold - _airLeft) * (airLowTreshold - value) <= 0;
+	        _airLeft = value;
+	        if(oxygenLowChanged) isOxygenLow.value = _airLeft <= airLowTreshold;	        
 	    }
 	}
 	public ValueHolder isOxygenLow;	
@@ -93,11 +92,7 @@ public class GameMaster : MonoBehaviour {
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
 		fade = (FadeEffect)gameObject.GetComponent(typeof(FadeEffect));
 		
-		int minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
-        airMax = minutesToBreath * 60;
-        airTimer = airMax;
-		health = healthMax;
-		currentTimer = 0.0f;	
+		minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
 		
 		if(PlayerPrefs.HasKey("benchMark")) {
 			benchMark = true;
@@ -130,21 +125,23 @@ public class GameMaster : MonoBehaviour {
 		} else {
 			currentTimer += Time.deltaTime;
 		}
-		if(airTimer <= 0.0 || health < 1.0) {
+		if(airLeft <= 0.0 || health < 1.0) {
 			Fail();
 		}
 		depth = (underwaterLevel - playerTransform.position.y)/0.3f;
 		
+		float airStep = Time.deltaTime/(minutesToBreath*60);
 		if(!isSurface) {
-		    if(!airLocked){
-    			float airStep = Time.deltaTime;
+		    if(!airLocked){    			
     			if(playerControl && playerControl.isBoost)
-    				airStep *= 4.0f;
-    			airTimer -= airStep;		        
+    				airLeft -= 4*airStep;
+    			else
+    			    airLeft -= airStep;		        
 		    }
-		} else {
-			if(airTimer + 1.0f <= airMax)
-				airTimer += 1.0f;
+		} else {		    
+		    float rate = 0.1f*Time.deltaTime;
+			if(airLeft + rate <= 1.0f)
+				airLeft += rate;
 		}
 		
 		if(benchMark)
@@ -221,7 +218,7 @@ public class GameMaster : MonoBehaviour {
 	void Save () {
 		PlayerPrefs.SetFloat("health", health);
 		PlayerPrefs.SetString("transform", getPosition());
-		PlayerPrefs.SetFloat("air", airTimer);
+		PlayerPrefs.SetFloat("air", airLeft);
 		PlayerPrefs.SetFloat("timer", currentTimer);
 		PlayerPrefs.SetInt("lives", lives);
 		
@@ -235,7 +232,7 @@ public class GameMaster : MonoBehaviour {
          //      return;
 	    
         health = PlayerPrefs.GetFloat("health", healthMax);
-		airTimer = PlayerPrefs.GetFloat("air", airMax);
+		airLeft = PlayerPrefs.GetFloat("air", 1.0f);
 		currentTimer = PlayerPrefs.GetFloat("timer", 0.0f);
 		lives = PlayerPrefs.GetInt("lives", 3);
 		
@@ -265,7 +262,7 @@ public class GameMaster : MonoBehaviour {
 		if(playerControl)
 			playerControl.setEnableControl(true);
 		
-		airTimer = airMax;
+		airLeft = 1.0f;
 		health = healthMax;
 		lives--;
 	}
@@ -278,13 +275,9 @@ public class GameMaster : MonoBehaviour {
 		health = _health;
 	}
 
-	public float getAir() {
-		return (airTimer/airMax);
-	}
-	
 	public void LockOxygenLow(){	    
 	    airLocked = true;
-	    airTimer = airTreshold*airMax - 0.1f;
+	    airLeft = airLowTreshold - 0.1f;
 	}
 	
 	public void UnlockOxygen(){

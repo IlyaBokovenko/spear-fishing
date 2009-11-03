@@ -190,7 +190,7 @@ public class HUD : MonoBehaviour {
                 int depth = 0;
                 int health = 0;                
 
-                int airLevel = (int)Mathf.Round(gameMaster.getAir() * (airTank.Length - 1));
+                int airLevel = (int)Mathf.Round(gameMaster.airLeft * (airTank.Length - 1));
                 airTankLevel.value = Mathf.Clamp(airLevel, 0, airTank.Length - 1);
                 depth = (int)gameMaster.depth;
                 health = gameMaster.getHealth();
