@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public class GameMaster : MonoBehaviour {
-    public bool isFreeVersion = false;
+    public PrefHolder isFreeVersion;
     public AudioClip arrghSound;
     public AudioClip biteSound;
     
@@ -83,10 +83,11 @@ public class GameMaster : MonoBehaviour {
 	    isGame = PrefHolder.newBool("game", false);
 	    isOxygenLow = new ValueHolder(false);
 	    isSurface = new ValueHolder(false);
+	    
+	    isFreeVersion = PrefHolder.newBool("IsFreeVersion", false);
 	}
 	
-	void Start () {	    
-	    PlayerPrefs.SetInt("free_version", isFreeVersion ? 1 : 0);
+	void Start () {
 		playerTransform = gameObject.transform;
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));

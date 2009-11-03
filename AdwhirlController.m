@@ -1,6 +1,7 @@
 #import "AdwhirlController.h"
 #import "ARRollerProtocol.h"
 #import "ARRollerView.h"
+#import "common.h"
 
 @implementation AdwhirlController
 
@@ -55,7 +56,7 @@
 #pragma mark ARRollerDelegate
 
 - (NSString*)adWhirlApplicationKey{
-	return @"d3a1d37a928b102caf90c29cca1d33aa";
+	return g_adwhirlKey();
 }
 
 #pragma mark ARRollerDelegate optional delegate method implementations 

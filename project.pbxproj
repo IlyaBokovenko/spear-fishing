@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		092981E010A0418D00931823 /* common.m in Sources */ = {isa = PBXBuildFile; fileRef = 092981DF10A0418D00931823 /* common.m */; };
 		093C8B13108490BD0089EC1E /* FBPlayerPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 093C8B12108490BD0089EC1E /* FBPlayerPrefs.m */; };
 		093C8B2D108490C70089EC1E /* libAdWhirlDevice_1.2.5.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 093C8B2B108490C70089EC1E /* libAdWhirlDevice_1.2.5.a */; };
 		093C8B2E108490C70089EC1E /* libAdWhirlSimulator_1.2.5.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 093C8B2C108490C70089EC1E /* libAdWhirlSimulator_1.2.5.a */; };
@@ -15,6 +16,7 @@
 		093C8B39108491720089EC1E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 093C8B38108491720089EC1E /* CoreGraphics.framework */; };
 		093C8B3B108491720089EC1E /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 093C8B3A108491720089EC1E /* libsqlite3.dylib */; };
 		093C8B3D108491720089EC1E /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 093C8B3C108491720089EC1E /* libxml2.dylib */; };
+		094D312410A0394400E4146A /* Game.plist in Resources */ = {isa = PBXBuildFile; fileRef = 094D312310A0394400E4146A /* Game.plist */; };
 		0975CA381084A29E004BC774 /* FBConnect.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0975CA2C1084A29E004BC774 /* FBConnect.bundle */; };
 		0975CA881084ACEE004BC774 /* FBLoginButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0975CA871084ACEE004BC774 /* FBLoginButton.m */; };
 		0975CA8C1084AD06004BC774 /* FBLoginDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 0975CA8B1084AD06004BC774 /* FBLoginDialog.m */; };
@@ -67,6 +69,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		092981DF10A0418D00931823 /* common.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = common.m; path = Classes/common.m; sourceTree = "<group>"; };
 		093C8B11108490BD0089EC1E /* FBPlayerPrefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FBPlayerPrefs.h; path = Classes/FBPlayerPrefs.h; sourceTree = "<group>"; };
 		093C8B12108490BD0089EC1E /* FBPlayerPrefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FBPlayerPrefs.m; path = Classes/FBPlayerPrefs.m; sourceTree = "<group>"; };
 		093C8B29108490C70089EC1E /* ARRollerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARRollerProtocol.h; sourceTree = "<group>"; };
@@ -78,6 +81,8 @@
 		093C8B38108491720089EC1E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		093C8B3A108491720089EC1E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		093C8B3C108491720089EC1E /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		094AF6AC10A03FEE007CF61A /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common.h; path = Classes/common.h; sourceTree = "<group>"; };
+		094D312310A0394400E4146A /* Game.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Game.plist; path = ../Game.plist; sourceTree = "<group>"; };
 		0975CA221084A29E004BC774 /* FBConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBConnect.h; sourceTree = "<group>"; };
 		0975CA231084A29E004BC774 /* FBConnectGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBConnectGlobal.h; sourceTree = "<group>"; };
 		0975CA241084A29E004BC774 /* FBDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBDialog.h; sourceTree = "<group>"; };
@@ -185,6 +190,8 @@
 		0975CA1F1084A27E004BC774 /* OtherSources */ = {
 			isa = PBXGroup;
 			children = (
+				094AF6AC10A03FEE007CF61A /* common.h */,
+				092981DF10A0418D00931823 /* common.m */,
 				097B02061085E5C20032F6F5 /* AdwhirlController.h */,
 				097B02071085E5C20032F6F5 /* AdwhirlController.m */,
 				093C8B11108490BD0089EC1E /* FBPlayerPrefs.h */,
@@ -263,6 +270,7 @@
 				D82DCFB50E8000A5005D6AD8 /* Classes */,
 				D8A1C7220E80637F000160D3 /* Libraries */,
 				8D1107310486CEB800E47090 /* Info.plist */,
+				094D312310A0394400E4146A /* Game.plist */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				830B5C100E5ED4C100C7819F /* UIKit.framework */,
@@ -370,6 +378,7 @@
 				83DEA7440EACED0700D8A291 /* Icon.png in Resources */,
 				0975CA381084A29E004BC774 /* FBConnect.bundle in Resources */,
 				0975DB461085E3540007CF0B /* dummy-ad.png in Resources */,
+				094D312410A0394400E4146A /* Game.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,6 +426,7 @@
 				0975D5151084EB64004BC774 /* UIAlertView+Utils.m in Sources */,
 				097B02081085E5C20032F6F5 /* AdwhirlController.m in Sources */,
 				09F09D60108600C9008E29AE /* FBSession+Fix.m in Sources */,
+				092981E010A0418D00931823 /* common.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

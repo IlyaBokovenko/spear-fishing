@@ -458,7 +458,7 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	[_window addSubview:view];	
 	
 	_adController = [AdwhirlController createAdwhirlControllerWith: _window];
-	[_adController createAd];
+	[_adController createAd];	
 
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)[view layer];
 	_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
@@ -753,19 +753,32 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 #endif
 }
 
+BOOL IsFreeVersion(){
+	static BOOL isAssigned = NO;
+	static BOOL isFree;
+	
+	if(!isAssigned){
+		NSString *mainConfigPath = [[NSBundle mainBundle] pathForResource:@"Game" ofType:@"plist"];
+		NSDictionary* dict = [NSDictionary dictionaryWithContentsOfFile:mainConfigPath];
+		isFree = [[dict objectForKey: @"IsFreeVersion"] boolValue];		
+		isAssigned = YES;
+	}
+	
+	return isFree;	
+}
+
 - (void) applicationDidFinishLaunching:(UIApplication*)application
 {
-	[FBPlayerPrefs deleteKey: @"free_version"];
 	[FBPlayerPrefs deleteKey:@"game"];	
 	[FBPlayerPrefs deleteKey:@"upload"];
 	[FBPlayerPrefs deleteKey:@"moregames"];
 	[FBPlayerPrefs deleteKey:@"totalFishes"];
 	[FBPlayerPrefs deleteKey:@"totalWeight"];	
+	[FBPlayerPrefs setInt: IsFreeVersion() withKey:@"IsFreeVersion"];
 	
 	printf_console("-> applicationDidFinishLaunching()\n");
 	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight animated:NO];
 	[self startUnity:application];	
-	//[NSTimer scheduledTimerWithTimeInterval: 2.0 target: _adController selector: @selector(adjustViewSize) userInfo: nil repeats: NO];
 }
 	
 - (void) applicationDidBecomeActive:(UIApplication*)application
@@ -778,19 +791,19 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 	[NSTimer scheduledTimerWithTimeInterval:0.25 target:self
 								   selector:@selector(updateUI:)
 								   userInfo:nil repeats:YES];	
-	
-	//[NSTimer scheduledTimerWithTimeInterval: 2.0 target: _adController selector: @selector(adjustViewSize) userInfo: nil repeats: NO]; 
 }
  
--(void)updateUI: (NSTimer*) timer{	
-	BOOL isFree = [FBPlayerPrefs getInt:@"free_version" orDefault:0];
-	if(isFree && _adController.view.hidden){		
-		_adController.view.hidden = NO;
-		[_adController adjustViewSize];		
-	}		
-	
-	BOOL isGameRunning = [FBPlayerPrefs getInt:@"game" orDefault:0];
-	_adController.view.hidden = !isGameRunning;
+-(void)updateUI: (NSTimer*) timer{			
+	if(IsFreeVersion()){
+		static BOOL firstTime = YES;
+		if(firstTime){
+			[_adController adjustViewSize];		
+			firstTime = NO;
+		}
+		
+		BOOL isGameRunning = [FBPlayerPrefs getInt:@"game" orDefault:0];
+		_adController.view.hidden = !isGameRunning;		
+	}	
 	
 	BOOL externalGuiShown = _facebookController && _facebookController.isExternalGuiShown;
 	if(!externalGuiShown){
