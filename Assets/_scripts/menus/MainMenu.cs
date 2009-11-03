@@ -57,6 +57,7 @@ public class MainMenu : MonoBehaviour {
 	    difficulty = PrefHolder.newInt("difficulty", 1);
 	    sound = PrefHolder.newFloat("sound", 0.5f);
 	    graphicsLevel = PrefHolder.newInt("graphicsLevel", 1);
+	    
 	}
 	
 	void Start () {
@@ -81,7 +82,17 @@ public class MainMenu : MonoBehaviour {
 		GameMaster.SetGame(false);
         JukeBox.AttachTo(this);
 		JukeBox.PlayMenu();
+		
+		minutesToBreath.Subscribe(OnTap);
+	    difficulty.Subscribe(OnTap);
+	    sound.Subscribe(OnTap);
+	    graphicsLevel.Subscribe(OnTap);	    
 	}
+	
+	void OnTap(object value){
+	    JukeBox.Tap();
+	}	
+	
 	// Update is called once per frame
 	void OnGUI () {
 
@@ -151,7 +162,7 @@ public class MainMenu : MonoBehaviour {
 			    
 			    GUI.BeginGroup(new Rect(40, 80, 400, 240));
 			
-			    GUI.Label(new Rect(0, 0, 380, 24), "BREATH TIME", labelStyle);
+			    GUI.Label(new Rect(0, 0, 380, 24), "BREATH DURATION", labelStyle);
 			    minutesToBreath.value = GUI.SelectionGrid(new Rect(0,30, 400, 24), minutesToBreath - 1, new string[3]{"1 min", "2 min", "3 min"}, 3, controlStyle) + 1;			    
 
 			    GUI.Label(new Rect(0, 60, 380, 24), "DIFFICULTY", labelStyle);
