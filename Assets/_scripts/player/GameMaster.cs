@@ -72,6 +72,11 @@ public class GameMaster : MonoBehaviour {
 	
 	private bool isBeingBiting = false;
 	
+	bool isFailed
+	{
+	    get{return airLeft <= 0.0 || health < 1.0;}
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	
 	public void AddHealth(){
@@ -114,6 +119,8 @@ public class GameMaster : MonoBehaviour {
 			bmFPSCount = 0;
 		} else {			
             Load();
+            if(isFailed)
+                SpendLive();
 		}		
 		
 		Pause(false);
@@ -125,7 +132,7 @@ public class GameMaster : MonoBehaviour {
 		} else {
 			currentTimer += Time.deltaTime;
 		}
-		if(airLeft <= 0.0 || health < 1.0) {
+		if(isFailed) {
 			Fail();
 		}
 		depth = (underwaterLevel - playerTransform.position.y)/0.3f;
@@ -197,6 +204,23 @@ public class GameMaster : MonoBehaviour {
 			hud.showFail();
 	}
 	
+	public void Continue() {
+		if(fade)
+			fade.fadeOut();
+		if(playerControl)
+			playerControl.setEnableControl(true);
+			
+		SpendLive();
+	}
+	
+	void SpendLive(){
+	    if(lives > 0){
+    		airLeft = 1.0f;
+    		health = healthMax;
+    		lives--;	    	        
+	    }
+	}
+	
 	public void DoBite() {
 		health -= 10.0f;
 		if(fade)
@@ -256,17 +280,6 @@ public class GameMaster : MonoBehaviour {
 		Application.LoadLevel(0);
 	}
 	
-	public void Continue() {
-		if(fade)
-			fade.fadeOut();
-		if(playerControl)
-			playerControl.setEnableControl(true);
-		
-		airLeft = 1.0f;
-		health = healthMax;
-		lives--;
-	}
-	
 	public int getHealth() {
 		return (int)health;
 	}
@@ -305,9 +318,9 @@ public class GameMaster : MonoBehaviour {
 		playerTransform.rotation = new Quaternion(float.Parse(param[index++]),float.Parse(param[index++]),float.Parse(param[index++]),float.Parse(param[index++]));
 	}
 	
-	void OnApplicationQuit() {
-		if(!benchMark) {
-			Save();
-		}
+	void OnApplicationQuit() {	    
+    		if(!benchMark) {
+    			Save();
+    		}
 	}
 }

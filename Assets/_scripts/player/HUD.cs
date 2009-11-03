@@ -263,8 +263,8 @@ public class HUD : MonoBehaviour {
 						gameMaster.goMainMenu();
 				}
 				break;
-			case GameState.FAIL :
-				if(lives > 0) {
+			case GameState.FAIL:
+				if(lives > 1) {
 					if(GUI.Button(btFail, "", buttonContinue)) {
 					    JukeBox.Tap();
 						if(gameMaster)
