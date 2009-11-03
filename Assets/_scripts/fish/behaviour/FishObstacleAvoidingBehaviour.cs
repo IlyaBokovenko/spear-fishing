@@ -166,7 +166,9 @@ public class FishObstacleAvoidingBehaviour : FishArbitratedBehaviour {
             }
         }  
         
-        
+        if(isCollided){
+            seekingTargetTransform.position = hit.point + hit.normal * minDistance;
+        }        
 	}
 	
 	private void TryCheckCollisions(){

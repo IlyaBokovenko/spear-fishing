@@ -201,7 +201,7 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	public void DoBite() {
-		health -= 1.0f;
+		health -= 10.0f;
 		if(fade)
 			fade.setFadeAlpha(0.6f);
 			

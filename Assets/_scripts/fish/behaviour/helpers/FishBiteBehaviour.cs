@@ -17,6 +17,7 @@ public class FishBiteBehaviour : FishBehaviour {
 	    get{return _target;}
 	    set{_target = value;
 	        targetTransform = _target.transform;
+	        targetCollider = _target.collider;
 	        SetBitables(value);
 	        targetAI = (FishAI)value.GetComponent(typeof(FishAI));}
 	}
@@ -25,12 +26,22 @@ public class FishBiteBehaviour : FishBehaviour {
 	
 	private Transform _transform;
 	private Transform targetTransform;
+	private Collider targetCollider;
+	private Animation _anim;
 	
+	private bool readyToBite = true;
 	private bool _bited = false;
 	public bool bited
 	{
 	    get{return _bited;}	    
 	}
+	
+	public override string ToString(){
+        string ret = base.ToString();
+        if(!TargetIsDead())
+            ret += " (distance to target: " + DistanceToTarget() + "); coll: " + targetCollider;
+        return ret;
+    }
 	
 	public void StartBiting(GameObject obj){
 	    target = obj;
@@ -43,20 +54,33 @@ public class FishBiteBehaviour : FishBehaviour {
 	
 	void Awake(){
 	    nose = ((Nose)GetComponent(typeof(Nose))).position;	  
-	    _transform = transform;  
+	    _transform = transform;  	    
 	}	
 	
+	void Start(){
+	    _anim = (Animation)GetComponentsInChildren(typeof(Animation))[0];
+	}
+	
 	void Update(){
-	    if( target == null || (targetAI != null && targetAI.isDead)){	            
+	    if( TargetIsDead() ){
                 enabled = false;
                 return;
         }
         
-        float distanceToTarget = Vector3.Distance(_transform.TransformPoint(nose), targetTransform.position);			    
-      	if(distanceToTarget < biteDistance){
-      	    DoBite();
+      	if(DistanceToTarget() < biteDistance && readyToBite){
+      	    StartCoroutine("DoBite");
   	    }        
-	}		    
+	}
+	
+	float DistanceToTarget(){	    
+	    Vector3 globalNose = _transform.TransformPoint(nose);
+	    if(targetCollider != null){
+	        Vector3 closestPoint = targetCollider.ClosestPointOnBounds(globalNose);
+	        return Vector3.Distance(globalNose, closestPoint);
+	    }else{	        
+	        return Vector3.Distance(globalNose, targetTransform.position);			    
+	    }
+	}	
 
 	private void SetBitables(GameObject obj){	    
 	    ArrayList _bitables = new ArrayList();
@@ -68,36 +92,23 @@ public class FishBiteBehaviour : FishBehaviour {
 	    bitables = (IBitable[])_bitables.ToArray(typeof(IBitable));
 	}
 	
-	private void DoBite(){		    
-		_bited = true;    
+	bool TargetIsDead(){
+	    return target == null || (targetAI != null && targetAI.isDead);
+	}	
+	
+	IEnumerator DoBite(){
+	    readyToBite = false;
+	    
+	    AnimationState attack = _anim["Attack"];
+	    attack.speed = 0.5f;    
+	    _anim.Blend("Attack");	
+        yield return new WaitForSeconds(attack.length / attack.speed);
+        _anim.Stop("Attack");
 	    foreach(IBitable b in bitables){
 	        if(b != null)
 	            b.OnBite();
 	    }	        
-	}	
-
-	private void AnimateAgony() {
-		foreach(Animation elem in GetComponentsInChildren(typeof(Animation))) {
-			if(!elem.IsPlaying("Agony")) {
-				if(elem.isPlaying) {
-					elem.Stop();
-				}
-				elem.wrapMode = WrapMode.Once;
-				elem.Play("Attack");
-				//elem.PlayQueued("Swim");
-				//elem.wrapMode = WrapMode.Loop;
-			}
-		}
-	}
-	private void AminateSwim() {
-		foreach(Animation elem in GetComponentsInChildren(typeof(Animation))) {
-			if(!elem.IsPlaying("Swim")) {
-				if(elem.isPlaying) {
-					elem.Stop();
-				}
-				elem.wrapMode = WrapMode.Loop;
-				elem.Play("Swim");
-			}
-		}
+        _bited = true;
+        readyToBite = true;	    
 	}
 }
