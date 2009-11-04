@@ -6,8 +6,12 @@ public class FadeEffect : MonoBehaviour {
 	public float alpha = 0.0f;
 	public float maxAlpha = 1.0f;
 	public float minAlpha = 0.0f;
-	public int depth = 1000;
 	public float speed = 1.0f;
+	
+	public float duration
+	{
+	    get{return 1.0f/speed;}
+	}
 	
 	private float direct = -1.0f;
 	
@@ -45,8 +49,9 @@ public class FadeEffect : MonoBehaviour {
 			
 			alpha = Mathf.Clamp01(alpha);   
 			GUI.color = new Color(1.0f, 1.0f, 1.0f, alpha);
-    		GUI.depth = depth;
-    		GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), texture);
+    		if(!Utils.Approximately(alpha, 0.0f)){
+    		    GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), texture);    
+    		}
 		}
 	}
 }

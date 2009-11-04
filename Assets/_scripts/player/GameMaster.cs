@@ -28,7 +28,7 @@ public class GameMaster : MonoBehaviour {
 	
 	private HUD hud = null;
 	private PlayerControl playerControl;
-	private FadeEffect fade;
+    // private FadeEffect fade;
 	private int state;
 	
 	// oxygen
@@ -70,12 +70,10 @@ public class GameMaster : MonoBehaviour {
 	// is player on surface
 	public ValueHolder isSurface;
 	
-	private bool isBeingBiting = false;
+	private bool isFailed = false;
+	private bool isComplete = false;
 	
-	bool isFailed
-	{
-	    get{return airLeft <= 0.0 || health < 1.0;}
-	}
+	private bool isBeingBiting = false;
 	
 	//////////////////////////////////////////////////////////////////////
 	
@@ -86,8 +84,7 @@ public class GameMaster : MonoBehaviour {
 	void Awake(){
 	    isGame = PrefHolder.newBool("game", false);
 	    isOxygenLow = new ValueHolder(false);
-	    isSurface = new ValueHolder(false);
-	    
+	    isSurface = new ValueHolder(false);	    
 	    isFreeVersion = PrefHolder.newBool("IsFreeVersion", false);
 	}
 	
@@ -95,7 +92,7 @@ public class GameMaster : MonoBehaviour {
 		playerTransform = gameObject.transform;
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
-		fade = (FadeEffect)gameObject.GetComponent(typeof(FadeEffect));
+        // fade = (FadeEffect)gameObject.GetComponent(typeof(FadeEffect));
 		
 		minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
 		
@@ -120,23 +117,40 @@ public class GameMaster : MonoBehaviour {
 		} else {			
             Load();
             if(isFailed)
-                SpendLive();
+                SpendLife();
 		}		
 		
 		Pause(false);
 	}
 	
 	void Update () {
-		if(currentTimer >= gameTimer) {
-			Complete();
-		} else {
-			currentTimer += Time.deltaTime;
-		}
-		if(isFailed) {
-			Fail();
-		}
-		depth = (underwaterLevel - playerTransform.position.y)/0.3f;
+	    
+	    if(isComplete)
+	        return;
+	    isComplete = currentTimer >= gameTimer;
+	    if(isComplete){
+	        Complete();
+	        return;
+	    }
+	    
+	    if(isFailed)
+	        return;	        
+	    isFailed = airLeft <= 0.0 || health < 1.0;
+	    if(isFailed){
+            // StartCoroutine("Fail");
+	        Fail();
+	        return;
+	    }
+	        
+		currentTimer += Time.deltaTime;		
 		
+		depth = (underwaterLevel - playerTransform.position.y)/0.3f;		
+		CalculateAir();		
+		if(benchMark)
+            Benchmark();		
+	}
+	
+	void CalculateAir(){
 		float airStep = Time.deltaTime/(minutesToBreath*60);
 		if(!isSurface) {
 		    if(!airLocked){    			
@@ -149,10 +163,7 @@ public class GameMaster : MonoBehaviour {
 		    float rate = 0.1f*Time.deltaTime;
 			if(airLeft + rate <= 1.0f)
 				airLeft += rate;
-		}
-		
-		if(benchMark)
-            Benchmark();		
+		}	    
 	}
 	
 	void Benchmark(){
@@ -194,37 +205,35 @@ public class GameMaster : MonoBehaviour {
 			hud.showComplete();
 	}
 	
-	public void Fail() {
-		FadeEffect fade = (FadeEffect)gameObject.GetComponent(typeof(FadeEffect));
-		if(fade)
-			fade.fadeIn();
+	public void Fail() {	    
 		if(playerControl)
-			playerControl.setEnableControl(false);
+			playerControl.setEnableControl(false);			
 		if(hud)
-			hud.showFail();
+			hud.showFail();		
+    	Pause(true);		
 	}
 	
 	public void Continue() {
-		if(fade)
-			fade.fadeOut();
+	    Pause(false);
 		if(playerControl)
 			playerControl.setEnableControl(true);
 			
-		SpendLive();
+		SpendLife();
 	}
 	
-	void SpendLive(){
+	void SpendLife(){
 	    if(lives > 0){
     		airLeft = 1.0f;
     		health = healthMax;
-    		lives--;	    	        
+    		lives--;
+    		isFailed = false;	    	        
 	    }
 	}
 	
 	public void DoBite() {
 		health -= 10.0f;
-		if(fade)
-			fade.setFadeAlpha(0.6f);
+		if(hud)
+			hud.BloodFlash();
 			
 		if(!isBeingBiting)
 		    StartCoroutine("PlayBiting");

@@ -48,7 +48,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 		hud = (HUD)gameObject.GetComponent(typeof(HUD));	
 	}
 	
-	void Update () {	    
+	void Update () {
 		if(!gun.animation.isPlaying && isEnabled) {			
 			if(Application.platform == RuntimePlatform.OSXEditor) {
 				if(Input.GetMouseButton(0)) {

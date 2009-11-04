@@ -4,8 +4,11 @@ using System.Collections;
 public class HUD : MonoBehaviour {
 	public bool hideHud = false;
 
+    public Texture2D fade;
+    Fader fader;
 	//Textures
 	//GUI
+	
 	public Texture2D crosshair;
 	public GUITexture crosshairGUI;
 	public Texture2D mask;
@@ -108,10 +111,15 @@ public class HUD : MonoBehaviour {
 	public bool isGame
 	{
 	    get{return _state == GameState.GAME;}
+	}
+	
+	public void BloodFlash(){
+	    fader.alpha = 0.6f;
 	}	
 	
-	void Awake() {
+	void Awake() {	    
 		useGUILayout = false;
+		fader = new Fader(fade);
 		buttonFire = new HighlightableControlButton(this, fireButtonGUI, fireButtonOn, fireButtonOff, fireButtonHighlight);
 		buttonBoost = new HighlightableControlButton(this, boostButtonGUI, boostButtonOn, boostButtonOff, boostButtonHighlight);
 		buttonAim =  new HighlightableControlButton(this, aimButtonGUI, aimButtonOn, aimButtonOff, aimButtonHighlight);		
@@ -133,16 +141,7 @@ public class HUD : MonoBehaviour {
 		_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 	}	
 	
-    // Rect qqq(Rect r){
-    //     Rect ret = new Rect();
-    //     ret.width = r.width;
-    //     ret.height = r.height;
-    //     ret.x = r.x/480f;
-    //     ret.y = (320 - (r.y+r.height))/320f;
-    //     return ret;
-    // }
-
-	void GUIInit() {
+	void GUIInit() {	    
 		btMenu = new Rect(0, 0, 48, 48);
         // print("btMenu : " + qqq(btMenu));
 		
@@ -177,10 +176,12 @@ public class HUD : MonoBehaviour {
 
 	void OnGUI() {	    
 	    bool isGame = false;
+	    GUI.color = Color.white;
+	    fader.FadeOut();
 	    
 		switch(_state) {
-			case GameState.GAME :
-			    isGame = true;                
+			case GameState.GAME :			
+			    isGame = true;   
 			    
                 // if(crosshair)
                 //      GUI.DrawTexture(rcCrosshair, crosshair);
@@ -191,7 +192,7 @@ public class HUD : MonoBehaviour {
                 int health = 0;                
 
                 int airLevel = (int)Mathf.Round(gameMaster.airLeft * (airTank.Length - 1));
-                airTankLevel.value = Mathf.Clamp(airLevel, 0, airTank.Length - 1);
+                airTankLevel.value = (int)Mathf.Clamp(airLevel, 0, airTank.Length - 1);
                 depth = (int)gameMaster.depth;
                 health = gameMaster.getHealth();
                 lives = gameMaster.getLives();
@@ -242,6 +243,7 @@ public class HUD : MonoBehaviour {
                 GUI.Label(rcCount, "" + fishes.Count, statusText);
                 GUI.Label(rcWeight, FishInfo.formatWeight(weight) + " lbs.", statusText);
                 GUI.Label(rcLives, "" + lives, statusText);
+                fader.OnGUI();
 				break;
 			case GameState.PAUSE :
 				if(bgMenu)
@@ -264,6 +266,8 @@ public class HUD : MonoBehaviour {
 				}
 				break;
 			case GameState.FAIL:
+				fader.FadeIn();
+				fader.OnGUI();				
 				if(lives > 1) {
 					if(GUI.Button(btFail, "", buttonContinue)) {
 					    JukeBox.Tap();
@@ -277,9 +281,9 @@ public class HUD : MonoBehaviour {
 						MainMenu.CleanPlayerPrefs();
 						Application.LoadLevel(Application.loadedLevel);
 					}
-				}
+				}				
 				break;
-			case GameState.GALLERY :
+			case GameState.GALLERY :			    
 				if(bgGallery)
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgGallery);
 				
@@ -314,7 +318,7 @@ public class HUD : MonoBehaviour {
 						_state = GameState.PAUSE;
 				}
 				break;
-			case GameState.BENCHMARK :
+			case GameState.BENCHMARK :			
 				if(benchString != "") {
 					GUI.Label(new Rect(1, 64, Screen.width,26), benchString,  galleryText);
 				}
@@ -324,8 +328,7 @@ public class HUD : MonoBehaviour {
 				break;
 			case GameState.HIDEHUD :
 				break;
-		}
-		
+		}		
 		gameMaster.isGame.value = isGame;
 	}
 	
@@ -383,5 +386,41 @@ public class HUD : MonoBehaviour {
 				break;
 			}
 		}
-	}
+	}	
+}
+
+class Fader
+{
+    bool isFade = false;
+    public float alpha = 0f;
+    float maxAlpha = 0.8f;
+    float speed = 0.2f;
+    Rect rect;
+    float lastDeltaTime;
+    
+    Texture2D fade;
+    public Fader(Texture2D _fade){
+        fade = _fade;
+        rect  = new Rect(0, 0, Screen.width, Screen.height);
+    }
+    
+    public void FadeIn(){
+        isFade = true;
+    }
+    public void FadeOut(){
+        isFade = false;
+    }
+    
+    public void OnGUI(){
+        if(!Utils.Approximately(Time.deltaTime, 0f))    lastDeltaTime = Time.deltaTime;
+        float delta = (isFade ? 1f : -1f) * speed * lastDeltaTime;
+        alpha += delta;        
+        alpha = Mathf.Clamp(alpha, 0f, maxAlpha);
+        if(!Utils.Approximately(alpha, 0.0f)){
+            Color old = GUI.color;
+            GUI.color = new Color(1.0f, 1.0f, 1.0f, alpha);
+		    GUI.DrawTexture(rect, fade);    
+		    GUI.color = old;
+		}		
+    }
 }
