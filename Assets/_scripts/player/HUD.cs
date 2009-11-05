@@ -299,7 +299,7 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(340,219,80,24), "" + fishInfo.getWeightString(FishInfo.GROUPER) + " lbs.", galleryText);
 				
 				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);
-				GUI.Label(new Rect(380,262,78,24), "" + FishInfo.formatWeight(weight) + " lbs.", galleryText);
+				GUI.Label(new Rect(375,262,88,24), "" + FishInfo.formatWeight(weight) + " lbs.", galleryText);
 				
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
 				    JukeBox.Tap();
