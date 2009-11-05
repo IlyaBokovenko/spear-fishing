@@ -84,7 +84,7 @@ public class FishAI : GenericScript, IHittable
 		ArrayList behs = new ArrayList(GetComponents(typeof(FishBehaviour)));		
 
 	    foreach(GenericScript elem in behs)
-	        elem.SelfDestroy();
+	        elem.enabled = false;
 		
 		foreach(Animation elem in GetComponentsInChildren(typeof(Animation))) {
 			if(elem.isPlaying) {

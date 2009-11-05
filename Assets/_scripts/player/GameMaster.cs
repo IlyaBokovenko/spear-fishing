@@ -28,8 +28,8 @@ public class GameMaster : MonoBehaviour {
 	
 	private HUD hud = null;
 	private PlayerControl playerControl;
-    // private FadeEffect fade;
-	private int state;
+
+	Tutorial tutorial;
 	
 	// oxygen
 	private int minutesToBreath;
@@ -57,6 +57,11 @@ public class GameMaster : MonoBehaviour {
 	}
 	public static bool IsGame(){
 	    return PrefHolder.newBool("game", false);
+	}
+	
+	static bool showTutorialNextTime = false;
+	public static void ShowTutorialNextTime(){
+	    showTutorialNextTime = true;
 	}
 			
 	// depth
@@ -86,6 +91,13 @@ public class GameMaster : MonoBehaviour {
 	    isOxygenLow = new ValueHolder(false);
 	    isSurface = new ValueHolder(false);	    
 	    isFreeVersion = PrefHolder.newBool("IsFreeVersion", false);
+	    
+	    tutorial = (Tutorial)GetComponent(typeof(Tutorial));
+	    if(showTutorialNextTime){
+	        tutorial.enabled = true;
+	        showTutorialNextTime = false;
+	    }
+	        
 	}
 	
 	void Start () {
@@ -99,11 +111,6 @@ public class GameMaster : MonoBehaviour {
 		if(PlayerPrefs.HasKey("benchMark")) {
 			benchMark = true;
 		}
-		
-        if(PlayerPrefs.GetInt("isFirstTime", 0) == 0){
-            PlayerPrefs.SetInt("isFirstTime", 1);
-		    ((Tutorial)GetComponent(typeof(Tutorial))).enabled = true;
-        }
 		
 		if(benchMark) {
 			PlayerControl pc = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
@@ -249,6 +256,8 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Save () {
+	    if(tutorial.enabled == true) return;
+	    
 		PlayerPrefs.SetFloat("health", health);
 		PlayerPrefs.SetString("transform", getPosition());
 		PlayerPrefs.SetFloat("air", airLeft);

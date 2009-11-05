@@ -4,7 +4,6 @@ using System.Collections;
 // [ExecuteInEditMode]
 public class MainMenu : MonoBehaviour {
 	public Texture2D bgTexture;
-	public Texture2D bgHelp;
 	public Texture2D bgSettings;
 	//Buttons
 	public GUIStyle btResume;
@@ -41,7 +40,6 @@ public class MainMenu : MonoBehaviour {
 	{
         MENU,
         SETTINGS,
-        HELP,
         LOADING	    
 	}
 	
@@ -109,20 +107,13 @@ public class MainMenu : MonoBehaviour {
 				if(isResume) {				    
 					if(GUI.Button(rectResume,"",btResume)) {
 					    JukeBox.Tap();
-						if(Application.levelCount > 1) {
-							state = State.LOADING;
-							Application.LoadLevel(1);
-						}
+					    StartGame(true);
 					}
 				}
 				if(GUI.Button(rectStart,"",btStart)) {
 				    JukeBox.Tap();
-					if(Application.levelCount > 1) {
-						CleanPlayerPrefs();
-						state = State.LOADING;
-						Application.LoadLevel(1);
-					}
-				}
+                    StartGame(false);
+                 }
 				if(GUI.Button(rectHighScores,"",btHighScores)) {
 				    JukeBox.Tap();
 					if(Application.levelCount > 2) {
@@ -136,17 +127,9 @@ public class MainMenu : MonoBehaviour {
 				}
 				if(GUI.Button(rectHelp,"",btHelp)) {
 				    JukeBox.Tap();
-					state = State.HELP;
+				    GameMaster.ShowTutorialNextTime();
+				    StartGame(false);
 				}
-				/*
-				if(GUI.Button(rectBenchMark,"",btBenchMark)) {
-					if(Application.levelCount > 1) {
-						CleanPlayerPrefs();
-						state = LOADING;
-						PlayerPrefs.SetInt("benchMark", 1);
-						Application.LoadLevel(1);
-					}
-				}*/
 				if(GUI.Button(rectMoreGames,"",lnMoreGames)) {
                     JukeBox.Tap();                    
                     Application.OpenURL("http://phobos.apple.com/WebObjects/MZSearch.woa/wa/search?submit=seeAllLockups&media=software&entity=software&term=yossi+malki");
@@ -178,21 +161,20 @@ public class MainMenu : MonoBehaviour {
 			    GUI.EndGroup();
 			    
 			    break;
-			case State.HELP :
-				if(bgHelp) {
-					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgHelp);
-				}
-				if(GUI.Button(new Rect(0, 0, 48, 48), "", btBack)) {
-				    JukeBox.Tap();
-					state = State.MENU;
-				}
-				break;
 			case State.LOADING :
 				if(bgTexture != null) 
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgTexture);
 				break;
 		}
 		
+	}
+	
+	void StartGame(bool isResume){
+		if(Application.levelCount > 1) {
+		    if(!isResume) CleanPlayerPrefs();
+			state = State.LOADING;
+			Application.LoadLevel(1);
+		}	    
 	}
 	
 	public static void CleanPlayerPrefs() {

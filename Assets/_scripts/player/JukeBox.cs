@@ -40,7 +40,6 @@ public class JukeBox : MonoBehaviour {
     public static void Tap(){instance._Tap();}
     
     void _Tap(){     
-        print("tap");   
         audio.PlayOneShot(menuTap);
     }
     

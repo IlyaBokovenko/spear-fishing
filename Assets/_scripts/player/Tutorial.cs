@@ -32,11 +32,11 @@ public class Tutorial : MonoBehaviour {
 	    hud = (HUD)GetComponent(typeof(HUD));
 	    
 	    sm = new StateMachine();
-	    Invoke("BeginTutorial", 3.0f);	    
+	    Invoke("BeginTutorial", 0.5f);	    
 	}
 	
 	void BeginTutorial(){
-	    sm.MoveTo(new SwimState(this));
+	    sm.MoveTo(new WelcomeState(this));
 	}
 	
 	void FixedUpdate(){
@@ -72,6 +72,22 @@ public class Tutorial : MonoBehaviour {
         public TutorialState(Tutorial _context){
             context = _context;
         }
+    }
+    
+    class WelcomeState : TutorialState{
+        float initialTime;
+        
+        public WelcomeState(Tutorial context):base(context){
+            initialTime = Time.time;
+        }
+        
+        public override void OnGUI(){
+            GUI.Box(new Rect(120, 119, 240, 22), "Welcome to SpearFishing tutorial !");        
+        }
+
+        public override void Do(){
+            if(Time.time - initialTime > 4.0f)  sm.MoveTo(new SwimState(context));
+        }       
     }
 
     class SwimState : TutorialState{
@@ -323,6 +339,7 @@ public class Tutorial : MonoBehaviour {
         
         public override void Do(){
             if(Time.time - initialTime > 5){
+                context.enabled = false;
                 sm.MoveTo(null);
             }
         }
