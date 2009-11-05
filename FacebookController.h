@@ -9,7 +9,7 @@
 	BOOL permissionsChecked;
 	
 	int fishes;
-	int weight;
+	float weight;
 	NSString* userName;
 	
 	BOOL isExternalGuiShown;
@@ -20,6 +20,6 @@
 @property(readonly, nonatomic) BOOL isExternalGuiShown;
 
 +(FacebookController*)createFacebookController;
--(void)uploadScoreFishes: (int)_fishes weight: (int)_weight;
+-(void)uploadScoreFishes: (int)_fishes weight: (float)_weight;
 
 @end

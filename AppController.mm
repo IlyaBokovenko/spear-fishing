@@ -787,7 +787,7 @@ BOOL IsFreeVersion(){
 	UnitySetAudioSessionActive(true);
 	UnityPause(false);	
 	
-	[FBPlayerPrefs setInt:0 withKey:@"upload"];
+	[FBPlayerPrefs setInt: 0 withKey:@"upload"];
 	[NSTimer scheduledTimerWithTimeInterval:0.25 target:self
 								   selector:@selector(updateUI:)
 								   userInfo:nil repeats:YES];	
@@ -814,7 +814,7 @@ BOOL IsFreeVersion(){
 			if(!_facebookController) _facebookController = [FacebookController createFacebookController];				
 			
 			int fishes = [FBPlayerPrefs getInt:@"totalFishes" orDefault:0];
-			int weight = [FBPlayerPrefs getInt:@"totalWeight" orDefault:0];
+			float weight = [FBPlayerPrefs getFloat:@"totalWeight" orDefault:0.0f];
 			[_facebookController uploadScoreFishes: fishes weight:weight];		
 		}		
 	}	

@@ -47,7 +47,7 @@ static NSString* SHARE_PERMISSION = @"share_item";
 }
 
 -(NSString*)comment{
-	return [NSString stringWithFormat:@"%@ is playing Speargun Hunter 3D!\nCaught %d %@ and total weight of %dLbs. Beat that!", userName, fishes, (fishes == 1 ? @"fish" : @"fishes"), weight];
+	return [NSString stringWithFormat:@"%@ is playing Speargun Hunter 3D!\nCaught %d %@ and total weight of %.2fLbs. Beat that!", userName, fishes, (fishes == 1 ? @"fish" : @"fishes"), weight];
 }
 
 
@@ -96,7 +96,7 @@ static NSString* SHARE_PERMISSION = @"share_item";
 
 #pragma mark controlling
 
--(void)uploadScoreFishes: (int)_fishes weight: (int)_weight{
+-(void)uploadScoreFishes: (int)_fishes weight: (float)_weight{
 	fishes = _fishes;
 	weight = _weight;
 

@@ -113,10 +113,8 @@ public class GameMaster : MonoBehaviour {
 		}
 		
 		if(benchMark) {
-			PlayerControl pc = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
-			if(pc != null)
-				pc.setEnableControl(false);
-			
+		    isGame.value = false;
+		    			
 			bmPointIndex = 0;
 			bmMinFPS = 100;
 			bmMaxFPS = 0;
@@ -144,12 +142,11 @@ public class GameMaster : MonoBehaviour {
 	        return;	        
 	    isFailed = airLeft <= 0.0 || health < 1.0;
 	    if(isFailed){
-            // StartCoroutine("Fail");
 	        Fail();
 	        return;
 	    }
 	        
-		currentTimer += Time.deltaTime;		
+		currentTimer += Time.deltaTime;
 		
 		depth = (underwaterLevel - playerTransform.position.y)/0.3f;		
 		CalculateAir();		
@@ -213,18 +210,13 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	public void Fail() {	    
-		if(playerControl)
-			playerControl.setEnableControl(false);			
 		if(hud)
 			hud.showFail();		
     	Pause(true);		
 	}
 	
 	public void Continue() {
-	    Pause(false);
-		if(playerControl)
-			playerControl.setEnableControl(true);
-			
+	    Pause(false);			
 		SpendLife();
 	}
 	

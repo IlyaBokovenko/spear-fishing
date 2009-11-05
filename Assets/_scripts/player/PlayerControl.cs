@@ -25,7 +25,6 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	private ControlButton buttonAim;
 	private ControlButton buttonBoost;
 	
-	private bool isEnabled = true;
 	//Keys
 	public bool isBoost
 	{
@@ -49,59 +48,61 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	}
 	
 	void Update () {
-		if(!gun.animation.isPlaying && isEnabled) {			
-			if(Application.platform == RuntimePlatform.OSXEditor) {
-				if(Input.GetMouseButton(0)) {
-					goTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
-					goTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
-					RestrictRotation();
-				}
-				if(gun && Input.GetKey(KeyCode.LeftShift)) {
-					gunTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
-					gunTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);					
-					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
-					buttonAim.setDown(true);
-					if(hud)
-						hud.setCrosshair(new Vector2(point.x,point.y));
-				} else {
-					gunTransform.localRotation = defaultGunPosition;
-					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
-					buttonAim.setDown(false);
-					if(hud)
-						hud.setCrosshair(new Vector2(point.x,point.y));
-				}
-				
-				buttonFire.setDown(Input.GetKeyUp ("space"));				
-				buttonBoost.setDown(Input.GetMouseButton(1));
-				
-			} else {
-			    buttonBoost.UpdateState();				
-    			buttonAim.UpdateState();
-    			buttonFire.UpdateState();			
-    		    
-				Vector3 accelerator = gravityFilter(iPhoneInput.acceleration - defaultPosition);
-				goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
-				goTransform.Rotate( Vector3.right * accelerator.x * Time.deltaTime * sensitivity);
+		if(gun.animation.isPlaying) return;
+        if(!gameMaster.isGame) return;		
+			
+		if(Application.platform == RuntimePlatform.OSXEditor) {
+			if(Input.GetMouseButton(0)) {
+				goTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
+				goTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
 				RestrictRotation();
-				
-				if(gunTransform.localRotation != defaultGunPosition) {	
-					gunTransform.localRotation = defaultGunPosition;
-					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
-					if(hud)
-						hud.setCrosshair(new Vector2(point.x,point.y));
-				}				
-				
-				if(buttonAim.isDown){
-					Vector2 deltaAim = buttonAim.TouchOffset(); 
-					gunTransform.Rotate(Vector3.up * deltaAim.x * 0.5f);
-					gunTransform.Rotate( Vector3.right * deltaAim.y * 0.5f);
-					Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
-					if(hud)
-						hud.setCrosshair(new Vector2(point.x,point.y));				    
-				}				
 			}
-			goTransform.Translate(Vector3.forward * (this.isBoost ? boostSpeed : swimSpeed) * Time.deltaTime);
+			if(gun && Input.GetKey(KeyCode.LeftShift)) {
+				gunTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
+				gunTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);					
+				Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
+				buttonAim.setDown(true);
+				if(hud)
+					hud.setCrosshair(new Vector2(point.x,point.y));
+			} else {
+				gunTransform.localRotation = defaultGunPosition;
+				Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
+				buttonAim.setDown(false);
+				if(hud)
+					hud.setCrosshair(new Vector2(point.x,point.y));
+			}
+			
+			buttonFire.setDown(Input.GetKeyUp ("space"));				
+			buttonBoost.setDown(Input.GetMouseButton(1));
+			
+		} else {
+		    buttonBoost.UpdateState();				
+			buttonAim.UpdateState();
+			buttonFire.UpdateState();			
+		    
+			Vector3 accelerator = gravityFilter(iPhoneInput.acceleration - defaultPosition);
+			goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
+			goTransform.Rotate( Vector3.right * accelerator.x * Time.deltaTime * sensitivity);
+			RestrictRotation();
+			
+			if(gunTransform.localRotation != defaultGunPosition) {	
+				gunTransform.localRotation = defaultGunPosition;
+				Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
+				if(hud)
+					hud.setCrosshair(new Vector2(point.x,point.y));
+			}				
+			
+			if(buttonAim.isDown){
+				Vector2 deltaAim = buttonAim.TouchOffset(); 
+				gunTransform.Rotate(Vector3.up * deltaAim.x * 0.5f);
+				gunTransform.Rotate( Vector3.right * deltaAim.y * 0.5f);
+				Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
+				if(hud)
+					hud.setCrosshair(new Vector2(point.x,point.y));				    
+			}				
 		}
+		goTransform.Translate(Vector3.forward * (this.isBoost ? boostSpeed : swimSpeed) * Time.deltaTime);
+		
 	}
 	
 	void OnTriggerEnter(Collider other){
@@ -121,9 +122,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	public void setBoostButtonControl(ControlButton arg) { buttonBoost = arg; }
 
 	public void OnHit(Spear spear) {}
-
-	public void setEnableControl(bool arg) { isEnabled = arg; }
-
+	
 	public void OnBite() { 
 		if(gameMaster)
 			gameMaster.DoBite();
