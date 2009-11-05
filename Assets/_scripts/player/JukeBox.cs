@@ -39,7 +39,8 @@ public class JukeBox : MonoBehaviour {
     public static void PlaySurface(){instance.Play(instance.surface);}
     public static void Tap(){instance._Tap();}
     
-    void _Tap(){
+    void _Tap(){     
+        print("tap");   
         audio.PlayOneShot(menuTap);
     }
     

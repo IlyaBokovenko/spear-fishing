@@ -24,13 +24,17 @@ public class ValueHolder
         }
     }
     
-    public void Subscribe(OnValueChangedDelegate d){
+    public void Subscribe(OnValueChangedDelegate d, bool callNow){
         if(del == null)
             del = d;
         else
             del += d;
-            
-        d(value);
+        
+        if(callNow) d(value);
+    }
+    
+    public void Subscribe(OnValueChangedDelegate d){
+        Subscribe(d, true);
     }
     
     public void Unsubscribe(OnValueChangedDelegate d){

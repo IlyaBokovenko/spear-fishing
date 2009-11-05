@@ -83,10 +83,10 @@ public class MainMenu : MonoBehaviour {
         JukeBox.AttachTo(this);
 		JukeBox.PlayMenu();
 		
-		minutesToBreath.Subscribe(OnTap);
-	    difficulty.Subscribe(OnTap);
-	    sound.Subscribe(OnTap);
-	    graphicsLevel.Subscribe(OnTap);	    
+		minutesToBreath.Subscribe(OnTap, false);
+	    difficulty.Subscribe(OnTap, false);
+	    sound.Subscribe(OnTap, false);
+	    graphicsLevel.Subscribe(OnTap, false);	    
 	}
 	
 	void OnTap(object value){

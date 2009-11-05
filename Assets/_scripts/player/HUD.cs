@@ -205,19 +205,21 @@ public class HUD : MonoBehaviour {
                 //  gameObject.SendMessage("Pause", true);
                 //  _state = GameState.PAUSE;
                 // }
-                if(menuButtonGUI){
+                if(menuButtonGUI){                    
                     if(Application.platform == RuntimePlatform.OSXPlayer){
                         foreach(iPhoneTouch touch in iPhoneInput.touches){
                 	        Vector2 touchCoords = new Vector2(touch.position.x, Screen.height - touch.position.y);
-                	        if(touch.phase != iPhoneTouchPhase.Ended && menuButtonGUI.HitTest(touchCoords)){                	                           	            
+                	        if(touch.phase != iPhoneTouchPhase.Ended && menuButtonGUI.HitTest(touchCoords)){
+                	            JukeBox.Tap();
                                 gameObject.SendMessage("Pause", true);
                                 _state = GameState.PAUSE;                	            
                 	            break;
                 	        }   
                 	    }
                     }else{
-                        if(Input.GetMouseButtonDown(0) &&
+                        if(Input.GetMouseButtonDown(0) &&                        
                             menuButtonGUI.HitTest(Input.mousePosition)){                                
+                            JukeBox.Tap();
                              gameObject.SendMessage("Pause", true);
                              _state = GameState.PAUSE;
                         }                        
