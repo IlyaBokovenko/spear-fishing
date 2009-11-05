@@ -72,6 +72,10 @@ public class GameMaster : MonoBehaviour {
 	    private set{_depthMeter = value; isSurface.value = value <= 0;}
 	}
 	
+	public void SetUnderwaterLevel(float newUnderwaterLevel){
+	    underwaterLevel = newUnderwaterLevel - 0.05f;
+	}
+	
 	// is player on surface
 	public ValueHolder isSurface;
 	

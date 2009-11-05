@@ -32,6 +32,7 @@
 		09D1365C10A1EFFF00DEE39B /* FBSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D1364F10A1EFFF00DEE39B /* FBSession.m */; };
 		09D1365D10A1EFFF00DEE39B /* FBStreamDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D1365010A1EFFF00DEE39B /* FBStreamDialog.m */; };
 		09D1365E10A1EFFF00DEE39B /* FBXMLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D1365210A1EFFF00DEE39B /* FBXMLHandler.m */; };
+		09F1D87F10A33D7500F7A13E /* crashFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 09F1D87E10A33D7500F7A13E /* crashFix.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		5682F4B20F3B34FF007A219C /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5682F4B10F3B34FF007A219C /* MediaPlayer.framework */; };
 		5692F3DD0FA9D8E500EBA2F1 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5692F3DC0FA9D8E500EBA2F1 /* CoreLocation.framework */; };
@@ -117,6 +118,7 @@
 		09D1365010A1EFFF00DEE39B /* FBStreamDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBStreamDialog.m; sourceTree = "<group>"; };
 		09D1365110A1EFFF00DEE39B /* FBXMLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBXMLHandler.h; sourceTree = "<group>"; };
 		09D1365210A1EFFF00DEE39B /* FBXMLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBXMLHandler.m; sourceTree = "<group>"; };
+		09F1D87E10A33D7500F7A13E /* crashFix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = crashFix.m; path = Classes/crashFix.m; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* SpearFishing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpearFishing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5682F4B10F3B34FF007A219C /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
@@ -184,6 +186,7 @@
 		0975CA1F1084A27E004BC774 /* OtherSources */ = {
 			isa = PBXGroup;
 			children = (
+				09F1D87E10A33D7500F7A13E /* crashFix.m */,
 				09D1363710A1EFFF00DEE39B /* Adwhirl */,
 				09D1363B10A1EFFF00DEE39B /* fbconnect */,
 				094AF6AC10A03FEE007CF61A /* common.h */,
@@ -440,6 +443,7 @@
 				09D1365C10A1EFFF00DEE39B /* FBSession.m in Sources */,
 				09D1365D10A1EFFF00DEE39B /* FBStreamDialog.m in Sources */,
 				09D1365E10A1EFFF00DEE39B /* FBXMLHandler.m in Sources */,
+				09F1D87F10A33D7500F7A13E /* crashFix.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

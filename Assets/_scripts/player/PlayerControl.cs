@@ -48,7 +48,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	}
 	
 	void Update () {
-		if(gun.animation.isPlaying) return;
+        // if(gun.animation.isPlaying) return;
         if(!gameMaster.isGame) return;		
 			
 		if(Application.platform == RuntimePlatform.OSXEditor) {
