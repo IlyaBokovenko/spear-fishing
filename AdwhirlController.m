@@ -50,7 +50,8 @@
 }
 
 -(void)adjustViewSize{	
-	view.frame = CGRectMake(320-48-2, (480-320)/2, 48, 320);
+	static const int statusBarHeight = 26;
+	view.frame = CGRectMake(320-48-statusBarHeight-2, (480-320)/2, 48, 320);
 }
 
 #pragma mark ARRollerDelegate

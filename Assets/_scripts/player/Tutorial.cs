@@ -172,17 +172,18 @@ public class Tutorial : MonoBehaviour {
     }
     
     class PraiseState : ChainedState{
-        static Rect rectGood;
+        Rect rectGood;
         const float timeToShowMessage = 3.0f;
         float startTime;
-        static PraiseState(){
-            const float width = 50;
-            rectGood = new Rect((Screen.width -  width)/2 + 5, 120, width, 20);
-        }
         
         public PraiseState(Tutorial _context, ChainedState _back, ChainedState _next)
         :base(_context, _back, _next){
             startTime = Time.time;
+            
+            Rect crosshair = context.crosshairGUI.GetScreenRect();
+            float center = crosshair.x + crosshair.width/2;
+            const float width = 50;
+            rectGood = new Rect(center -  width/2, 120, width, 20);            
         }
         
         public override void OnGUI(){

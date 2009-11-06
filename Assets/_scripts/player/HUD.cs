@@ -162,16 +162,10 @@ public class HUD : MonoBehaviour {
 		rcHealth = new Rect(216, 264, 48, 26);
 		
 		// status
-		float statusOffset = gameMaster.isFreeVersion ? 50 : 0;
-		float statusHeight = statusGUI.GetScreenRect().height;
-		Vector3 pos = statusGUI.transform.position;
-		pos.y = (Screen.height - statusOffset - statusHeight) / Screen.height;
-		statusGUI.transform.position = pos;		
 		Rect rcStatus = statusGUI.GetScreenRect();
-		rcStatus.y = Screen.height - rcStatus.height - rcStatus.y;
-		rcCount = new Rect(rcStatus.x + 49, rcStatus.y - 2, 29, rcStatus.height);
-		rcWeight = new Rect(rcStatus.x + 118, rcStatus.y - 2, 84, rcStatus.height);
-		rcLives = new Rect(rcStatus.x + 215, rcStatus.y - 2, 32, rcStatus.height);		
+		rcCount = new Rect(rcStatus.x + 49, - 2, 29, rcStatus.height);
+		rcWeight = new Rect(rcStatus.x + 118, - 2, 84, rcStatus.height);
+		rcLives = new Rect(rcStatus.x + 215, - 2, 32, rcStatus.height);		
 	}
 
 	void OnGUI() {	    
