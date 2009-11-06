@@ -59,9 +59,14 @@ public class GameMaster : MonoBehaviour {
 	    return PrefHolder.newBool("game", false);
 	}
 	
-	static bool showTutorialNextTime = false;
 	public static void ShowTutorialNextTime(){
-	    showTutorialNextTime = true;
+	    PrefHolder.newBool("ShowTutorial", true).value = true;
+	}
+	private static void DontShowTutorialNextTime(){
+	    PrefHolder.newBool("ShowTutorial", true).value = false;
+	}
+	public static bool IsNeedShowTutorial(){
+	    return PrefHolder.newBool("ShowTutorial", true);
 	}
 			
 	// depth
@@ -97,9 +102,9 @@ public class GameMaster : MonoBehaviour {
 	    isFreeVersion = PrefHolder.newBool("IsFreeVersion", false);
 	    
 	    tutorial = (Tutorial)GetComponent(typeof(Tutorial));
-	    if(showTutorialNextTime){
+	    if(IsNeedShowTutorial()){
 	        tutorial.enabled = true;
-	        showTutorialNextTime = false;
+	        DontShowTutorialNextTime();
 	    }
 	        
 	}
@@ -307,7 +312,7 @@ public class GameMaster : MonoBehaviour {
 	    airLeft = airLowTreshold - 0.1f;
 	}
 	
-	public void UnlockOxygen(){
+	public void UnlockOxygen(){	    
 	    airLocked = false;
 	}
 	

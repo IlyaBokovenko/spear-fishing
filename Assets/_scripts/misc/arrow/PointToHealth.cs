@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class Arrow : MonoBehaviour {
+public class PointToHealth : MonoBehaviour {
     Transform _transform;
     Transform _heartTransform;
     GameObject heart;

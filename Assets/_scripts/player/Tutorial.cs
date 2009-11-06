@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Tutorial : MonoBehaviour {    
     public GUITexture arrowGUI;
+    public GUITexture crosshairGUI;
     
 	StateMachine sm;
     
@@ -68,46 +69,181 @@ public class Tutorial : MonoBehaviour {
 	
 	class TutorialState : State{
         protected Tutorial context;
-
+        
         public TutorialState(Tutorial _context){
-            context = _context;
+            context = _context;            
         }
+        
+        protected void EndTutorial(){
+            sm.MoveTo(null);
+            context.enabled = false;            
+        }
+        
+        protected GameObject Create3DArrow(){
+            GameObject player = GameObject.FindWithTag("Player");
+            GameObject arrow = (GameObject)Instantiate(context.arrow3D, Vector3.zero, Quaternion.identity);            
+            arrow.transform.parent = player.transform;
+            arrow.transform.localPosition = new Vector3(-0.19f, 0f, 0.3f);
+            return arrow;
+        }
+        
+        protected HighlightableControlButton CreateBlinking2DArrow(){
+            Texture2D emptyTexture = CreateEmptyTexture();            
+            HighlightableControlButton arrow =  new HighlightableControlButton(context, context.arrowGUI, null, emptyTexture, context.arrow2D);
+            arrow.StartBlinking();
+            return arrow;
+        }
+        
+        protected void Set2DArrowPos(Vector2 point){
+            Vector3 position = context.arrowGUI.transform.position;
+            position.x = point.x/Screen.width;
+            position.y = 1.0f - point.y/Screen.height;
+            context.arrowGUI.transform.position = position;
+        }
+        protected void Point2DArrowToCrosshair(){
+            Vector3 pos = context.arrowGUI.transform.position;
+            pos.x = context.crosshairGUI.transform.position.x;
+            pos.y = context.crosshairGUI.transform.position.y;
+            context.arrowGUI.transform.position = pos;
+        }
+        
+        private Texture2D CreateEmptyTexture(){
+            Texture2D empty = new Texture2D(64,64);
+            empty.SetPixels(new Color[64*64], 0);
+            empty.Apply();
+            return empty;            
+        }     
     }
     
-    class WelcomeState : TutorialState{
+    class ChainedState : TutorialState{
+        protected ChainedState back, next;
+        
+        Rect rectNext, rectBack, rectSkip;
+        
+        public ChainedState(Tutorial _context, ChainedState _back, ChainedState _next)
+        :base(_context)
+        {
+            back = _back;
+            next = _next;
+            
+            const float margin = 80;
+            const float width = 60;
+            float top = context.gameMaster.isFreeVersion ? 80 : 30;
+            rectBack = new Rect(margin, top, width, 30);
+            rectNext = new Rect(Screen.width - (width + margin), top, width, 30);            
+            rectSkip = new Rect((Screen.width -  width)/2, top, width, 30);            
+        }
+        public ChainedState(Tutorial _context)
+        :this(_context, null, null){}
+        
+        public override void OnGUI(){
+             DrawControlButtons();
+        }
+        
+        protected void DrawBack(){
+         if(GUI.Button(rectBack, "<< Back")) MoveBack();
+        }
+        protected void DrawNext(){
+            if(GUI.Button(rectNext, "Next >>")) MoveNext();
+        }
+        protected void DrawSkip(){
+            if(GUI.Button(rectSkip, "Skip")) EndTutorial();
+        }
+        
+        protected virtual void DrawControlButtons(){
+            if(back != null) DrawBack();
+            if(next != null) DrawNext();
+            DrawSkip();
+        }     
+        
+        protected virtual void MoveNext(){
+            if(next != null) sm.MoveTo(next);
+        }
+        protected virtual void MoveBack(){
+            if(back != null) sm.MoveTo(back);
+        }
+        
+        protected void PraiseAndMoveNext(){
+            if(next != null){
+                sm.MoveTo(new PraiseState(context, back, next));
+            }
+        }        
+    }
+    
+    class PraiseState : ChainedState{
+        static Rect rectGood;
+        const float timeToShowMessage = 3.0f;
+        float startTime;
+        static PraiseState(){
+            rectGood = new Rect((Screen.width -  50)/2, 120, 70, 20);
+        }
+        
+        public PraiseState(Tutorial _context, ChainedState _back, ChainedState _next)
+        :base(_context, _back, _next){
+            startTime = Time.time;
+        }
+        
+        public override void OnGUI(){
+            base.OnGUI();
+            GUI.Box(rectGood, "GOOD !");
+        }
+        
+        public override void Do(){
+            if(Time.time - startTime > timeToShowMessage) MoveNext();
+        }
+    }    
+    
+    class WelcomeState : ChainedState{
         float initialTime;
         
-        public WelcomeState(Tutorial context):base(context){
+        public WelcomeState(Tutorial context)
+        :base(context)
+        {
+            next = new SwimState(context, null);
             initialTime = Time.time;
         }
         
         public override void OnGUI(){
-            GUI.Box(new Rect(120, 119, 240, 22), "Welcome to SpearFishing tutorial !");        
+            base.OnGUI();
+            GUI.Box(new Rect(135, 120, 210, 22), "Welcome to SpearFishing tutorial !");        
         }
 
         public override void Do(){
-            if(Time.time - initialTime > 4.0f)  sm.MoveTo(new SwimState(context));
-        }       
+            if(Time.time - initialTime > 4.0f)  MoveNext();
+        } 
+        
+        protected override void DrawControlButtons(){}      
     }
 
-    class SwimState : TutorialState{
-        const float DEPTH_TRESHOLD = 2.0f;
+    class SwimState : ChainedState{
+        const float DEPTH_TRESHOLD = 4.0f;
+        
+        bool isUp = true;
+        PointUpOrDown arrow;
 
         float initialDepth, minDepth, maxDepth;
-        bool isBlinkingDepthText = false;
+        bool isBlinkingDepthText = false;        
 
-        public SwimState(Tutorial context):base(context){}
+        public SwimState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new BoostState(context, this);
+        }
 
         public override void OnGUI(){
-            GUI.Box(new Rect(80, 119, 320, 22), "You can swim/dive by tilting your iPhone. Try it now.");        
+            base.OnGUI();
+            GUI.Box(new Rect(100, 119, 280, 22), "Swim up / down / sideways by tilting your device.");        
         }
 
         public override void Enter(){
             initialDepth = minDepth = maxDepth = context.depth;
             StartBlinkingDepthText();
+            GameObject obj = Create3DArrow();
+            arrow = (PointUpOrDown)obj.AddComponent(typeof(PointUpOrDown));
         }
 
         public override void Exit(){
+            Destroy(arrow.gameObject);
             StopBlinkingDepthText();
         }
 
@@ -115,10 +251,14 @@ public class Tutorial : MonoBehaviour {
             minDepth = Mathf.Min(minDepth, context.depth);
             maxDepth = Mathf.Max(maxDepth, context.depth);
 
-            if(initialDepth - minDepth > DEPTH_TRESHOLD ||
-                maxDepth - initialDepth > DEPTH_TRESHOLD ){
-                    sm.MoveTo(new BoostState(context));                    
-                }
+            if(isUp && initialDepth - minDepth > DEPTH_TRESHOLD){
+                isUp = false;
+                initialDepth = minDepth = maxDepth = context.depth;
+                arrow.PointDown();
+            }
+            if(!isUp && maxDepth - initialDepth > DEPTH_TRESHOLD){
+                PraiseAndMoveNext();            
+            }
         }
 
         // private
@@ -144,13 +284,18 @@ public class Tutorial : MonoBehaviour {
     	}    
     }
 
-    class BoostState : TutorialState{
+    class BoostState : ChainedState{
         OnPressedDelegate d;
 
-        public BoostState(Tutorial context):base(context){}
+        public BoostState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new FireState(context, this);
+        }
 
         public override void OnGUI(){
-            GUI.Box(new Rect(40, 119, 400, 22), "Good. Now press \"Boost\" button to boost your movement.");        
+            base.OnGUI();
+            GUI.Box(new Rect(120, 119, 240, 22), "Swim faster by pressing the \"Fins\" button");        
         }
 
         public override void Enter(){
@@ -168,47 +313,59 @@ public class Tutorial : MonoBehaviour {
         }
 
         void OnPressedBoost(bool down){
-            if(!down) return;
-            sm.MoveTo(new AimState(context));
+            if(down) PraiseAndMoveNext();
         }
     }
     
-    class AimState : TutorialState{
+    class AimState : ChainedState{
         OnPressedDelegate d;
+        HighlightableControlButton arrow;
 
-        public AimState(Tutorial context):base(context){}
+        public AimState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new RefuilingState(context, this);
+        }
 
         public override void OnGUI(){
-            GUI.Box(new Rect(80, 119, 320, 22), "You can aim your speargun by pressing this button.");        
+            base.OnGUI();
+            GUI.Box(new Rect(60, 115, 360, 36), "Aim your speargun using the \"Joystick\" button.\nThe black cross in the middle shows the direction of the launch");        
         }
 
         public override void Enter(){
             d = new OnPressedDelegate(this.OnPressedAim);
             context.buttonAim.AddPressedDelegate(d);
             context.buttonAim.StartBlinking();
+            arrow = CreateBlinking2DArrow();            
         }
 
         public override void Exit(){
             context.buttonAim.RemovePressedDelegate(d);
             context.buttonAim.StopBlinking();
+            arrow.StopBlinking();
         }
 
         public override void Do(){
+            Point2DArrowToCrosshair();
         }
 
         void OnPressedAim(bool down){
-            if(!down) return;
-            sm.MoveTo(new FireState(context));
+            if(down) PraiseAndMoveNext();
         }
     }
     
-    class FireState : TutorialState{
+    class FireState : ChainedState{
         OnPressedDelegate d;
 
-        public FireState(Tutorial context):base(context){}
+        public FireState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new HealthState(context, this);
+        }
 
         public override void OnGUI(){
-            GUI.Box(new Rect(100, 119, 280, 22), "Fire speargun by pressing this button");        
+            base.OnGUI();
+            GUI.Box(new Rect(90, 119, 300, 22), "Launch a spear by pressing the \"Speargun\" button.");        
         }
 
         public override void Enter(){
@@ -226,68 +383,74 @@ public class Tutorial : MonoBehaviour {
         }
 
         void OnPressedFire(bool down){
-            if(!down) return;
-            sm.MoveTo(new RefuilingState(context));
+            if(down) PraiseAndMoveNext();
         }
     }
 	
-    class RefuilingState : TutorialState{
+    class RefuilingState : ChainedState{
         HighlightableControlButton buttonArrow;
         Texture2D emptyTexture;
+        GameObject arrow;
         
-        public RefuilingState(Tutorial context):base(context){}
+        public RefuilingState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new FinalState(context);
+        }
 
         public override void OnGUI(){
-            GUI.Box(new Rect(100, 113, 280, 34), "Your oxygen level is depleting over time.\nFloat to surface to refill it.");
+            base.OnGUI();
+            GUI.Box(new Rect(110, 113, 260, 34), "Your oxygen supply depletes while diving.\nSwim to sea surface to refill the air tank.\nFollow the yellow arrow");
         }
 
         public override void Enter(){
-            emptyTexture = CreateEmptyTexture();
+            arrow = Create3DArrow();
+            arrow.transform.localPosition = new Vector3(0.18f, 0.08f, 0.3f);
+            arrow.AddComponent(typeof(PointUpOrDown));
+            
             context.gameMaster.LockOxygenLow();
-            // print(context.arrowGUI.texture);
-            buttonArrow =  new HighlightableControlButton(context, context.arrowGUI, null, emptyTexture, context.arrow2D);
-            buttonArrow.StartBlinking();
+            buttonArrow = CreateBlinking2DArrow();
+            Set2DArrowPos(new Vector2(155, 262));
         }
 
         public override void Exit(){
+            Destroy(arrow);
             context.gameMaster.UnlockOxygen();
             buttonArrow.StopBlinking();
         }
 
         public override void Do(){
             if(context.gameMaster.isSurface){
-                sm.MoveTo(new HealthState(context));
+                PraiseAndMoveNext();
             }            
         }
         
-        private Texture2D CreateEmptyTexture(){
-            Texture2D empty = new Texture2D(64,64);
-            empty.SetPixels(new Color[64*64], 0);
-            empty.Apply();
-            return empty;            
+        protected override void DrawControlButtons(){
+            DrawBack();
+            DrawSkip();
         }
-
     }
     
-   class HealthState : TutorialState{
-        GameObject player;
+   class HealthState : ChainedState{
         GameObject arrow;
         bool isBlinkingHealthText = false;        
 
-        public HealthState(Tutorial context):base(context){
-            player = GameObject.FindWithTag("Player");
+        public HealthState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new AimState(context, this);
         }
 
         public override void OnGUI(){
-            GUI.Box(new Rect(80, 113, 320, 34), "If your health run low,\njust find health icon near the bottom and eat it");        
+            base.OnGUI();
+            GUI.Box(new Rect(95, 113, 290, 50), "When your health levels runs low, you can search\n the sea floor for \"First Aid\" icons, and use them.\nFollow the yellow arrow to find one.");        
         }
 
         public override void Enter(){ 
             context.gameMaster.setHealth(90f);
             StartBlinkingHealthText();
-            arrow = (GameObject)Instantiate(context.arrow3D, Vector3.zero, Quaternion.identity);            
-            arrow.transform.parent = player.transform;
-            arrow.transform.localPosition = new Vector3(-0.15f, 0f, 0.3f);
+            arrow = Create3DArrow();
+            arrow.AddComponent(typeof(PointToHealth));
         }
 
         public override void Exit(){
@@ -297,7 +460,7 @@ public class Tutorial : MonoBehaviour {
 
         public override void Do(){
             if(context.gameMaster.getHealth() > 91f ){
-                    sm.MoveTo(new FinalState(context));                    
+                    MoveNext();
                 }
         }
 
@@ -324,13 +487,15 @@ public class Tutorial : MonoBehaviour {
     	}    
     }
     
-    class FinalState : TutorialState{
+    class FinalState : ChainedState{
         float initialTime;
 
-        public FinalState(Tutorial context):base(context){}
+        public FinalState(Tutorial context)
+        :base(context){}
 
         public override void OnGUI(){
-            GUI.Box(new Rect(100, 113, 280, 34), "Tutorial is complete!\nGood fishing!");        
+            base.OnGUI();
+            GUI.Box(new Rect(100, 113, 280, 34), "You have completed the tutorial successfully !\nGood Luck!");        
         }
 
         public override void Enter(){
@@ -339,10 +504,11 @@ public class Tutorial : MonoBehaviour {
         
         public override void Do(){
             if(Time.time - initialTime > 5){
-                context.enabled = false;
-                sm.MoveTo(null);
+                EndTutorial();
             }
         }
+        
+        protected override void DrawControlButtons(){}
 
     }
 }
