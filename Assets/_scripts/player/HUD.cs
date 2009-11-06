@@ -34,6 +34,7 @@ public class HUD : MonoBehaviour {
 	
 	//Menu
 	public Texture2D bgMenu;
+	public Texture2D textureFacebook;
 	public Texture2D bgGallery;
 	
 	//GUIStyle
@@ -167,7 +168,7 @@ public class HUD : MonoBehaviour {
 		rcHealth = new Rect(216, 264, 48, 26);
 		rcCount = new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height);
 		rcWeight = new Rect(rcStatus.x + 123, rcStatus.y, 70, rcStatus.height);
-		rcLives = new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height);
+		rcLives = new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height);		
 		
 		Vector3 pos = statusGUI.transform.position;
 		pos.y = gameMaster.isFreeVersion ? 0.76f : 0.92f;
@@ -301,6 +302,7 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);
 				GUI.Label(new Rect(375,262,88,24), "" + FishInfo.formatWeight(weight) + " lbs.", galleryText);
 				
+				GUI.DrawTexture(new Rect(243, 292, 90, 25), textureFacebook);
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
 				    JukeBox.Tap();
 				    PlayerPrefs.SetInt("totalFishes", fishes.Count);

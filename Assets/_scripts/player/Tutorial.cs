@@ -29,6 +29,7 @@ public class Tutorial : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+	    useGUILayout = false;
 	    gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
 	    hud = (HUD)GetComponent(typeof(HUD));
 	    
@@ -175,7 +176,8 @@ public class Tutorial : MonoBehaviour {
         const float timeToShowMessage = 3.0f;
         float startTime;
         static PraiseState(){
-            rectGood = new Rect((Screen.width -  50)/2, 120, 70, 20);
+            const float width = 50;
+            rectGood = new Rect((Screen.width -  width)/2 + 5, 120, width, 20);
         }
         
         public PraiseState(Tutorial _context, ChainedState _back, ChainedState _next)
@@ -185,7 +187,7 @@ public class Tutorial : MonoBehaviour {
         
         public override void OnGUI(){
             base.OnGUI();
-            GUI.Box(rectGood, "GOOD !");
+            GUI.Box(rectGood, "Good!");
         }
         
         public override void Do(){
@@ -216,7 +218,7 @@ public class Tutorial : MonoBehaviour {
     }
 
     class SwimState : ChainedState{
-        const float DEPTH_TRESHOLD = 4.0f;
+        const float DEPTH_TRESHOLD = 3.0f;
         
         bool isUp = true;
         PointUpOrDown arrow;
