@@ -72,7 +72,6 @@ public class HUD : MonoBehaviour {
 	private Rect rcAirTank;
 	private Rect rcCrosshair;
 	private Rect rcWatch;
-	private Rect rcStatus;
 	
 	private Rect rcMask;
 	private Rect rcDepth;
@@ -149,10 +148,6 @@ public class HUD : MonoBehaviour {
 		rcAirTank = new Rect(Screen.width / 2 - 120, Screen.height - 150, 100,150);
 		rcWatch = new Rect(Screen.width / 2 - 64, Screen.height - 130, 128 , 128);
 		
-		float statusHeight = gameMaster.isFreeVersion ? 50 : 0;
-		rcStatus = new Rect(Screen.width / 2 - 115, statusHeight, 229, 26);
-        // print("rcStatus : " + qqq(rcStatus));
-		
 		int yLayout = 134;
 		btPesume = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		yLayout += (int)btSize.y + 4;
@@ -165,13 +160,18 @@ public class HUD : MonoBehaviour {
 		rcMask = new Rect(0,0,Screen.width, Screen.height);
 		rcDepth = new Rect(216, 230, 48, 26);
 		rcHealth = new Rect(216, 264, 48, 26);
-		rcCount = new Rect(rcStatus.x + 50, rcStatus.y, 32, rcStatus.height);
-		rcWeight = new Rect(rcStatus.x + 123, rcStatus.y, 70, rcStatus.height);
-		rcLives = new Rect(rcStatus.x + 200, rcStatus.y, 32, rcStatus.height);		
 		
+		// status
+		float statusOffset = gameMaster.isFreeVersion ? 50 : 0;
+		float statusHeight = statusGUI.GetScreenRect().height;
 		Vector3 pos = statusGUI.transform.position;
-		pos.y = gameMaster.isFreeVersion ? 0.76f : 0.92f;
-		statusGUI.transform.position = pos;
+		pos.y = (Screen.height - statusOffset - statusHeight) / Screen.height;
+		statusGUI.transform.position = pos;		
+		Rect rcStatus = statusGUI.GetScreenRect();
+		rcStatus.y = Screen.height - rcStatus.height - rcStatus.y;
+		rcCount = new Rect(rcStatus.x + 49, rcStatus.y - 2, 29, rcStatus.height);
+		rcWeight = new Rect(rcStatus.x + 118, rcStatus.y - 2, 84, rcStatus.height);
+		rcLives = new Rect(rcStatus.x + 215, rcStatus.y - 2, 32, rcStatus.height);		
 	}
 
 	void OnGUI() {	    
@@ -182,12 +182,6 @@ public class HUD : MonoBehaviour {
 		switch(_state) {
 			case GameState.GAME :			
 			    isGame = true;   
-			    
-                // if(crosshair)
-                //      GUI.DrawTexture(rcCrosshair, crosshair);
-                //  if(mask)
-                //      GUI.DrawTexture(rcMask, mask);
-                
                 int depth = 0;
                 int health = 0;                
 
@@ -197,14 +191,6 @@ public class HUD : MonoBehaviour {
                 health = gameMaster.getHealth();
                 lives = gameMaster.getLives();
                 
-                // if(airTank[index])
-                //     GUI.DrawTexture(rcAirTank, airTank[index]);
-                // 
-                
-                // if(menuButton && GUI.Button(btMenu, menuButton, menuStyle)) {
-                //  gameObject.SendMessage("Pause", true);
-                //  _state = GameState.PAUSE;
-                // }
                 if(menuButtonGUI){                    
                     if(Application.platform == RuntimePlatform.OSXPlayer){
                         foreach(iPhoneTouch touch in iPhoneInput.touches){
@@ -225,22 +211,10 @@ public class HUD : MonoBehaviour {
                         }                        
                     }
                 }
-                
-                
-                // if(buttonFire != null)
-                //  buttonFire.Draw();
-                // if(buttonAim != null)
-                //  buttonAim.Draw();
-                // if(buttonBoost != null)
-                //  buttonBoost.Draw();
-                // 
-                // if(watch)
-                //  GUI.DrawTexture(rcWatch, watch);
-                // if(status)
-                //  GUI.DrawTexture(rcStatus, status);
 				
                 GUI.Label(rcDepth, "" + depth + " ft", depthText);
                 GUI.Label(rcHealth, health + "", healthText);
+                
                 //Status
                 GUI.Label(rcCount, "" + fishes.Count, statusText);
                 GUI.Label(rcWeight, FishInfo.formatWeight(weight) + " lbs.", statusText);
@@ -298,7 +272,7 @@ public class HUD : MonoBehaviour {
 				GUI.Label(new Rect(292,219,64,24), "" + fishInfo.getCount(FishInfo.GROUPER), galleryText);
 				GUI.Label(new Rect(340,219,80,24), "" + fishInfo.getWeightString(FishInfo.GROUPER) + " lbs.", galleryText);
 				
-				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);
+				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);				
 				GUI.Label(new Rect(375,262,88,24), "" + FishInfo.formatWeight(weight) + " lbs.", galleryText);
 				
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
