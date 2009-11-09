@@ -151,33 +151,35 @@ public class Tutorial : MonoBehaviour {
             if(GUI.Button(rectSkip, "Skip")) EndTutorial();
         }
         
-        protected virtual void DrawControlButtons(){
+        public virtual void DrawControlButtons(){
             if(back != null) DrawBack();
             if(next != null) DrawNext();
             DrawSkip();
         }     
         
-        protected virtual void MoveNext(){
+        public virtual void MoveNext(){
             if(next != null) sm.MoveTo(next);
         }
-        protected virtual void MoveBack(){
+        public virtual void MoveBack(){
             if(back != null) sm.MoveTo(back);
         }
         
         protected void PraiseAndMoveNext(){
             if(next != null){
-                sm.MoveTo(new PraiseState(context, back, next));
+                sm.MoveTo(new PraiseState(context, this));
             }
         }        
     }
     
     class PraiseState : ChainedState{
+        ChainedState parent;
         Rect rectGood;
         const float timeToShowMessage = 3.0f;
-        float startTime;
+        float startTime;        
         
-        public PraiseState(Tutorial _context, ChainedState _back, ChainedState _next)
-        :base(_context, _back, _next){
+        public PraiseState(Tutorial _context, ChainedState _parent)
+        :base(_context){
+            parent = _parent;            
             startTime = Time.time;
             
             Rect crosshair = context.crosshairGUI.GetScreenRect();
@@ -192,7 +194,11 @@ public class Tutorial : MonoBehaviour {
         }
         
         public override void Do(){
-            if(Time.time - startTime > timeToShowMessage) MoveNext();
+            if(Time.time - startTime > timeToShowMessage) parent.MoveNext();
+        }
+        
+        public override void DrawControlButtons(){
+            parent.DrawControlButtons();
         }
     }    
     
@@ -215,13 +221,13 @@ public class Tutorial : MonoBehaviour {
             if(Time.time - initialTime > 4.0f)  MoveNext();
         } 
         
-        protected override void DrawControlButtons(){}      
+        public override void DrawControlButtons(){}      
     }
 
     class SwimState : ChainedState{
         const float DEPTH_TRESHOLD = 3.0f;
         
-        bool isUp = true;
+        bool isUp;
         PointUpOrDown arrow;
 
         float initialDepth, minDepth, maxDepth;
@@ -239,6 +245,7 @@ public class Tutorial : MonoBehaviour {
         }
 
         public override void Enter(){
+            isUp = true;
             initialDepth = minDepth = maxDepth = context.depth;
             StartBlinkingDepthText();
             GameObject obj = Create3DArrow();
@@ -428,7 +435,7 @@ public class Tutorial : MonoBehaviour {
             }            
         }
         
-        protected override void DrawControlButtons(){
+        public override void DrawControlButtons(){
             DrawBack();
             DrawSkip();
         }
@@ -511,7 +518,7 @@ public class Tutorial : MonoBehaviour {
             }
         }
         
-        protected override void DrawControlButtons(){}
+        public override void DrawControlButtons(){}
 
     }
 }

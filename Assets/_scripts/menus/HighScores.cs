@@ -30,7 +30,7 @@ public class HighScores : MonoBehaviour {
 				players[index] = new PlayerScore();
 			}
 			players[index].id = index;
-			players[index].rect = new Rect(120, 52 + index * 24, 300, 24);
+			players[index].rect = new Rect(120, 70 + index * 24, 300, 24);
 			players[index].textStyle = textStyle;
 			index++;
 		}

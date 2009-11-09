@@ -161,7 +161,7 @@ public class HUD : MonoBehaviour {
 		rcDepth = new Rect(216, 230, 48, 26);
 		rcHealth = new Rect(216, 264, 48, 26);
 		
-		// status
+		// status		
 		Rect rcStatus = statusGUI.GetScreenRect();
 		rcCount = new Rect(rcStatus.x + 49, - 2, 29, rcStatus.height);
 		rcWeight = new Rect(rcStatus.x + 118, - 2, 84, rcStatus.height);

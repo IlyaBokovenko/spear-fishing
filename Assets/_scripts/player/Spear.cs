@@ -23,6 +23,7 @@ public class Spear : MonoBehaviour {
 		if(obj.tag == "Player" && fish != null) {
 			obj.SendMessage("addFish", fish.name + ":" + fish.transform.localScale.x);
 			((GenericScript)fish.GetComponent(typeof(FishAI))).DestroyGameObject();
+			fish = null;
 		}
 	}
 	
