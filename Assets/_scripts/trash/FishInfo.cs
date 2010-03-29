@@ -23,10 +23,10 @@ public class FishInfo {
 		return 0;
 	}
 	
-	public FishInfo(ArrayList fishes) {
+	public FishInfo(ArrayList arg_fishes) {
 		fishCount = new int[3];
 		fishWeight = new float[3];
-		foreach(string fish in fishes) {
+		foreach(string fish in arg_fishes) {
 			string[] param = fish.Split(":"[0]);
 			if(GROUPER == param[0]) {
 				fishCount[0]++;
@@ -93,3 +93,4 @@ public class FishInfo {
 		return result;
 	}	
 }
+

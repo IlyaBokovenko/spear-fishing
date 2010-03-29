@@ -47,7 +47,6 @@ public class GameMaster : MonoBehaviour {
 	    }
 	}
 	public ValueHolder isOxygenLow;	
-	
 	// is player in game or in menu
 	public PrefHolder isGame;
 	
@@ -58,6 +57,10 @@ public class GameMaster : MonoBehaviour {
 	public static bool IsGame(){
 	    return PrefHolder.newBool("game", false);
 	}
+	
+	public static void ShowAd(bool value) {
+		PrefHolder.newBool("game", false).value = value;
+	} 
 	
 	public static void ShowTutorialNextTime(){
 	    PrefHolder.newBool("ShowTutorial", true).value = true;
@@ -96,17 +99,12 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void Awake(){
-	    isGame = PrefHolder.newBool("game", false);
+	    isGame = PrefHolder.newBool("isGame", false);
 	    isOxygenLow = new ValueHolder(false);
 	    isSurface = new ValueHolder(false);	    
 	    isFreeVersion = PrefHolder.newBool("IsFreeVersion", false);
 	    
 	    tutorial = (Tutorial)GetComponent(typeof(Tutorial));
-	    if(IsNeedShowTutorial()){
-	        tutorial.enabled = true;
-	        DontShowTutorialNextTime();
-	    }
-	        
 	}
 	
 	void Start () {
@@ -115,7 +113,14 @@ public class GameMaster : MonoBehaviour {
 		playerControl = (PlayerControl)gameObject.GetComponent(typeof(PlayerControl));
         // fade = (FadeEffect)gameObject.GetComponent(typeof(FadeEffect));
 		
-		minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 2);
+		minutesToBreath = PlayerPrefs.GetInt("minutesToBreath", 3);
+		
+		if(IsNeedShowTutorial()){
+	        tutorial.enabled = true;
+	        DontShowTutorialNextTime();
+	    } else {
+		    hud.InitTasks();
+		}
 		
 		if(PlayerPrefs.HasKey("benchMark")) {
 			benchMark = true;
@@ -130,27 +135,27 @@ public class GameMaster : MonoBehaviour {
 			bmFPSCount = 0;
 		} else {			
             Load();
-            if(isFailed)
+            if(isFailed) {
                 SpendLife();
+			}
 		}		
 		
 		Pause(false);
 	}
 	
 	void Update () {
-	    
-	    if(isComplete)
-	        return;
-	    isComplete = currentTimer >= gameTimer;
-	    if(isComplete){
+		if(isComplete || isFailed) {
+			return;
+		}
+		
+		/*
+		if(isComplete = currentTimer >= gameTimer) {
 	        Complete();
 	        return;
 	    }
-	    
-	    if(isFailed)
-	        return;	        
-	    isFailed = airLeft <= 0.0 || health < 1.0;
-	    if(isFailed){
+	    */
+	
+	    if(isFailed = airLeft <= 0.0 || health < 1.0){
 	        Fail();
 	        return;
 	    }
@@ -173,7 +178,7 @@ public class GameMaster : MonoBehaviour {
     			    airLeft -= airStep;		        
 		    }
 		} else {		    
-		    float rate = 0.1f*Time.deltaTime;
+		    float rate = 0.15f * Time.deltaTime;
 			if(airLeft + rate <= 1.0f)
 				airLeft += rate;
 		}	    
@@ -219,8 +224,9 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	public void Fail() {	    
-		if(hud)
-			hud.showFail();		
+		if(hud) {
+			hud.showFail();
+		}		
     	Pause(true);		
 	}
 	
@@ -256,7 +262,7 @@ public class GameMaster : MonoBehaviour {
 	    isBeingBiting = false;
 	}
 	
-	void Save () {
+	void Save() {
 	    if(tutorial.enabled == true) return;
 	    
 		PlayerPrefs.SetFloat("health", health);
@@ -265,25 +271,23 @@ public class GameMaster : MonoBehaviour {
 		PlayerPrefs.SetFloat("timer", currentTimer);
 		PlayerPrefs.SetInt("lives", lives);
 		
-		HUD hud = (HUD)gameObject.GetComponent(typeof(HUD));
-		if(hud)
-			hud.saveFishes();
+		if(hud) {
+			hud.Save();
+		}
 	}
 	
 	void Load() {
-         // if(Application.platform == RuntimePlatform.OSXEditor)
-         //      return;
-	    
         health = PlayerPrefs.GetFloat("health", healthMax);
 		airLeft = PlayerPrefs.GetFloat("air", 1.0f);
 		currentTimer = PlayerPrefs.GetFloat("timer", 0.0f);
 		lives = PlayerPrefs.GetInt("lives", 3);
 		
-		if(PlayerPrefs.HasKey("transform"))
+		if(PlayerPrefs.HasKey("transform")) {
 			setPosition(PlayerPrefs.GetString("transform"));
-		
-		if(hud)
-			hud.loadFishes();
+		}
+		if(hud) {
+			hud.Load();
+		}
 	}
 	
 	public void Pause(bool arg) {
@@ -338,8 +342,8 @@ public class GameMaster : MonoBehaviour {
 	}
 	
 	void OnApplicationQuit() {	    
-    		if(!benchMark) {
-    			Save();
-    		}
+    	if(!benchMark) {
+    		Save();
+    	}
 	}
 }

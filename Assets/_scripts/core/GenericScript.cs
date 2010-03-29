@@ -9,6 +9,8 @@ public class GenericScript : MonoBehaviour {
 	}
 	
 	public void DestroyGameObject(){
-	    Destroy(gameObject);
+	    if(gameObject != null)  {
+			Destroy(gameObject);
+		}
 	}
 }

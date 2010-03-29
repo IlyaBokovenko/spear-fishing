@@ -3,16 +3,13 @@ using System.Collections;
 
 public class HUD : MonoBehaviour {
 	public bool hideHud = false;
-
     public Texture2D fade;
     Fader fader;
 	//Textures
 	//GUI
 	
-	public Texture2D crosshair;
-	public GUITexture crosshairGUI;
-	public Texture2D mask;
-	public Texture2D[] airTank;
+    public GUITexture crosshairGUI;
+    public Texture2D[] airTank;
 	public GUITexture airTankGUI;
 	public GUITexture fireButtonGUI;
 	public Texture2D fireButtonOn;
@@ -28,9 +25,9 @@ public class HUD : MonoBehaviour {
 	public Texture2D aimButtonHighlight;
     public Texture2D menuButton;
     public GUITexture menuButtonGUI; // for game mode only
-	public Texture2D watch;
-	public Texture2D status;
 	public GUITexture statusGUI;
+	public Texture2D labelFail;
+	public Texture2D labelComplete;
 	
 	//Menu
 	public Texture2D bgMenu;
@@ -51,13 +48,25 @@ public class HUD : MonoBehaviour {
 	public GUIStyle buttonTryAgain;
 	public GUIStyle buttonContinue;
 	public GUIStyle buttonNull;
+	public GUIStyle buttonObjectives;
+    public GUIStyle buttonNext;
+	public GUIStyle buttonStart;
+	public GUIStyle buttonGameOver;
+	public GUIStyle buttonBuy;
+	public GUIStyle buttonCancel;
+    
+	public GameObject tasksText;
 
+	public GUIStyle objectivesStyle;
+	public GUIStyle objectivesTitleStyle;
+	
 	//Menu
 	private Vector2 btSize = new Vector2(238,32);
 	private Rect btPesume;
 	private Rect btGallery;
 	private Rect btMainMenu;
 	private Rect btFail;
+   	private Rect btObjectives;
 	
 	//GUI
 	private HighlightableControlButton buttonFire;	
@@ -81,11 +90,16 @@ public class HUD : MonoBehaviour {
 	private Rect rcLives;	
 	
 	private bool isComplete = false;
+	private bool IsFreeVersion = false;
+	
+	public static string upgradeText = "You have completed all levels of the free version. Buy full version now and enjoy more fun challenges.";
 	
 	private int lives = 0;
 	private string benchString = "";
-	private ArrayList fishes;
-	private FishInfo fishInfo;
+    private FishesInfo fishesInfo;
+ 	private Tasks tasks;
+	private int level;
+
 	private GameMaster gameMaster = null;
 	private float weight = 0.0f;
 	
@@ -98,7 +112,9 @@ public class HUD : MonoBehaviour {
     	FAIL,
     	GALLERY,
     	BENCHMARK,
-    	HIDEHUD	    
+    	HIDEHUD,
+	    OBJECTIVES,
+		UPGRADE
 	}
 	
 	private GameState _state;
@@ -118,15 +134,41 @@ public class HUD : MonoBehaviour {
 	
 	void Awake() {	    
 		useGUILayout = false;
+		IsFreeVersion = PlayerPrefs.HasKey("IsFreeVersion") ? PlayerPrefs.GetInt("IsFreeVersion") > 0 ? true : false : false;
 		fader = new Fader(fade);
 		buttonFire = new HighlightableControlButton(this, fireButtonGUI, fireButtonOn, fireButtonOff, fireButtonHighlight);
 		buttonBoost = new HighlightableControlButton(this, boostButtonGUI, boostButtonOn, boostButtonOff, boostButtonHighlight);
 		buttonAim =  new HighlightableControlButton(this, aimButtonGUI, aimButtonOn, aimButtonOff, aimButtonHighlight);		
-		fishes = new ArrayList();
-		
+		fishesInfo = new FishesInfo();
 		airTankLevel = new ValueHolder(airTank.Length - 1);
 		airTankLevel.Subscribe(OnAirTankLevelChanged);
 	}	
+	
+	public void InitTasks() {
+		if(tasks == null) {
+			level =  PlayerPrefs.HasKey("level") ? PlayerPrefs.GetInt("level") : 0;
+			tasks = new Tasks(level, tasksText);
+			tasks.Show();
+		}
+	}
+	
+	public void showAimButton(bool arg) {
+		aimButtonGUI.active = arg;
+	}
+	
+	public void InitTasksWithStart() {
+		if(tasks == null) {
+			level =  PlayerPrefs.HasKey("level") ? PlayerPrefs.GetInt("level") : 0;
+			tasks = new Tasks(level, tasksText);
+			tasks.Show();
+			
+			if(gameMaster) {
+				gameMaster.Pause(false);
+			}
+			tasks.StartTask();
+			_state = GameState.OBJECTIVES;
+		}
+	}
 	
 	void OnAirTankLevelChanged(object value){
 	   if(airTankGUI != null) 
@@ -148,10 +190,12 @@ public class HUD : MonoBehaviour {
 		rcAirTank = new Rect(Screen.width / 2 - 120, Screen.height - 150, 100,150);
 		rcWatch = new Rect(Screen.width / 2 - 64, Screen.height - 130, 128 , 128);
 		
-		int yLayout = 134;
+		int yLayout = 124;
 		btPesume = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		yLayout += (int)btSize.y + 4;
 		btGallery = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
+		yLayout += (int)btSize.y + 4;
+		btObjectives = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y); 
 		yLayout += (int)btSize.y + 4;
 		btMainMenu = new Rect((Screen.width - btSize.x) / 2, yLayout, btSize.x, btSize.y);
 		
@@ -162,7 +206,7 @@ public class HUD : MonoBehaviour {
 		rcHealth = new Rect(216, 264, 48, 26);
 		
 		// status		
-		Rect rcStatus = statusGUI.GetScreenRect();
+		Rect rcStatus = statusGUI != null ? statusGUI.GetScreenRect() : new Rect(0,0,0,0);
 		rcCount = new Rect(rcStatus.x + 49, - 2, 29, rcStatus.height);
 		rcWeight = new Rect(rcStatus.x + 118, - 2, 84, rcStatus.height);
 		rcLives = new Rect(rcStatus.x + 215, - 2, 32, rcStatus.height);		
@@ -175,8 +219,9 @@ public class HUD : MonoBehaviour {
 	    
 		switch(_state) {
 			case GameState.GAME :			
-			    isGame = true;   
-                int depth = 0;
+			    GameMaster.ShowAd(false);
+				isGame = true;
+				int depth = 0;
                 int health = 0;                
 
                 int airLevel = (int)Mathf.Round(gameMaster.airLeft * (airTank.Length - 1));
@@ -192,17 +237,22 @@ public class HUD : MonoBehaviour {
                 	        if(touch.phase != iPhoneTouchPhase.Ended && menuButtonGUI.HitTest(touchCoords)){
                 	            JukeBox.Tap();
                                 gameObject.SendMessage("Pause", true);
-                                _state = GameState.PAUSE;                	            
-                	            break;
+                                _state = GameState.PAUSE;
+								break;
                 	        }   
                 	    }
                     }else{
                         if(Input.GetMouseButtonDown(0) &&                        
                             menuButtonGUI.HitTest(Input.mousePosition)){                                
                             JukeBox.Tap();
-                             gameObject.SendMessage("Pause", true);
-                             _state = GameState.PAUSE;
-                        }                        
+                            if(gameObject != null) {
+								gameObject.SendMessage("Pause", true);
+                            }
+							if(tasks != null) {
+								tasks.Hide();
+							}
+							_state = GameState.PAUSE;
+						}                        
                     }
                 }
 				
@@ -210,69 +260,100 @@ public class HUD : MonoBehaviour {
                 GUI.Label(rcHealth, health + "", healthText);
                 
                 //Status
-                GUI.Label(rcCount, "" + fishes.Count, statusText);
-                GUI.Label(rcWeight, FishInfo.formatWeight(weight) + " lbs.", statusText);
+                GUI.Label(rcCount, "" + fishesInfo.FishesCount, statusText);
+                GUI.Label(rcWeight, fishesInfo.getWeightToString() + " lbs.", statusText);
                 GUI.Label(rcLives, "" + lives, statusText);
                 fader.OnGUI();
+				
+				if(tasks != null) {
+					switch(tasks.Update(Time.deltaTime)) {
+						case Tasks.TaskStates.IN_PROCESS :
+							break;
+						case Tasks.TaskStates.FAIL :
+							gameObject.SendMessage("Pause", true);
+	                        _state = GameState.OBJECTIVES;
+							break;
+						case Tasks.TaskStates.COMPLETE :
+							gameObject.SendMessage("Pause", true);
+	                        _state = GameState.OBJECTIVES;
+							break;
+					}
+				}
 				break;
 			case GameState.PAUSE :
-				if(bgMenu)
+				GameMaster.ShowAd(false);
+				if(bgMenu) {
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgMenu);
+				}
 				if(GUI.Button(btPesume, "", buttonResume)) {
 				    JukeBox.Tap();
-					if(gameMaster)
+					if(gameMaster) {
 						gameMaster.Pause(false);
+					}
+					if(tasks != null) {
+						tasks.Show();
+					}
 					_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 				}
 				if(GUI.Button(btGallery, "", buttonGallery)) {
 				    JukeBox.Tap();
-					fishInfo = new FishInfo(fishes);
 					_state = GameState.GALLERY;
 				}
-				if(GUI.Button(btMainMenu, "", buttonMainMenu)) {
+				if(tasks != null) {
+					if(GUI.Button(btObjectives, "", buttonObjectives)) {
+						JukeBox.Tap();
+						_state = GameState.OBJECTIVES;
+					}
+				}
+				if(GUI.Button(tasks != null ? btMainMenu : btObjectives, "", buttonMainMenu)) {
 				    JukeBox.Tap();
 					if(gameMaster)
 						gameMaster.goMainMenu();
 				}
 				break;
 			case GameState.FAIL:
+				GameMaster.ShowAd(false);
 				fader.FadeIn();
 				fader.OnGUI();				
 				if(lives > 1) {
 					if(GUI.Button(btFail, "", buttonContinue)) {
 					    JukeBox.Tap();
-						if(gameMaster)
+						if(gameMaster) {
 							gameMaster.Continue();
+						}
 						_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
 					}
 				} else {
-					if(GUI.Button(btFail, "", buttonTryAgain)) {
+					//tasks.Hide();
+					if(GUI.Button(btFail, "", buttonGameOver)) {
 					    JukeBox.Tap();
-						MainMenu.CleanPlayerPrefs();
-						Application.LoadLevel(Application.loadedLevel);
+						showComplete();
+						//MainMenu.CleanPlayerPrefs();
+						//Application.LoadLevel(Application.loadedLevel);
 					}
 				}				
 				break;
 			case GameState.GALLERY :			    
-				if(bgGallery)
+				GameMaster.ShowAd(false);
+				if(bgGallery) {
 					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgGallery);
+				}
+				GUI.Label(new Rect(292,125,64,24), "" + fishesInfo.getCountByType(FishesInfo.YELLOWFINTUNA), galleryText);
+				GUI.Label(new Rect(340,125,80,24), "" + fishesInfo.getWeightByTypeToString(FishesInfo.YELLOWFINTUNA) + " lbs.", galleryText);
 				
-				GUI.Label(new Rect(292,125,64,24), "" + fishInfo.getCount(FishInfo.YELLOWFINTUNA), galleryText);
-				GUI.Label(new Rect(340,125,80,24), "" + fishInfo.getWeightString(FishInfo.YELLOWFINTUNA) + " lbs.", galleryText);
+				GUI.Label(new Rect(292,172,64,24), "" + fishesInfo.getCountByType(FishesInfo.REDSNAPPER), galleryText);
+				GUI.Label(new Rect(340,172,80,24), "" + fishesInfo.getWeightByTypeToString(FishesInfo.REDSNAPPER) + " lbs.", galleryText);
 				
-				GUI.Label(new Rect(292,172,64,24), "" + fishInfo.getCount(FishInfo.REDSNAPPER), galleryText);
-				GUI.Label(new Rect(340,172,80,24), "" + fishInfo.getWeightString(FishInfo.REDSNAPPER) + " lbs.", galleryText);
+				GUI.Label(new Rect(292,219,64,24), "" + fishesInfo.getCountByType(FishesInfo.GROUPER), galleryText);
+				GUI.Label(new Rect(340,219,80,24), "" + fishesInfo.getWeightByTypeToString(FishesInfo.GROUPER) + " lbs.", galleryText);
 				
-				GUI.Label(new Rect(292,219,64,24), "" + fishInfo.getCount(FishInfo.GROUPER), galleryText);
-				GUI.Label(new Rect(340,219,80,24), "" + fishInfo.getWeightString(FishInfo.GROUPER) + " lbs.", galleryText);
-				
-				GUI.Label(new Rect(136,262,64,24), "" + fishes.Count, galleryText);				
-				GUI.Label(new Rect(375,262,88,24), "" + FishInfo.formatWeight(weight) + " lbs.", galleryText);
+				GUI.Label(new Rect(136,262,64,24), "" + fishesInfo.FishesCount, galleryText);				
+				GUI.Label(new Rect(375,262,88,24), "" + fishesInfo.getWeightToString() + " lbs.", galleryText);
 				
 				if(GUI.Button(new Rect(100,292,237, 88), "", buttonNull)){
 				    JukeBox.Tap();
-				    PlayerPrefs.SetInt("totalFishes", fishes.Count);
-				    PlayerPrefs.SetFloat("totalWeight", weight);				    
+				    PlayerPrefs.SetInt("totalFishes", fishesInfo.FishesCount);
+				    PlayerPrefs.SetFloat("totalWeight", fishesInfo.getWeight());				    
 				    PlayerPrefs.SetInt("upload", 1);
 				}
 				
@@ -280,7 +361,7 @@ public class HUD : MonoBehaviour {
 				    JukeBox.Tap();
 					if(isComplete) {
 						if(Application.levelCount > 2) {
-							PlayerPrefs.SetString("player", "Player:" + fishes.Count + ":" + weight);
+							PlayerPrefs.SetString("player", "Player:" + fishesInfo.FishesCount + ":" + fishesInfo.getWeight());
 							Application.LoadLevel(Application.levelCount - 1);
 						} else  
 							Application.LoadLevel(0);
@@ -296,7 +377,90 @@ public class HUD : MonoBehaviour {
 					Application.LoadLevel(0);
 				}
 				break;
+			case GameState.UPGRADE :
+				GameMaster.ShowAd(false);
+				IsFreeVersion = PlayerPrefs.HasKey("IsFreeVersion") ? PlayerPrefs.GetInt("IsFreeVersion") > 0 ? true : false : false;
+				if(IsFreeVersion) {
+					if(bgMenu) {
+						GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgMenu);
+					}
+					GUI.Label(new Rect((Screen.width - 180)/ 2,100, 180, 140),"Congratulations!", objectivesTitleStyle);
+	                GUI.Label(new Rect(50,140,Screen.width - 100, Screen.height - 200), upgradeText, objectivesStyle);
+					if(GUI.Button(new Rect(1, Screen.height - btSize.y - 20, btSize.x, btSize.y), "", buttonBuy)) {
+						JukeBox.Tap();
+						PlayerPrefs.SetInt("upgrade", 1);
+					}
+					if(GUI.Button(new Rect((Screen.width - btSize.x - 1), Screen.height - btSize.y - 20, btSize.x, btSize.y), "", buttonCancel)) {
+						JukeBox.Tap();
+						showComplete();
+					}
+				} else {
+					_state = GameState.OBJECTIVES;
+					if(MainMenu.OpenNewLevel(level)) {
+						tasks.StartTask(level);
+						PlayerPrefs.SetInt("level", level);
+					} else {
+						showComplete();
+					}
+				}
+				break;
 			case GameState.HIDEHUD :
+				break;
+			case GameState.OBJECTIVES :
+				GameMaster.ShowAd(true);
+				if(bgMenu) {
+					GUI.DrawTexture(new Rect(0,0,Screen.width, Screen.height), bgMenu);
+				}
+				GUI.Label(new Rect(30,100, Screen.width - 60, 140),"objectives :", objectivesTitleStyle);
+                GUI.Label(new Rect(40,140,Screen.width - 80, Screen.height - 200), MainMenu.objectives[level], objectivesStyle);
+				
+				switch(tasks.State) {
+					case Tasks.TaskStates.COMPLETE :
+						if(labelComplete) {
+							GUI.DrawTexture(new Rect((Screen.width - 256)/2, (Screen.height - 256)/2, 256, 256), labelComplete);
+						}
+						if(GUI.Button(new Rect((Screen.width - btSize.x)/2, Screen.height - btSize.y - 20  - (IsFreeVersion ? 50 : 0), btSize.x, btSize.y), "", buttonNext)) {
+							JukeBox.Tap();
+							level++;
+							if(MainMenu.OpenNewLevel(level)) {
+								tasks.StartTask(level);
+								PlayerPrefs.SetInt("level", level);
+							} else {
+								if(IsFreeVersion) {
+									showUpgrade();
+								} else {
+								   	showComplete();
+								}
+							}
+						}
+						break;
+					case Tasks.TaskStates.FAIL :
+						if(labelFail) {
+							GUI.DrawTexture(new Rect((Screen.width - 256)/2, (Screen.height - 256)/2, 256, 256), labelFail);
+						}
+						if(GUI.Button(new Rect((Screen.width - btSize.x)/2, Screen.height - btSize.y - 20 - (IsFreeVersion ? 50 : 0), btSize.x, btSize.y), "", buttonTryAgain)) {
+							JukeBox.Tap();
+							tasks.StartTask(level);
+							//Application.LoadLevel(Application.loadedLevel);
+						}
+						break;
+					case Tasks.TaskStates.IN_PROCESS :
+						if(GUI.Button(btMenu, menuButton, menuStyle)) {
+						    JukeBox.Tap();
+							_state = GameState.PAUSE;
+						}
+						break;
+					case Tasks.TaskStates.NEW :
+						if(GUI.Button(new Rect((Screen.width - btSize.x)/2, Screen.height - btSize.y - 20  - (IsFreeVersion ? 50 : 0), btSize.x, btSize.y), "", buttonStart)) {
+							JukeBox.Tap();
+							if(gameMaster) {
+								gameMaster.Pause(false);
+							}
+							tasks.setStarted();
+							_state = hideHud ? GameState.HIDEHUD : GameState.GAME;
+						}
+						break;
+				}
 				break;
 		}		
 		gameMaster.isGame.value = isGame;
@@ -316,9 +480,12 @@ public class HUD : MonoBehaviour {
 	public void showGame() { _state = hideHud ? GameState.HIDEHUD : GameState.GAME; }
 	
 	public void showComplete() {
-		fishInfo = new FishInfo(fishes);
 		isComplete = true;
 		_state = GameState.GALLERY;		
+	}
+	
+	public void showUpgrade() {
+		_state = GameState.UPGRADE;
 	}
 	
 	public void showBenchResult(string arg) { benchString = arg; _state = GameState.BENCHMARK; }
@@ -332,35 +499,38 @@ public class HUD : MonoBehaviour {
         crosshairGUI.transform.position = pos;
 	}
 	
-	public void addFish(string arg) {
-		fishes.Add(arg);
-		string[] param = arg.Split(":"[0]);
-		weight += FishInfo.getInfo(param[0], float.Parse(param[1]));
+	
+	public void addFish(string arg) { 
+		fishesInfo.addFish(arg);
+		if(tasks != null) {
+			tasks.addFish(arg);
+		}
 	}
 
-	public void saveFishes() {
-		int index = 0;
-		foreach(string fish in fishes) {
-			PlayerPrefs.SetString("fish" + (index++), fish);
+	public void Save() {
+		if(fishesInfo != null) {
+			fishesInfo.Save();
+		}
+		if(tasks != null) {
+			tasks.Save();
 		}
 	}
 	
-	public void loadFishes() {	    
-		int index = 0;
-		string key = "";
-		while(true) {
-			key = "fish" + (index++);
-			if(PlayerPrefs.HasKey(key)) {
-				addFish(PlayerPrefs.GetString(key));
-			} else {
-				break;
-			}
+	public void Load() {
+		if(gameMaster != null) {
+			lives = gameMaster.getLives();
 		}
-	}	
+		if(fishesInfo != null) {
+			fishesInfo.Load();
+		}
+		if(tasks != null) {
+			tasks.Load();
+		}
+	}
+	
 }
 
-class Fader
-{
+class Fader {
     bool isFade = false;
     public float alpha = 0f;
     float maxAlpha = 0.8f;
@@ -371,7 +541,7 @@ class Fader
     Texture2D fade;
     public Fader(Texture2D _fade){
         fade = _fade;
-        rect  = new Rect(0, 0, Screen.width, Screen.height);
+        rect = new Rect(0, 0, Screen.width, Screen.height);
     }
     
     public void FadeIn(){
@@ -382,11 +552,13 @@ class Fader
     }
     
     public void OnGUI(){
-        if(!Utils.Approximately(Time.deltaTime, 0f))    lastDeltaTime = Time.deltaTime;
+        if(!Utils.Approximately(Time.deltaTime, 0f)) { 
+			lastDeltaTime = Time.deltaTime;
+		}
         float delta = (isFade ? 1f : -1f) * speed * lastDeltaTime;
         alpha += delta;        
         alpha = Mathf.Clamp(alpha, 0f, maxAlpha);
-        if(!Utils.Approximately(alpha, 0.0f)){
+        if(!Utils.Approximately(alpha, 0.0f)) {
             Color old = GUI.color;
             GUI.color = new Color(1.0f, 1.0f, 1.0f, alpha);
 		    GUI.DrawTexture(rect, fade);    

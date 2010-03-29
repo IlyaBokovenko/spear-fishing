@@ -8,36 +8,45 @@ public class Speargun : MonoBehaviour {
     
     public AudioClip fireSound;
     public AudioClip bubblesSound;
-    public GameObject spear;
+    public Spear spear;
     
-    void Awake(){
+	private bool ready;
 
+    void Awake(){
         if(!isSubscribed || Application.platform != RuntimePlatform.OSXEditor){
           SubscribeToAnimation();
           isSubscribed = true;  
         } 
-        
+        ready = true;
         isBubblesEnabled = PlayerPrefs.GetInt("graphicsLevel", 1) > 0;        
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 	
 	public void Fire(){
 	    audio.PlayOneShot(fireSound);
         audio.PlayOneShot(bubblesSound);
-	    animation.Play();
+	    animation.Play("Shot");
+		if(spear != null) {
+			spear.Fire();
+		}
+		ready = false;
 	}
 	
-	void StartBubbles(){
+	public bool isReady {
+		get {return ready && !animation.isPlaying;}
+	} 
+	
+	public void Reload() {
+		animation.Play("Reload");
+		ready = true;
+	}
+	
+	public void StartBubbles(){
 	    if(!isBubblesEnabled) return;	    
 	    bubbles.emit = true; 
         // bubbles.Emit(10);
 	}
 	
-	void StopBubbles(){
+	public void StopBubbles(){
 	    bubbles.emit = false; 
 	}
 	
@@ -45,11 +54,16 @@ public class Speargun : MonoBehaviour {
 	    AnimationEvent startBubbles = new AnimationEvent();
         startBubbles.time = 0.01f; 
         startBubbles.functionName= "StartBubbles";
-        animation.clip.AddEvent(startBubbles);        
+        animation["Shot"].clip.AddEvent(startBubbles);        
 
         AnimationEvent stopBubbles = new AnimationEvent();
         stopBubbles.time = 0.45f; 
         stopBubbles.functionName= "StopBubbles";
-        animation.clip.AddEvent(stopBubbles);            	    
+        animation["Shot"].clip.AddEvent(stopBubbles);            	    
+		
+		AnimationEvent stopBubblesNow = new AnimationEvent();
+        stopBubblesNow.time = 0.01f; 
+        stopBubblesNow.functionName= "StopBubbles";
+		animation["Reload"].clip.AddEvent(stopBubblesNow);            	    
 	}	
 }

@@ -3,8 +3,20 @@
 <plist version="1.0">
 <dict>
 	<key>AdwhirlKey</key>
-	<string>d3a1d37a928b102caf90c29cca1d33aa</string>
+	<string>e57344ff89a245818d6485dc22e01d02</string>
 	<key>IsFreeVersion</key>
 	<true/>
+	<key>IsDebug</key>
+	<true/>
+	<key>ProductIdentifier</key>
+	<string>levels</string>
+	<key>AppIconURL</key>
+	<string>www.google.com</string>
+	<key>FBApiKey</key>
+	<string>1bb54f067729f2933a888d9f7e871e21</string>
+	<key>FBAppSecret</key>
+	<string>6b7bc15fa52e7531db6e796280c9e472</string>
+	<key>FBSharePermission</key>
+	<string>share_item</string>
 </dict>
 </plist>

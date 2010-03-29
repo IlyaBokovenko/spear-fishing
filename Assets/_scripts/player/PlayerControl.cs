@@ -2,6 +2,11 @@ using UnityEngine;
 using System.Collections;
 
 public class PlayerControl : MonoBehaviour, IBitable {
+	public enum Type {
+		Joystick,
+		Accelerometer
+	}
+	
 	private float swimSpeed = 0.5f;
 	private float boostSpeed = 2.0f;
 	
@@ -24,6 +29,11 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	private ControlButton buttonFire;
 	private ControlButton buttonAim;
 	private ControlButton buttonBoost;
+	private Type control;
+	
+	public Type controlType {
+		get {return control;}
+	}
 	
 	//Keys
 	public bool isBoost
@@ -33,22 +43,22 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	
 	void Awake () {
 		goTransform = transform;
-		gunTransform = gun.transform;
 	}
 	
 	void Start() {
 		foreach(GameObject element in ignoreObjects) {
 			Physics.IgnoreCollision(element.collider, collider);
 		}
-		if(gun)
-			defaultGunPosition = gunTransform.localRotation;
-		defaultPosition = new Vector3(-0.7f, 0.0f, -0.7f);
+    	defaultPosition = new Vector3(-0.7f, 0.0f, -0.7f);
 		gameMaster = (GameMaster)gameObject.GetComponent(typeof(GameMaster));
-		hud = (HUD)gameObject.GetComponent(typeof(HUD));	
+		hud = (HUD)gameObject.GetComponent(typeof(HUD));
+		control = intToType(PrefHolder.newInt("control", 0));
+		if(hud != null) {
+			hud.showAimButton(control == Type.Joystick);
+		}	
 	}
 	
 	void Update () {
-        if(gun.animation.isPlaying) return;
         if(!gameMaster.isGame) return;		
 			
 		if(Application.platform == RuntimePlatform.OSXEditor) {
@@ -57,6 +67,16 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				goTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
 				RestrictRotation();
 			}
+			if(control == Type.Joystick) {
+				if(Input.GetKey(KeyCode.LeftShift)) {
+					goTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
+					goTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);
+					buttonAim.setDown(true);
+				} else {
+					buttonAim.setDown(false);
+				} 
+			}
+			/*
 			if(gun && Input.GetKey(KeyCode.LeftShift)) {
 				gunTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 10.0f, Space.World);
 				gunTransform.Rotate(Vector3.right * Input.GetAxis("Mouse Y") * 10.0f);					
@@ -71,7 +91,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				if(hud)
 					hud.setCrosshair(new Vector2(point.x,point.y));
 			}
-			
+			*/
 			buttonFire.setDown(Input.GetKeyUp ("space"));				
 			buttonBoost.setDown(Input.GetMouseButton(1));
 			
@@ -80,6 +100,9 @@ public class PlayerControl : MonoBehaviour, IBitable {
 			buttonAim.UpdateState();
 			buttonFire.UpdateState();			
 		    
+		
+			/*
+			
 			Vector3 accelerator = gravityFilter(iPhoneInput.acceleration - defaultPosition);
 			goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
 			goTransform.Rotate( Vector3.right * accelerator.x * Time.deltaTime * sensitivity);
@@ -99,10 +122,27 @@ public class PlayerControl : MonoBehaviour, IBitable {
 				Vector3 point = camera.WorldToScreenPoint(gunTransform.TransformPoint(- Vector3.forward * 5.0f));
 				if(hud)
 					hud.setCrosshair(new Vector2(point.x,point.y));				    
-			}				
+			}*/
+			switch(control) {
+				case Type.Joystick :
+					if(buttonAim.isDown) {
+						Vector2 deltaAim = buttonAim.TouchOffset();
+						goTransform.Rotate(Vector3.up * deltaAim.x * 0.05f);
+						goTransform.Rotate( Vector3.right * -deltaAim.y * 0.05f);
+						RestrictRotation();
+					}
+					break;
+				case Type.Accelerometer :
+					Vector3 accelerator = gravityFilter(iPhoneInput.acceleration - defaultPosition);
+					goTransform.Rotate(- Vector3.up * accelerator.y * Time.deltaTime * sensitivity, Space.World);
+					goTransform.Rotate( Vector3.right * accelerator.x * Time.deltaTime * sensitivity);
+					RestrictRotation();
+					break;
+			}
+			
+							
 		}
 		goTransform.Translate(Vector3.forward * (this.isBoost ? boostSpeed : swimSpeed) * Time.deltaTime);
-		
 	}
 	
 	void OnTriggerEnter(Collider other){
@@ -134,7 +174,7 @@ public class PlayerControl : MonoBehaviour, IBitable {
 	}
 
 	void Fire(){	    
-        if(gun && !gameMaster.isSurface) {            
+        if(gun && !gameMaster.isSurface && gun.isReady) {            
 			gun.Fire();
 		}
 	}
@@ -160,4 +200,20 @@ public class PlayerControl : MonoBehaviour, IBitable {
 		angles.z = 0;
 		goTransform.eulerAngles = angles;		
 	}
+	
+	public void setControl(Type arg) {
+		control = arg;
+		if(hud != null) {
+			hud.showAimButton(control == Type.Joystick);
+		}
+	}
+	
+	public static Type intToType (int arg) {
+		switch(arg) {
+			case 1 :
+			 	return Type.Accelerometer;
+		}
+		return Type.Joystick;
+	}
+	
 }

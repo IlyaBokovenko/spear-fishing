@@ -34,6 +34,14 @@
 		09D1365E10A1EFFF00DEE39B /* FBXMLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D1365210A1EFFF00DEE39B /* FBXMLHandler.m */; };
 		09F1D87F10A33D7500F7A13E /* crashFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 09F1D87E10A33D7500F7A13E /* crashFix.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		30185C6C10BC331C0045052F /* AudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 30185C6310BC331C0045052F /* AudioPlayer.m */; };
+		30185C6D10BC331C0045052F /* AudioQueueObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30185C6510BC331C0045052F /* AudioQueueObject.m */; };
+		30185C6E10BC331C0045052F /* AudioRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 30185C6710BC331C0045052F /* AudioRecorder.m */; };
+		30185C6F10BC331C0045052F /* AudioSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 30185C6910BC331C0045052F /* AudioSession.m */; };
+		30185C7010BC331C0045052F /* SystemSoundPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 30185C6B10BC331C0045052F /* SystemSoundPlayer.m */; };
+		309F6DB310B709C9002EB6B2 /* GameConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 309F6DB110B709C9002EB6B2 /* GameConfig.m */; };
+		309F6DB410B709C9002EB6B2 /* UpgradeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 309F6DB210B709C9002EB6B2 /* UpgradeController.m */; };
+		309F6E3210B7130B002EB6B2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309F6E3110B7130B002EB6B2 /* StoreKit.framework */; };
 		5682F4B20F3B34FF007A219C /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5682F4B10F3B34FF007A219C /* MediaPlayer.framework */; };
 		5692F3DD0FA9D8E500EBA2F1 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5692F3DC0FA9D8E500EBA2F1 /* CoreLocation.framework */; };
 		56BCBA390FCF049A0030C3B2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56BCBA380FCF049A0030C3B2 /* SystemConfiguration.framework */; };
@@ -120,7 +128,22 @@
 		09D1365210A1EFFF00DEE39B /* FBXMLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBXMLHandler.m; sourceTree = "<group>"; };
 		09F1D87E10A33D7500F7A13E /* crashFix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = crashFix.m; path = Classes/crashFix.m; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		1D6058910D05DD3D006BFB54 /* SpearFishing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpearFishing.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* spearfishing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spearfishing.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		30185C6210BC331C0045052F /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
+		30185C6310BC331C0045052F /* AudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioPlayer.m; sourceTree = "<group>"; };
+		30185C6410BC331C0045052F /* AudioQueueObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioQueueObject.h; sourceTree = "<group>"; };
+		30185C6510BC331C0045052F /* AudioQueueObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioQueueObject.m; sourceTree = "<group>"; };
+		30185C6610BC331C0045052F /* AudioRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioRecorder.h; sourceTree = "<group>"; };
+		30185C6710BC331C0045052F /* AudioRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioRecorder.m; sourceTree = "<group>"; };
+		30185C6810BC331C0045052F /* AudioSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioSession.h; sourceTree = "<group>"; };
+		30185C6910BC331C0045052F /* AudioSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioSession.m; sourceTree = "<group>"; };
+		30185C6A10BC331C0045052F /* SystemSoundPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemSoundPlayer.h; sourceTree = "<group>"; };
+		30185C6B10BC331C0045052F /* SystemSoundPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SystemSoundPlayer.m; sourceTree = "<group>"; };
+		309F6DB010B709C9002EB6B2 /* GameConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameConfig.h; path = ../GameConfig.h; sourceTree = SOURCE_ROOT; };
+		309F6DB110B709C9002EB6B2 /* GameConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GameConfig.m; path = ../GameConfig.m; sourceTree = SOURCE_ROOT; };
+		309F6DB210B709C9002EB6B2 /* UpgradeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeController.m; path = ../UpgradeController.m; sourceTree = SOURCE_ROOT; };
+		309F6E3110B7130B002EB6B2 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		30EDA75610B6AF1400A381A7 /* UpgradeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeController.h; path = ../UpgradeController.h; sourceTree = "<group>"; };
 		5682F4B10F3B34FF007A219C /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		5692F3DC0FA9D8E500EBA2F1 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		56BCBA380FCF049A0030C3B2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -177,6 +200,7 @@
 				093C8B3B108491720089EC1E /* libsqlite3.dylib in Frameworks */,
 				093C8B3D108491720089EC1E /* libxml2.dylib in Frameworks */,
 				09D1365310A1EFFF00DEE39B /* libAdWhirlDevice_1.2.5_nothumb_nofb.a in Frameworks */,
+				309F6E3210B7130B002EB6B2 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -186,6 +210,10 @@
 		0975CA1F1084A27E004BC774 /* OtherSources */ = {
 			isa = PBXGroup;
 			children = (
+				30185C6110BC331C0045052F /* Audio */,
+				309F6DB010B709C9002EB6B2 /* GameConfig.h */,
+				309F6DB110B709C9002EB6B2 /* GameConfig.m */,
+				309F6DB210B709C9002EB6B2 /* UpgradeController.m */,
 				09F1D87E10A33D7500F7A13E /* crashFix.m */,
 				09D1363710A1EFFF00DEE39B /* Adwhirl */,
 				09D1363B10A1EFFF00DEE39B /* fbconnect */,
@@ -201,6 +229,7 @@
 				0975D5101084EB64004BC774 /* FacebookPermissionChecker.m */,
 				0975D5111084EB64004BC774 /* UIAlertView+Utils.h */,
 				0975D5121084EB64004BC774 /* UIAlertView+Utils.m */,
+				30EDA75610B6AF1400A381A7 /* UpgradeController.h */,
 			);
 			name = OtherSources;
 			sourceTree = "<group>";
@@ -263,7 +292,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* SpearFishing.app */,
+				1D6058910D05DD3D006BFB54 /* spearfishing.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -271,6 +300,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				309F6E3110B7130B002EB6B2 /* StoreKit.framework */,
 				097B01FB1085E5530032F6F5 /* img */,
 				0975CA1F1084A27E004BC774 /* OtherSources */,
 				56BCBA380FCF049A0030C3B2 /* SystemConfiguration.framework */,
@@ -307,6 +337,24 @@
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
+		};
+		30185C6110BC331C0045052F /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				30185C6210BC331C0045052F /* AudioPlayer.h */,
+				30185C6310BC331C0045052F /* AudioPlayer.m */,
+				30185C6410BC331C0045052F /* AudioQueueObject.h */,
+				30185C6510BC331C0045052F /* AudioQueueObject.m */,
+				30185C6610BC331C0045052F /* AudioRecorder.h */,
+				30185C6710BC331C0045052F /* AudioRecorder.m */,
+				30185C6810BC331C0045052F /* AudioSession.h */,
+				30185C6910BC331C0045052F /* AudioSession.m */,
+				30185C6A10BC331C0045052F /* SystemSoundPlayer.h */,
+				30185C6B10BC331C0045052F /* SystemSoundPlayer.m */,
+			);
+			name = Audio;
+			path = ../Audio;
+			sourceTree = SOURCE_ROOT;
 		};
 		D82DCFB50E8000A5005D6AD8 /* Classes */ = {
 			isa = PBXGroup;
@@ -359,7 +407,7 @@
 			);
 			name = "Unity-iPhone";
 			productName = "iPhone-target";
-			productReference = 1D6058910D05DD3D006BFB54 /* SpearFishing.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* spearfishing.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -444,6 +492,13 @@
 				09D1365D10A1EFFF00DEE39B /* FBStreamDialog.m in Sources */,
 				09D1365E10A1EFFF00DEE39B /* FBXMLHandler.m in Sources */,
 				09F1D87F10A33D7500F7A13E /* crashFix.m in Sources */,
+				309F6DB310B709C9002EB6B2 /* GameConfig.m in Sources */,
+				309F6DB410B709C9002EB6B2 /* UpgradeController.m in Sources */,
+				30185C6C10BC331C0045052F /* AudioPlayer.m in Sources */,
+				30185C6D10BC331C0045052F /* AudioQueueObject.m in Sources */,
+				30185C6E10BC331C0045052F /* AudioRecorder.m in Sources */,
+				30185C6F10BC331C0045052F /* AudioSession.m in Sources */,
+				30185C7010BC331C0045052F /* SystemSoundPlayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,7 +525,7 @@
 					"\"$(SRCROOT)/../AdWhirl\"",
 					"\"$(SRCROOT)/Adwhirl\"",
 				);
-				PRODUCT_NAME = SpearFishing;
+				PRODUCT_NAME = spearfishing;
 			};
 			name = Debug;
 		};
@@ -493,7 +548,7 @@
 					"\"$(SRCROOT)/Adwhirl\"",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = SpearFishing;
+				PRODUCT_NAME = spearfishing;
 			};
 			name = Release;
 		};

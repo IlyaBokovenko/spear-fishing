@@ -9,7 +9,8 @@ public class Tutorial : MonoBehaviour {
     
     GameMaster gameMaster;   
     HUD hud; 
-    
+    PlayerControl playerControl;
+
     bool isBlinkingDepthText = false;    
 
 	HighlightableControlButton buttonFire;
@@ -26,13 +27,16 @@ public class Tutorial : MonoBehaviour {
 	    get{return gameMaster.depth;}
 	}
 	
+	Transform playerTransform {
+		get{return gameObject.transform;}
+	}
 
 	// Use this for initialization
 	void Start () {
 	    useGUILayout = false;
 	    gameMaster = (GameMaster)GetComponent(typeof(GameMaster));
 	    hud = (HUD)GetComponent(typeof(HUD));
-	    
+	    playerControl = (PlayerControl)GetComponent(typeof(PlayerControl));
 	    sm = new StateMachine();
 	    Invoke("BeginTutorial", 0.5f);	    
 	}
@@ -77,8 +81,10 @@ public class Tutorial : MonoBehaviour {
         
         protected void EndTutorial(){
             sm.MoveTo(null);
-            context.enabled = false;            
-        }
+            context.hud.InitTasksWithStart();
+			context.enabled = false;            
+        	
+		}
         
         protected GameObject Create3DArrow(){
             GameObject player = GameObject.FindWithTag("Player");
@@ -208,7 +214,7 @@ public class Tutorial : MonoBehaviour {
         public WelcomeState(Tutorial context)
         :base(context)
         {
-            next = new SwimState(context, null);
+            next = new ControlInfoState(context);
             initialTime = Time.time;
         }
         
@@ -223,8 +229,212 @@ public class Tutorial : MonoBehaviour {
         
         public override void DrawControlButtons(){}      
     }
+    
+	class ControlInfoState : ChainedState {
+		float initialTime;
+        
+        public ControlInfoState(Tutorial context)
+        :base(context)
+        {
+            next = new SwimJoystickLeftState(context, null);
+        }
+        
+		public override void Enter(){
+			initialTime = Time.time;
+		}
 
-    class SwimState : ChainedState{
+        public override void OnGUI(){
+            base.OnGUI();
+            GUI.Box(new Rect(115, 80, 250, 64), "There are two modes for controlling\n the diver, which can be adjusted\n on 'Settings' menu : tilting your\n device or using a joystick.");        
+        }
+
+        public override void Do(){
+            if(Time.time - initialTime > 8.0f)  MoveNext();
+        } 
+        
+        public override void DrawControlButtons(){}      
+	}
+    
+	class SwimJoystickLeftState : ChainedState{
+        PointToPoint arrow;
+		Transform playerTransform;
+		OnPressedDelegate onPressedDelegate;
+		float angle;
+        
+		PlayerControl.Type defaulControl;
+
+        public SwimJoystickLeftState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new SwimJoystickRightState(context, this);
+        	defaulControl = context.playerControl.controlType;
+		}
+
+        public override void OnGUI(){
+            base.OnGUI();
+            GUI.Box(new Rect(100, 120, 280, 22), "Swim to the left side using your joystick");        
+        }
+
+        public override void Enter(){
+			angle = context.playerTransform.eulerAngles.y;
+			GameObject obj = Create3DArrow();
+			arrow = (PointToPoint)obj.AddComponent(typeof(PointToPoint)); 
+			arrow.setVector(context.playerTransform.TransformDirection(Vector3.left));
+			onPressedDelegate = new OnPressedDelegate(this.OnPressedAim); 
+			context.buttonAim.AddPressedDelegate(onPressedDelegate);
+            context.buttonAim.StartBlinking();
+			context.playerControl.setControl(PlayerControl.Type.Joystick);
+		}
+
+        public override void Exit(){
+            context.playerControl.setControl(defaulControl);
+			context.buttonAim.RemovePressedDelegate(onPressedDelegate);
+            context.buttonAim.StopBlinking();
+			Destroy(arrow.gameObject);
+        }
+        
+		void OnPressedAim(bool down){
+            if(down) context.buttonAim.StopBlinking();
+        }
+
+        public override void Do(){
+			if((angle - context.playerTransform.localEulerAngles.y) > 60) {
+				PraiseAndMoveNext();
+			}
+        }
+    }
+	
+	class SwimJoystickRightState : ChainedState{
+        PointToPoint arrow;
+		Transform playerTransform;
+		OnPressedDelegate onPressedDelegate;
+		float angle;
+
+		PlayerControl.Type defaulControl;
+
+        public SwimJoystickRightState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new SwimAccelerometerUpState(context, this);
+        	defaulControl = context.playerControl.controlType;
+		}
+
+        public override void OnGUI(){
+            base.OnGUI();
+            GUI.Box(new Rect(100, 120, 280, 22), "Swim to the right side using your joystick");        
+        }
+
+        public override void Enter(){
+    		angle = context.playerTransform.eulerAngles.y;
+			GameObject obj = Create3DArrow();
+			arrow = (PointToPoint)obj.AddComponent(typeof(PointToPoint)); 
+			arrow.setVector(context.playerTransform.TransformDirection(Vector3.right));
+			onPressedDelegate = new OnPressedDelegate(this.OnPressedAim); 
+			context.buttonAim.AddPressedDelegate(onPressedDelegate);
+            context.buttonAim.StartBlinking();
+			context.playerControl.setControl(PlayerControl.Type.Joystick);
+		}
+
+        public override void Exit(){
+            context.playerControl.setControl(defaulControl);
+			context.buttonAim.RemovePressedDelegate(onPressedDelegate);
+            context.buttonAim.StopBlinking();
+			Destroy(arrow.gameObject);
+        }
+
+		void OnPressedAim(bool down){
+            if(down) context.buttonAim.StopBlinking();
+        }
+
+        public override void Do(){
+    		if((angle - context.playerTransform.localEulerAngles.y) < -90) {
+				PraiseAndMoveNext();
+			}
+        }
+    }
+    
+	class SwimAccelerometerUpState : ChainedState{
+        PointToPoint arrow;
+		Transform playerTransform;
+		OnPressedDelegate onPressedDelegate;
+		//float angle;
+
+		PlayerControl.Type defaulControl;
+
+        public SwimAccelerometerUpState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new SwimAccelerometerDownState(context, this);
+        	defaulControl = context.playerControl.controlType;
+		}
+
+        public override void OnGUI(){
+            base.OnGUI();
+            GUI.Box(new Rect(100, 120, 280, 40), "Now let's try the tilt mode.\n Tilt your device up to swim to sea surface");        
+        }
+
+        public override void Enter(){
+    		//angle = context.playerTransform.eulerAngles.x;
+			GameObject obj = Create3DArrow();
+			arrow = (PointToPoint)obj.AddComponent(typeof(PointToPoint)); 
+			arrow.setVector(Vector3.up);
+			context.playerControl.setControl(PlayerControl.Type.Accelerometer);
+		}
+
+        public override void Exit(){
+            context.playerControl.setControl(defaulControl);
+			Destroy(arrow.gameObject);
+        }
+
+        public override void Do(){
+			float angle = context.playerTransform.eulerAngles.x;
+			if((angle > 280 && angle < 290)) {
+				PraiseAndMoveNext();
+			}
+		}
+    }
+    
+	class SwimAccelerometerDownState : ChainedState{
+        PointToPoint arrow;
+		Transform playerTransform;
+		OnPressedDelegate onPressedDelegate;
+		
+		PlayerControl.Type defaulControl;
+
+        public SwimAccelerometerDownState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new BoostState(context, this);
+        	defaulControl = context.playerControl.controlType;
+		}
+
+        public override void OnGUI(){
+            base.OnGUI();
+            GUI.Box(new Rect(90, 120, 300, 22), "Now try to dive deeper by tilting your device down");        
+        }
+
+        public override void Enter(){
+    		GameObject obj = Create3DArrow();
+			arrow = (PointToPoint)obj.AddComponent(typeof(PointToPoint)); 
+			arrow.setVector(Vector3.down);
+			context.playerControl.setControl(PlayerControl.Type.Accelerometer);
+		}
+
+        public override void Exit(){
+            context.playerControl.setControl(defaulControl);
+			Destroy(arrow.gameObject);
+        }
+
+        public override void Do(){
+			float angle = context.playerTransform.eulerAngles.x; 
+			if(angle > 60 && angle < 70) {
+				PraiseAndMoveNext();
+			}
+		}
+    }
+
+
+    class SwimAccelerometerState : ChainedState{
         const float DEPTH_TRESHOLD = 3.0f;
         
         bool isUp;
@@ -232,12 +442,15 @@ public class Tutorial : MonoBehaviour {
 
         float initialDepth, minDepth, maxDepth;
         bool isBlinkingDepthText = false;        
+        
+		PlayerControl.Type defaulControl;
 
-        public SwimState(Tutorial context, ChainedState _back)
+        public SwimAccelerometerState(Tutorial context, ChainedState _back)
         :base(context){
             back = _back;
-            next = new BoostState(context, this);
-        }
+            next = new SwimJoystickState(context, this);
+        	defaulControl = context.playerControl.controlType;
+		}
 
         public override void OnGUI(){
             base.OnGUI();
@@ -250,10 +463,12 @@ public class Tutorial : MonoBehaviour {
             StartBlinkingDepthText();
             GameObject obj = Create3DArrow();
             arrow = (PointUpOrDown)obj.AddComponent(typeof(PointUpOrDown));
-        }
+        	context.playerControl.setControl(PlayerControl.Type.Accelerometer);
+		}
 
         public override void Exit(){
-            Destroy(arrow.gameObject);
+            context.playerControl.setControl(defaulControl);
+			Destroy(arrow.gameObject);
             StopBlinkingDepthText();
         }
 
@@ -267,7 +482,94 @@ public class Tutorial : MonoBehaviour {
                 arrow.PointDown();
             }
             if(!isUp && maxDepth - initialDepth > DEPTH_TRESHOLD){
-                PraiseAndMoveNext();            
+                context.playerControl.setControl(defaulControl);
+				PraiseAndMoveNext();            
+            }
+        }
+
+        // private
+    	void StartBlinkingDepthText(){
+    	    if(isBlinkingDepthText) return;
+    	    isBlinkingDepthText = true;
+    	    context.StartCoroutine(BlinkingDepth());
+    	}
+
+    	void StopBlinkingDepthText(){
+    	    isBlinkingDepthText = false;
+    	}
+
+    	IEnumerator BlinkingDepth(){
+    	    Color oldColor = context.depthText.normal.textColor;
+    	    while(isBlinkingDepthText){
+    	        context.depthText.normal.textColor = Color.yellow;
+    	        yield return new WaitForSeconds (0.5f);
+    	        context.depthText.normal.textColor = oldColor;
+    	        yield return new WaitForSeconds (0.5f);
+    	    }
+    	    context.depthText.normal.textColor = oldColor;
+    	}    
+    }
+    
+	class SwimJoystickState : ChainedState{
+        const float DEPTH_TRESHOLD = 3.0f;
+        
+        bool isUp;
+        PointUpOrDown arrow;
+
+        float initialDepth, minDepth, maxDepth;
+        bool isBlinkingDepthText = false;        
+        
+		PlayerControl.Type defaulControl;
+        OnPressedDelegate onPressedDelegate;
+		
+        public SwimJoystickState(Tutorial context, ChainedState _back)
+        :base(context){
+            back = _back;
+            next = new BoostState(context, this);
+			defaulControl = context.playerControl.controlType;
+        }
+
+        public override void OnGUI(){
+            base.OnGUI();
+            GUI.Box(new Rect(95, 119, 290, 22), "Use \"Joystick\" button to swim up / down / sideways.");        
+		}
+
+        public override void Enter(){
+            isUp = true;
+            initialDepth = minDepth = maxDepth = context.depth;
+            StartBlinkingDepthText();
+            GameObject obj = Create3DArrow();
+            arrow = (PointUpOrDown)obj.AddComponent(typeof(PointUpOrDown));
+        	onPressedDelegate = new OnPressedDelegate(this.OnPressedAim);
+			context.buttonAim.AddPressedDelegate(onPressedDelegate);
+            context.buttonAim.StartBlinking();
+			context.playerControl.setControl(PlayerControl.Type.Joystick);
+		}
+
+        public override void Exit(){
+            context.buttonAim.RemovePressedDelegate(onPressedDelegate);
+            context.buttonAim.StopBlinking();
+			context.playerControl.setControl(defaulControl);
+			Destroy(arrow.gameObject);
+            StopBlinkingDepthText();
+		}
+        
+		void OnPressedAim(bool down){
+            if(down) context.buttonAim.StopBlinking();
+        }
+
+        public override void Do(){
+            minDepth = Mathf.Min(minDepth, context.depth);
+            maxDepth = Mathf.Max(maxDepth, context.depth);
+
+            if(isUp && initialDepth - minDepth > DEPTH_TRESHOLD){
+                isUp = false;
+                initialDepth = minDepth = maxDepth = context.depth;
+                arrow.PointDown();
+            }
+            if(!isUp && maxDepth - initialDepth > DEPTH_TRESHOLD){
+                context.playerControl.setControl(defaulControl);
+				PraiseAndMoveNext();            
             }
         }
 
@@ -448,7 +750,7 @@ public class Tutorial : MonoBehaviour {
         public HealthState(Tutorial context, ChainedState _back)
         :base(context){
             back = _back;
-            next = new AimState(context, this);
+            next = new RefuilingState(context, this);
         }
 
         public override void OnGUI(){

@@ -7,10 +7,12 @@
 #import <OpenGLES/EAGLDrawable.h>
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
-
+#import "GameConfig.h"
 #import "FBPlayerPrefs.h"
 #import "FacebookController.h"
 #import "AdwhirlController.h"
+#import "UpgradeController.h"
+#import "AudioSession.h"
 
 // NSTIMER_BASED_LOOP
 //
@@ -58,7 +60,7 @@
 #define MAIN_LOOP_TYPE THREAD_BASED_LOOP
 //#define MAIN_LOOP_TYPE EVENT_PUMP_BASED_LOOP
 
-#define ENABLE_INTERNAL_PROFILER 1
+#define ENABLE_INTERNAL_PROFILER 0
 #define ENABLE_BLOCK_ON_GPU_PROFILER 0
 #define BLOCK_ON_GPU_EACH_NTH_FRAME 4
 #define INCLUDE_OPENGLES_IN_RENDER_TIME 0
@@ -316,6 +318,7 @@ NSTimer*				_timer;
 BOOL					_accelerometerIsActive = NO;
 AdwhirlController*		_adController;
 FacebookController*		_facebookController;
+UpgradeController*		_upgradeController;
 
 bool CreateWindowSurface(CAEAGLLayer* eaglLayer, GLuint format, GLuint depthFormat, bool retained, MyEAGLSurface* surface)
 {
@@ -753,7 +756,8 @@ int OpenEAGL_UnityCallback(int* screenWidth, int* screenHeight)
 #endif
 }
 
-BOOL IsFreeVersion(){
+BOOL IsFreeVersion() {
+	/*
 	static BOOL isAssigned = NO;
 	static BOOL isFree;
 	
@@ -762,9 +766,9 @@ BOOL IsFreeVersion(){
 		NSDictionary* dict = [NSDictionary dictionaryWithContentsOfFile:mainConfigPath];
 		isFree = [[dict objectForKey: @"IsFreeVersion"] boolValue];		
 		isAssigned = YES;
-	}
+	}*/
 	
-	return isFree;	
+	return [FBPlayerPrefs getInt:@"IsFreeVersion" orDefault:0] > 0 ? true : false;	
 }
 
 - (void) applicationDidFinishLaunching:(UIApplication*)application
@@ -773,8 +777,21 @@ BOOL IsFreeVersion(){
 	[FBPlayerPrefs deleteKey:@"upload"];
 	[FBPlayerPrefs deleteKey:@"moregames"];
 	[FBPlayerPrefs deleteKey:@"totalFishes"];
-	[FBPlayerPrefs deleteKey:@"totalWeight"];	
-	[FBPlayerPrefs setInt: IsFreeVersion() withKey:@"IsFreeVersion"];
+	[FBPlayerPrefs deleteKey:@"totalWeight"];
+	[FBPlayerPrefs deleteKey:@"upgrade"];
+	
+	if([GameConfig getBool:@"IsDebug"] || ![FBPlayerPrefs hasKey:@"IsFreeVersion"]) {
+		printf_console("-> write playerprefs 'IsFreeVersion' from 'Game.plist'\n");
+		//printf_console("");
+		[FBPlayerPrefs setInt:[GameConfig getBool:@"IsFreeVersion"] ? 1 : 0 withKey:@"IsFreeVersion"];
+	}
+	if(IsFreeVersion()) {
+		printf_console("-> IsFreeVersion\n");
+		_upgradeController = [[UpgradeController alloc] init];
+	}
+	
+	[AudioSession open];
+	[[AudioSession session] activate:kAudioSessionCategory_PlayAndRecord];
 	
 	printf_console("-> applicationDidFinishLaunching()\n");
 	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight animated:NO];
@@ -792,7 +809,23 @@ BOOL IsFreeVersion(){
 								   selector:@selector(updateUI:)
 								   userInfo:nil repeats:YES];	
 }
- 
+
+-(void) alert: (NSString*) msg title: (NSString*)title button1: (NSString*) btn1 button2: (NSString*) btn2
+{
+	UIAlertView *a = [[UIAlertView alloc] initWithTitle: title 
+												message: msg 
+											   delegate: self 
+									  cancelButtonTitle: btn1 
+									  otherButtonTitles: btn2, nil
+					  ];
+	[a show];
+	[a release];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+	UnityPause(false);
+} 
+
 -(void)updateUI: (NSTimer*) timer{			
 	if(IsFreeVersion()){
 		static BOOL firstTime = YES;
@@ -803,6 +836,36 @@ BOOL IsFreeVersion(){
 		
 		BOOL isGameRunning = [FBPlayerPrefs getInt:@"game" orDefault:0];
 		_adController.view.hidden = !isGameRunning;		
+		
+		BOOL isUpgrade = [FBPlayerPrefs getInt:@"upgrade" orDefault:0];
+		
+		if(isUpgrade) {
+			switch (_upgradeController.upgradeState) {
+				case UPGRADE_NONE:
+					printf_console("-> Try upgrade\n");
+					UnityPause(true);
+					[_upgradeController TryUpgrade:[GameConfig getString:@"ProductIdentifier"]];
+					break;
+				case UPGRADE_IN_PROCESS :
+					printf_console("-> Upgrade in process...\n");
+					break;
+				case UPGRADE_SUCCESS :
+					printf_console("-> Upgrade is success.\n");
+					[FBPlayerPrefs setInt:0	withKey:@"IsFreeVersion"];
+					[FBPlayerPrefs deleteKey:@"upgrade"];
+					[self alert:@"Upgrade completed." title:nil button1:@"Ok" button2:nil];
+					_adController.view.hidden = true;
+					//[_upgradeController release];
+					break;
+				case UPGRADE_FAIL:
+					printf_console("-> Upgrade is failed.\n");
+					[FBPlayerPrefs deleteKey:@"upgrade"];
+					[self alert:[_upgradeController getError] title:@"Upgrade is failed" button1:@"Ok" button2:nil];
+					[_upgradeController release];
+					_upgradeController = [[UpgradeController alloc] init];
+					break;
+			}
+		}
 	}	
 	
 	BOOL externalGuiShown = _facebookController && _facebookController.isExternalGuiShown;
@@ -843,8 +906,8 @@ BOOL IsFreeVersion(){
 	DestroySurface(&_surface);
 	[_context release];
 	_context = nil;
-	
-	[_window release];	
+	[_window release];
+	[_upgradeController release];
 	[super dealloc];
 }
 

@@ -15,6 +15,9 @@ BOOL g_isFreeVersion(){
 }
 
 NSString* g_adwhirlKey(){
-	return [description() objectForKey: @"AdwhirlKey"];
+	return [description() objectForKey:@"AdwhirlKey"];
 }
 
+NSString* g_productIdentifier() {
+	return [description() objectForKey:@"ProductIdentifier"];
+}

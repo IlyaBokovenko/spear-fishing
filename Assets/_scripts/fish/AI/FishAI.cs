@@ -49,7 +49,7 @@ public class FishAI : GenericScript, IHittable
 		GatherRootBehaviours(); 
         //PrintBehaviours();		
         
-        SendMessage("SetDifficulty", PlayerPrefs.GetInt("difficulty", 1));
+        SendMessage("SetDifficulty", PlayerPrefs.GetInt("difficulty", 0));
 	}
 	
 	void FixedUpdate () {
